@@ -416,69 +416,90 @@ struct PPTokenizer
     }
 
 
-    bool parseRawString()
+    bool parseStringLiteral()
     {
-        if (parseIdentifier())          
+        vector<int> id;
+
+        if (matchIdentifier(id))          
         {
-            if ( previous tokens is "uR" "u8R" "UR" "LR" )
+            if ( id is "uR" "u8R" "UR" "LR" "R")
             {
                 if ( peek is "\"" )
                 {
                     _rawStringMode = true;
-                    vector<int> prefix;
-                    while ( peek() is d-char-seq )
+                    if (parseRcharSequence()) 
                     {
-                        prefix.push_back(nextCode());
                     }
-                    if (peek() == '(')
+                    else
                     {
-                        nextCode();  // '('
-                        
-                        while (peek() is r-char) 
-                        {
-                            
-                        }
-                        
-                        vector<int> suffix;
-                        for (unsigned i=0 ; i<prefix.size() ; i++)
-                        {
-                            if (peek() == prefix[i])
-                            {
-                                suffix.push_back(nextCode()); 
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        } 
+                        return false;
+                    }
+                    //vector<int> prefix;
+                    //while ( peek() is d-char-seq )
+                    //{
+                    //    prefix.push_back(nextCode());
+                    //}
+                    //if (peek() == '(')
+                    //{
+                    //    nextCode();  // '('
+                    //    
+                    //    while (peek() is r-char) 
+                    //    {
+                    //        
+                    //    }
+                    //    
+                    //    vector<int> suffix;
+                    //    for (unsigned i=0 ; i<prefix.size() ; i++)
+                    //    {
+                    //        if (peek() == prefix[i])
+                    //        {
+                    //            suffix.push_back(nextCode()); 
+                    //        }
+                    //        else
+                    //        {
+                    //            break;
+                    //        }
+                    //    } 
 
-                        if (prefix equals suffix) 
-                        {
-                            if (peek == '\"')
-                            {
-                                // raw string ok! 
-                            }
-                            else
-                            {
-                               // no matching end quote 
-                            }
-                        }
-                    }
+                    //    if (prefix equals suffix) 
+                    //    {
+                    //        if (peek == '\"')
+                    //        {
+                    //            // raw string ok! 
+                    //        }
+                    //        else
+                    //        {
+                    //           // no matching end quote 
+                    //        }
+                    //    }
+                    //}
                 }           
                 else
                 {
-                    emit identifier
+                    emit id
                 }
             }
-            else if (previous tokens is "u" "u8" "U" "L")
+            else if (id is "u" "u8" "U" "L" )
             {
                 if (peek is "\"")
                 {
+                    parseScharSequence(); 
                 }
             }
+            else
+            {
+                emit id
+                return true;
+            }
+        }
+        else if (peek is "\"")
+        {
+            return parseScharSequence(); 
         }
         else
         {
+            // does not start with a \" or u U L
+            return false;
         }
     }
 
