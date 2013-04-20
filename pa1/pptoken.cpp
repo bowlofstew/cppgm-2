@@ -416,6 +416,100 @@ struct PPTokenizer
     }
 
 
+    bool compareCodeToStr(const vector<int>& code, const char* str)
+    {
+        if (code.size() == strlen(str))
+        {
+            for (unsigned int i=0 ; i< code.size(); i++)
+            {
+                if (code[i] != (int)str[i])
+                {
+                    return false;
+                } 
+            } 
+            return true;
+        }
+        return false;
+    }
+
+    bool compareCodeToCode(const vector<int>& code1, const vector<int>& code2)
+    {
+        if (code1.size() == code2.size())
+        {
+            for (unsigned int i=0 ; i<code1.size() ; i++)
+            {
+                if (code1[i] != code2[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    bool isDchar(int code)
+    {
+        if (code=='(' || code==')' || code=='\\' || code=='\t' || code=='\v' || code=='\f' || code==' ' || code=='\n')
+            return false;
+        else
+            return true;
+    }
+
+    bool matchDchars(vector<int>& dchars)
+    {
+        while (isDchar(peek()))
+        {
+            dchars.push_back(nextCode());    
+        }
+        if (peek() == '(' || peek() == ')')
+        {
+            return true;
+        }
+        else {
+            return false; 
+        }
+    }
+
+    bool matchRchars(vector<int>& prefix, vector<int>& rchars)
+    {
+        vector<int> rchars;
+        vector<int> tmp;
+
+        while (peek() != -1)
+        {
+            if (peek() == ')')
+            {
+                // match for the rest dchars
+                vector<int> suffix;
+                if (matchDchars(suffix) && peek()=='"')
+                {
+                    if (comareCodeToCode(prefix, suffix) == 0)
+                    {
+                        nextCode();  // skip "
+                        return true; 
+                    }
+                    else
+                    {
+                        rchars.push_back(')');
+                        rchars.push_back(suffix);
+                    }
+                }
+                else
+                {
+                    rchars.push_back(')');
+                    rchars.push_back(suffix);
+                }
+            }
+            else
+            {
+                rchars.push_back(nextCode());
+            }
+        }
+        return false;
+    }
+
+
     bool parseStringLiteral()
     {
         vector<int> id;
@@ -427,52 +521,34 @@ struct PPTokenizer
                 if ( peek is "\"" )
                 {
                     _rawStringMode = true;
-                    if (parseRcharSequence()) 
+                    nextCode(); // skip "
+                    vector<int> dchars;
+                    vector<int> rchars;
+                    if (matchDchars(dchars) && peek() == '(') 
                     {
+                        nextCode(); //skip (
+                        if (matchRchars(dchars, rchars))
+                        {
+                            // sucess
+                        }
                     }
                     else
                     {
-                        return false;
+                        // case like : uR"  (something)"
+                        //
+                        emit id as identifier
+                        vector<int> restSchars;
+                        vector<int> schars = dchars;
+                        matchSchars(restSchars);
+                        if (peek() == '"')     
+                        {
+                            // success
+                        }
+                        else
+                        {
+                            // throw unmached " exception
+                        }
                     }
-                    //vector<int> prefix;
-                    //while ( peek() is d-char-seq )
-                    //{
-                    //    prefix.push_back(nextCode());
-                    //}
-                    //if (peek() == '(')
-                    //{
-                    //    nextCode();  // '('
-                    //    
-                    //    while (peek() is r-char) 
-                    //    {
-                    //        
-                    //    }
-                    //    
-                    //    vector<int> suffix;
-                    //    for (unsigned i=0 ; i<prefix.size() ; i++)
-                    //    {
-                    //        if (peek() == prefix[i])
-                    //        {
-                    //            suffix.push_back(nextCode()); 
-                    //        }
-                    //        else
-                    //        {
-                    //            break;
-                    //        }
-                    //    } 
-
-                    //    if (prefix equals suffix) 
-                    //    {
-                    //        if (peek == '\"')
-                    //        {
-                    //            // raw string ok! 
-                    //        }
-                    //        else
-                    //        {
-                    //           // no matching end quote 
-                    //        }
-                    //    }
-                    //}
                 }           
                 else
                 {
@@ -483,7 +559,19 @@ struct PPTokenizer
             {
                 if (peek is "\"")
                 {
-                    parseScharSequence(); 
+                    vector<int> schars;
+                    matchSchars(schars); 
+                    if (peek()=='"')
+                    {
+                        //success
+                    }
+                    else
+                    {
+                    }
+                }
+                else
+                {
+                    emit id
                 }
             }
             else
@@ -494,7 +582,7 @@ struct PPTokenizer
         }
         else if (peek is "\"")
         {
-            return parseScharSequence(); 
+            match
         }
         else
         {
