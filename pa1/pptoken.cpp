@@ -513,10 +513,54 @@ struct PPTokenizer
                         output.emit_string_literal(UTF8Encoder::encode( result ));  
                     }
                 }
+                else if (peek() == '/')
+                {
+                    nextCode();  // skip '/'
+                    if (peek() == '*')
+                    {
+                        bool found = false;
+                        nextCode();  // skip '*'
+                        while (peek() != -1) 
+                        {
+                            if (nextCode()=='*' && peek()=='/')
+                            {
+                                nextCode();  // skip '/'
+                                found = true;
+                                output.emit_whitespace_sequence();
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            throw PPTokenizerException("partial comment");             
+                        }
+                    }
+                    else if (peek() == '/')
+                    {
+                        nextCode();  // skip 2nd '/'
+                        while (peek() != -1)
+                        {
+                            int c = nextCode();
+                            if (c=='\n')
+                                break;
+                        }
+                        output.emit_whitespace_sequence();
+                    }
+                    else
+                    {
+                        output.emit_preprocessing_op_or_punc("/");
+                    }
+                }
                 else if (peek() == '\n')
                 {
                     nextCode();
                     output.emit_new_line();
+                }
+                else
+                {
+                    vector<int> out;
+                    out.push_back(nextCode());
+                    output.emit_non_whitespace_char(UTF8Encoder::encode(out));
                 }
             } // end of while
             output.emit_eof();
@@ -842,7 +886,7 @@ struct PPTokenizer
         }
         else
         {
-            throw PPTokenizerException("Bad string linteral");             
+            throw PPTokenizerException("unterminated string literal");             
         }
         return false;
     }
