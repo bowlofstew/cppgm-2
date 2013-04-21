@@ -183,7 +183,18 @@ private:
 class UTF8Encoder
 {
 public:
-    static bool encode(int code, std::vector<char>& out)
+    
+    static std::string encode(vector<int>& code)
+    {
+        std::string s; 
+        for (unsigned int i=0 ; i<code.size() ; i++)
+        {
+            encode(code[i], s);
+        }
+        return s;
+    }
+
+    static bool encode(int code, std::string& out)
     {
         if (code < 0x80)
         {
@@ -224,6 +235,7 @@ public:
         {
             return false;
         }
+        return true;
     }
 };
 

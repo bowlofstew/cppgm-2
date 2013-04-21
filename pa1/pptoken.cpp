@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
+#include <exception>
+#include <cstdio>
+#include <cstring>
 
 using namespace std;
 
@@ -158,6 +161,37 @@ bool isHex(int c)
         return false;
 }
 
+bool isOctal(int c)
+{
+    if (c >= '0' && c <= '7')
+        return true;
+    else
+        return false;
+}
+
+
+class PPTokenizerException : public exception
+{
+public:
+    PPTokenizerException(const char* msg)
+        : _errMsg(msg)
+    {
+    }
+
+    virtual ~PPTokenizerException() throw()
+    {
+    }
+
+    virtual const char* what() const throw()
+    {
+        return _errMsg.c_str();
+    }
+
+private:
+    std::string _errMsg;
+
+};
+
 
 // Tokenizer
 struct PPTokenizer
@@ -309,7 +343,7 @@ struct PPTokenizer
         }
         else if (_oidx < _olst.size())
         {
-            if (_rawMode)
+            if (_rawStringMode)
             {
                 return _olst[_oidx++];
             }
@@ -386,6 +420,7 @@ struct PPTokenizer
    
     int     _lahead; 
     int     _idx;
+    bool    _rawStringMode;
 
 
     void parse (vector<int>& inList)
@@ -393,7 +428,7 @@ struct PPTokenizer
         _olst = inList;
         _oidx = 0;
         _tidx = 0;
-        _rawMode = false;
+        _rawStringMode = false;
 
         if (_olst.size() == 0)
         {
@@ -401,17 +436,90 @@ struct PPTokenizer
         }  
         else 
         {
-            _lahead = peek();
-            if (_lahead is nondigit)
+            while (peek() != -1) 
             {
-                parseRawString();
-            }
-
-            //int c;
-            //while ( (c = nextCode()) != -1 ) 
-            //{
-            //    cout << "Rich : " << (char)c << endl;
-            //}
+                if (isNonDigit(peek()))
+                {
+                    vector<int> id;
+                    matchIdentifier(id);
+                    if (compareCodeToStr(id, "uR") || compareCodeToStr(id,"u8R") || compareCodeToStr(id,"UR") || compareCodeToStr(id, "R"))
+                    {
+                        if (peek() == '"')
+                        {
+                            vector<int> rawStr;
+                            vector<int> result;
+                            matchRawStringLiteral(rawStr);
+                            result.insert(result.end(), id.begin(), id.end());
+                            result.insert(result.end(), rawStr.begin(), rawStr.end());
+                            if (isNonDigit(peek()))
+                            {
+                                id.resize(0); 
+                                matchIdentifier(id); 
+                                result.insert(result.end(), id.begin(), id.end());
+                                output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                            }
+                            else
+                            {
+                                output.emit_string_literal(UTF8Encoder::encode( result ));  
+                            }
+                        } 
+                        else
+                        {
+                            output.emit_identifier(UTF8Encoder::encode(id));
+                        }
+                    }
+                    else if (compareCodeToStr(id, "u") || compareCodeToStr(id,"u8") || compareCodeToStr(id,"U"))
+                    {
+                        if (peek() == '"')
+                        {
+                            vector<int> str;
+                            vector<int> result;
+                            matchNonRawStringLiteral(str);
+                            result.insert(result.end(), id.begin(), id.end());
+                            result.insert(result.end(), str.begin(), str.end());
+                            if (isNonDigit(peek()))
+                            {
+                                id.resize(0); 
+                                matchIdentifier(id); 
+                                result.insert(result.end(), id.begin(), id.end());
+                                output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                            }
+                            else
+                            {
+                                output.emit_string_literal(UTF8Encoder::encode( result ));  
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        output.emit_identifier(UTF8Encoder::encode(id));
+                    }
+                } // end of identifier and string literal matching
+                else if (peek() == '"')
+                {
+                    vector<int> str;
+                    vector<int> result;
+                    matchNonRawStringLiteral(str);
+                    result.insert(result.end(), str.begin(), str.end());
+                    if (isNonDigit(peek()))
+                    {
+                        vector<int> id;
+                        matchIdentifier(id); 
+                        result.insert(result.end(), id.begin(), id.end());
+                        output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                    }
+                    else
+                    {
+                        output.emit_string_literal(UTF8Encoder::encode( result ));  
+                    }
+                }
+                else if (peek() == '\n')
+                {
+                    nextCode();
+                    output.emit_new_line();
+                }
+            } // end of while
+            output.emit_eof();
         }
     }
 
@@ -448,13 +556,73 @@ struct PPTokenizer
         return false;
     }
     
+    bool isNonDigit(int code)
+    {
+        if ( code >= 'a' && code <= 'z')
+            return true;
+        else if ( code >= 'A' && code <= 'Z')
+            return true;
+        else if ( code == '_')
+            return true;
+        else
+            return false;
+    }
+
+    bool isDigit(int code)
+    {
+        if ( code >= '0' && code <= '9' )
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    bool isBasicChar(int code)
+    {
+        if (code>='a' && code<='z')
+            return true;
+        else if (code>='A' && code<='Z')
+            return true;
+        else if (code>='0' && code<='9')
+            return true;
+        else if (code=='_' || code=='{' || code=='}' || code=='[' || code==']' ||
+                 code=='#' || code=='(' || code==')' || code=='<' || code=='>' ||
+                 code=='%' || code==':' || code==';' || code=='.' || code=='?' ||
+                 code=='*' || code=='+' || code=='-' || code=='/' || code=='^' ||
+                 code=='&' || code=='|' || code=='~' || code=='!' || code=='=' ||
+                 code==',' || code=='"' || code=='\''|| code==' ' ||
+                 code=='\t' || code=='\v' || code=='\f'|| code=='\n')
+            return true; 
+        else
+            return false;
+    }
+    
     bool isDchar(int code)
     {
-        if (code=='(' || code==')' || code=='\\' || code=='\t' || code=='\v' || code=='\f' || code==' ' || code=='\n')
-            return false;
+        if (isBasicChar(code))
+        {
+            if (code!=' ' && code!='(' && code!=')' && code!='\\' && code!='\t' && code!='\v' && code!='\f' && code!='\n')
+                return true;
+            else
+                return false;
+        } 
         else
-            return true;
+            return false;
     }
+
+    
+    bool matchPattern(vector<int>& pattern, vector<int>& result)
+    {
+        for (unsigned int i=0 ; i<pattern.size(); i++)
+        {
+            if (peek() == pattern[i])
+                result.push_back(nextCode());
+            else
+                return false;
+        }
+        return true;
+    }
+
 
     bool matchDchars(vector<int>& dchars)
     {
@@ -471,9 +639,98 @@ struct PPTokenizer
         }
     }
 
+    
+    bool matchEscapeSequence(vector<int>& escape)
+    {
+        escape.push_back(nextCode());   // take '\\'
+        int c1 = nextCode();
+        if (c1=='\'' || c1=='"' || c1=='?' || c1=='\\' || c1=='a' || c1=='b' || c1=='f' || c1=='n' || c1=='r' || c1=='t' || c1=='v')
+        {
+            escape.push_back(c1);
+            return true;
+        }
+        else if (c1=='x')
+        {
+            escape.push_back(c1);
+            if (isHex(peek()))
+            {
+                escape.push_back(nextCode());     
+                return true;
+            }
+            else
+            {
+                throw PPTokenizerException("Bad escape sequence");             
+            }
+        }
+        else if (isHex(c1))
+        {
+            escape.push_back(c1);
+            while (isHex(peek()))
+            {
+                escape.push_back(nextCode());
+            }
+            return true;
+        }
+        else if (isOctal(c1))
+        {
+            // another 1 or another 2 
+            escape.push_back(c1);
+            if (isOctal(peek()))
+            {
+                escape.push_back(nextCode());
+                if (isOctal(peek()))
+                {
+                    escape.push_back(nextCode());
+                }
+            }
+            return true;
+        }
+        else
+        {
+            throw PPTokenizerException("Bad escape sequence");             
+        }
+        return false;
+    }
+
+    bool matchSchars(vector<int>& schars)
+    {
+        while (peek() != -1)
+        {
+            if (peek() == '"' || peek()=='\n') 
+            {
+                break;
+            }
+            else if (peek() == '\\')
+            {
+                // UCN should be replaced in translate stage
+                //
+                vector<int> escape;
+                if (matchEscapeSequence(escape))
+                {
+                    schars.insert(schars.end(), escape.begin(), escape.end());
+                }
+                else
+                {
+                    throw PPTokenizerException("Bad string literal");             
+                }
+            }
+            else
+            {
+                schars.push_back(nextCode());
+            }
+            
+        }       
+        return true;
+    }
+
+
+    //--------------------------------------------------------------
+    // Example : R"abc(xxxxxx)abc"
+    // This function should return "xxxxxx" part and skip through
+    // the last "abc" part
+    //
     bool matchRchars(vector<int>& prefix, vector<int>& rchars)
     {
-        vector<int> rchars;
         vector<int> tmp;
 
         while (peek() != -1)
@@ -481,10 +738,11 @@ struct PPTokenizer
             if (peek() == ')')
             {
                 // match for the rest dchars
+                nextCode();  // skip ) 
                 vector<int> suffix;
-                if (matchDchars(suffix) && peek()=='"')
+                if (matchPattern(prefix, suffix) && peek()=='"')
                 {
-                    if (comareCodeToCode(prefix, suffix) == 0)
+                    if (compareCodeToCode(prefix, suffix) == true)
                     {
                         nextCode();  // skip "
                         return true; 
@@ -492,13 +750,13 @@ struct PPTokenizer
                     else
                     {
                         rchars.push_back(')');
-                        rchars.push_back(suffix);
+                        rchars.insert(rchars.end(), suffix.begin(), suffix.end());
                     }
                 }
                 else
                 {
                     rchars.push_back(')');
-                    rchars.push_back(suffix);
+                    rchars.insert(rchars.end(), suffix.begin(), suffix.end());
                 }
             }
             else
@@ -509,86 +767,84 @@ struct PPTokenizer
         return false;
     }
 
-
-    bool parseStringLiteral()
+    
+    bool matchIdentifier(vector<int>& id)
     {
-        vector<int> id;
-
-        if (matchIdentifier(id))          
+        if (isNonDigit(peek()))
         {
-            if ( id is "uR" "u8R" "UR" "LR" "R")
+            id.push_back(nextCode()); 
+            while ( isNonDigit(peek()) || isDigit(peek()) )
             {
-                if ( peek is "\"" )
-                {
-                    _rawStringMode = true;
-                    nextCode(); // skip "
-                    vector<int> dchars;
-                    vector<int> rchars;
-                    if (matchDchars(dchars) && peek() == '(') 
-                    {
-                        nextCode(); //skip (
-                        if (matchRchars(dchars, rchars))
-                        {
-                            // sucess
-                        }
-                    }
-                    else
-                    {
-                        // case like : uR"  (something)"
-                        //
-                        emit id as identifier
-                        vector<int> restSchars;
-                        vector<int> schars = dchars;
-                        matchSchars(restSchars);
-                        if (peek() == '"')     
-                        {
-                            // success
-                        }
-                        else
-                        {
-                            // throw unmached " exception
-                        }
-                    }
-                }           
-                else
-                {
-                    emit id
-                }
+                id.push_back(nextCode());
             }
-            else if (id is "u" "u8" "U" "L" )
-            {
-                if (peek is "\"")
-                {
-                    vector<int> schars;
-                    matchSchars(schars); 
-                    if (peek()=='"')
-                    {
-                        //success
-                    }
-                    else
-                    {
-                    }
-                }
-                else
-                {
-                    emit id
-                }
-            }
-            else
-            {
-                emit id
-                return true;
-            }
-        }
-        else if (peek is "\"")
-        {
-            match
+            return true;
         }
         else
         {
-            // does not start with a \" or u U L
             return false;
         }
+    }
+
+
+    bool matchRawStringLiteral(vector<int>& result)
+    {
+        vector<int> id;
+        vector<int> dchars;
+        vector<int> rchars;
+        
+        nextCode(); // skip "
+        if (matchDchars(dchars) && peek() == '(') 
+        {
+            nextCode(); //skip (
+            _rawStringMode = true;
+            if (matchRchars(dchars, rchars))
+            {
+                // sucess
+                result.insert(result.end(), id.begin(), id.end());
+                result.push_back('"');
+                result.insert(result.end(), dchars.begin(), dchars.end());
+                result.push_back('(');
+                result.insert(result.end(), rchars.begin(), rchars.end());
+                result.push_back(')');
+                result.insert(result.end(), dchars.begin(), dchars.end());
+                result.push_back('"');
+            }
+            else
+            {
+                throw PPTokenizerException("Bad raw string literal");             
+            }
+            _rawStringMode = false;
+            return true;
+        }
+        else
+        {
+            throw PPTokenizerException("Bad raw string literal");             
+        }
+
+        return false;
+    }
+
+
+    bool matchNonRawStringLiteral(vector<int>& result)
+    {
+        nextCode(); // skip "
+
+        vector<int> schars;
+        matchSchars(schars);
+        if (peek()=='"')
+        {
+            //success
+            nextCode(); // skip "
+            result.push_back('"');
+            result.insert(result.end(), schars.begin(), schars.end());
+            result.push_back('"');
+            return true;
+        }
+        else
+        {
+            throw PPTokenizerException("Bad string linteral");             
+        }
+        return false;
     }
 
 
