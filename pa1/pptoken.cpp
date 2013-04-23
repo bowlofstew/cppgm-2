@@ -161,9 +161,19 @@ bool isHex(int c)
         return false;
 }
 
+
 bool isOctal(int c)
 {
     if (c >= '0' && c <= '7')
+        return true;
+    else
+        return false;
+}
+
+
+bool isDecimal(int c)
+{
+    if (c >= '0' && c <= '9')
         return true;
     else
         return false;
@@ -329,6 +339,7 @@ struct PPTokenizer
     bool            _rawMode; 
     vector<int>     _olst;
     unsigned int    _oidx;
+    unsigned int    _oidx_bt; // before translate
     unsigned int    _tidx;
 
 
@@ -345,6 +356,7 @@ struct PPTokenizer
         {
             if (_rawStringMode)
             {
+                _oidx_bt = _oidx+1;  
                 return _olst[_oidx++];
             }
             else
@@ -373,6 +385,31 @@ struct PPTokenizer
         else
         {
             return -1;
+        }
+    }
+
+    
+    int prevCode()
+    {
+        if (_tidx > 0)
+        {
+            _tidx--;
+            return _tlst[_tidx];
+        } 
+        else  // _tidx==0
+        {
+            _tlst.resize(0);
+            _oidx = --_oidx_bt;
+            if (_oidx >= 0)
+            {
+                return _olst[_oidx];
+            }
+            else
+            {
+                _oidx = 0;
+                _oidx_bt = 0;
+                return -1;
+            }
         }
     }
 
@@ -427,6 +464,7 @@ struct PPTokenizer
     {
         _olst = inList;
         _oidx = 0;
+        _oidx_bt = 0;
         _tidx = 0;
         _rawStringMode = false;
 
@@ -489,6 +527,46 @@ struct PPTokenizer
                                 output.emit_string_literal(UTF8Encoder::encode( result ));  
                             }
                         }
+                        else if (peek() == '\'' && compareCodeToStr(id,"u8")==false)
+                        {
+                            vector<int> result;
+                            vector<int> cliteral;
+                            matchCharLiteral(cliteral);
+                            result.insert(result.end(), id.begin(), id.end());
+                            result.insert(result.end(), cliteral.begin(), cliteral.end());
+                            if (isNonDigit(peek()))
+                            {
+                                vector<int> id2;
+                                matchIdentifier(id2);
+                                result.insert(result.end(), id2.begin(), id2.end());
+                                output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                            }
+                            else
+                            {
+                                output.emit_string_literal(UTF8Encoder::encode( result ));
+                            }
+                        }
+                    }
+                    else if (compareCodeToStr(id,"L"))
+                    {
+                        if (peek()=='\'')
+                        {
+                            vector<int> result;
+                            vector<int> cliteral;
+                            matchCharLiteral(cliteral);
+                            result.insert(result.end(), cliteral.begin(), cliteral.end());
+                            if (isNonDigit(peek()))
+                            {
+                                vector<int> id;
+                                matchIdentifier(id);
+                                result.insert(result.end(), id.begin(), id.end());
+                                output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                            }
+                            else
+                            {
+                                output.emit_string_literal(UTF8Encoder::encode( result ));
+                            }
+                        }
                     }
                     else 
                     {
@@ -511,6 +589,32 @@ struct PPTokenizer
                     else
                     {
                         output.emit_string_literal(UTF8Encoder::encode( result ));  
+                    }
+                }
+                else if (peek() == '\'')
+                {
+                    vector<int> result;
+                    vector<int> cliteral;
+                    matchCharLiteral(cliteral);
+                    result.insert(result.end(), cliteral.begin(), cliteral.end());
+                    if (isNonDigit(peek()))
+                    {
+                        vector<int> id;
+                        matchIdentifier(id);
+                        result.insert(result.end(), id.begin(), id.end());
+                        output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                    }
+                    else
+                    {
+                        output.emit_character_literal(UTF8Encoder::encode( result ));
+                    }
+                }
+                else if (peek() == '.' || isDigit(peek()))
+                {
+                    vector<int> ppnum;
+                    if (matchPPnumber(ppnum))
+                    {
+                        output.emit_pp_number(UTF8Encoder::encode( ppnum ));
                     }
                 }
                 else if (peek() == '/')
@@ -553,8 +657,59 @@ struct PPTokenizer
                 }
                 else if (peek() == '\n')
                 {
-                    nextCode();
+                    nextCode();  // skip '\n'
                     output.emit_new_line();
+                    if (peek()=='#')
+                    {
+                        nextCode(); // skip '#'
+                        if (peek()=='i')
+                        {
+                            output.emit_preprocessing_op_or_punc("#");
+                            vector<int> id;
+                            matchIdentifier(id);
+                            if (compareCodeToStr(id, "include"))
+                            {
+                                output.emit_identifier("include");
+                                int space = 0;
+                                while (isWhiteSpace(peek()))
+                                {
+                                    nextCode();
+                                    space++;
+                                }
+                                if (space>0)
+                                {
+                                    output.emit_whitespace_sequence();
+                                    if (peek()=='"'|| peek()=='<')
+                                    {
+                                        vector<int> header;
+                                        matchHeaderName(header);
+                                        output.emit_header_name(UTF8Encoder::encode(header));
+                                    }
+                                    else
+                                    {
+                                        // go back to the flow
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                output.emit_identifier(UTF8Encoder::encode(id));
+                            }
+                        }
+                        else
+                        {
+                            prevCode();
+                        }
+                    }
+                }
+                else if (isWhiteSpace(peek()))
+                {
+                    nextCode();
+                    while (isWhiteSpace(peek()))
+                    {
+                        nextCode();
+                    }
+                    output.emit_whitespace_sequence();
                 }
                 else
                 {
@@ -595,6 +750,15 @@ struct PPTokenizer
                     return false;
                 }
             }
+            return true;
+        }
+        return false;
+    }
+
+    bool isWhiteSpace(int code)
+    {
+        if (code==' ' || code=='\t' || code=='\f' || code=='\v' || code=='\r')
+        {
             return true;
         }
         return false;
@@ -655,6 +819,15 @@ struct PPTokenizer
     }
 
     
+    bool isCchar(int code)
+    {
+        if (code!='\'' && code!='\\' && code!='\n')
+            return true;
+        else
+            return false;
+    }
+
+    
     bool matchPattern(vector<int>& pattern, vector<int>& result)
     {
         for (unsigned int i=0 ; i<pattern.size(); i++)
@@ -663,6 +836,40 @@ struct PPTokenizer
                 result.push_back(nextCode());
             else
                 return false;
+        }
+        return true;
+    }
+
+
+    bool matchHchars(vector<int>& hchars)
+    {
+        while (peek() != -1)
+        {
+            if (peek()!='\n' && peek()!='>')
+            {
+                hchars.push_back(nextCode());
+            }
+            else
+            {
+                break;
+            }
+        }
+        return true;
+    }
+
+
+    bool matchQchars(vector<int>& qchars)
+    {
+        while (peek() != -1)
+        {
+            if (peek()!='\n' && peek()!='"')
+            {
+                qchars.push_back(nextCode());
+            }
+            else
+            {
+                break;
+            }
         }
         return true;
     }
@@ -768,6 +975,57 @@ struct PPTokenizer
     }
 
 
+    bool matchCchars(vector<int>& cchars)
+    {
+        while (peek() != -1)
+        {
+            if (peek() == '\'' || peek()=='\n') 
+            {
+                break;
+            }
+            else if (peek() == '\\')
+            {
+                // UCN should be replaced in translate stage
+                //
+                vector<int> escape;
+                if (matchEscapeSequence(escape))
+                {
+                    cchars.insert(cchars.end(), escape.begin(), escape.end());
+                }
+                else
+                {
+                    throw PPTokenizerException("Bad char literal");             
+                }
+            }
+            else
+            {
+                cchars.push_back(nextCode());
+            }
+            
+        }       
+        return true;
+    }
+
+    
+    bool matchCharLiteral(vector<int>& result)
+    {
+        nextCode(); // skip '\''
+        vector<int> cchars;
+        matchCchars(cchars); 
+        if (peek() == '\'')
+        {
+            result.push_back('\'');
+            result.insert(result.end(), cchars.begin(), cchars.end());
+            result.push_back(nextCode()); 
+        }
+        else
+        {
+            throw PPTokenizerException("Bad char literal");             
+        }
+        return true;
+    }
+
+
     //--------------------------------------------------------------
     // Example : R"abc(xxxxxx)abc"
     // This function should return "xxxxxx" part and skip through
@@ -811,7 +1069,42 @@ struct PPTokenizer
         return false;
     }
 
-    
+
+    bool matchHeaderName(vector<int>& hd)
+    {
+        int beg = nextCode();  // either '"' or '<'
+        int end = beg;
+        if (beg == '<')
+        {
+            end = '>';
+        }
+        hd.push_back(beg);   
+
+        while (peek()!=-1)
+        {
+            if (peek()=='\n' || peek()==end)
+            {
+                break;
+            }
+            else
+            {
+                hd.push_back(nextCode());
+            }
+        } 
+
+        if (peek()==end)
+        {
+            hd.push_back(nextCode());
+            return true;
+        }
+        else
+        {
+            throw PPTokenizerException("unterminated header name");             
+            return false;
+        }
+    }
+   
+ 
     bool matchIdentifier(vector<int>& id)
     {
         if (isNonDigit(peek()))
@@ -889,6 +1182,81 @@ struct PPTokenizer
             throw PPTokenizerException("unterminated string literal");             
         }
         return false;
+    }
+
+
+    bool isIdUCN(int code)
+    {
+        for (unsigned int i=0; i<AnnexE1_Allowed_RangesSorted.size() ; i++)
+        {
+            if (code >= AnnexE1_Allowed_RangesSorted[i].first && code <= AnnexE1_Allowed_RangesSorted[i].second)
+                return true;
+        }
+        return false;
+    }
+
+    
+    bool matchPPnumber(vector<int>& ppnum)
+    {
+        int lastCode = -1;
+        vector<int> result;
+
+        if (isDigit(peek()))
+        {
+            lastCode = nextCode();;
+            result.push_back(lastCode);
+        }
+        else if (peek()=='.')
+        {
+            nextCode(); // skip .
+            if (isDigit(peek()))
+            {
+                result.push_back('.');
+                lastCode = nextCode();
+                result.push_back(lastCode);
+            }
+            else
+            {
+                prevCode();
+                return false;
+            }
+        }
+       
+
+        while (peek() != -1)
+        {
+            if (peek()=='.' || isDigit(peek()) || isNonDigit(peek()) || isIdUCN(peek()))
+            {
+                lastCode = nextCode();
+                result.push_back(lastCode);
+            }
+            else if (peek()=='+' || peek()=='-')
+            {
+                if (lastCode=='e' || lastCode=='E')
+                {
+                    lastCode = nextCode();
+                    result.push_back(lastCode);
+                }
+                else
+                {
+                    break;
+                }
+            }            
+            else
+            {
+                break;
+            }
+        }
+       
+        if (result.size() > 0)
+        {
+            ppnum.insert(ppnum.end(), result.begin(), result.end()); 
+            return true;
+        } 
+        else
+        {
+            return false;
+        }
     }
 
 
