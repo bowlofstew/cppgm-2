@@ -8,6 +8,7 @@
 #include <exception>
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 using namespace std;
 
@@ -215,7 +216,7 @@ struct PPTokenizer
     int             _vhex;
 
     PPTokenizer(IPPTokenStream& output)
-        : output(output), _tstate(0), _chex(0), _vhex(0)
+        : output(output), _tstate(0), _chex(0), _vhex(0), _rawMode(false)
     {}
 
     //---------------------------------
@@ -241,7 +242,7 @@ struct PPTokenizer
                     _tstate = -1;
                 break;
             case 2:
-                if (c=='=' || c=='/' || c=='^' || c=='(' || c==')' || c=='!' || c=='<' || c=='>' || c=='-')
+                if (c=='=' || c=='/' || c=='\'' || c=='(' || c==')' || c=='!' || c=='<' || c=='>' || c=='-')
                 { 
                     _tlst.pop_back();
                     _tlst.pop_back();
@@ -266,7 +267,7 @@ struct PPTokenizer
                 {
                     _tlst.pop_back();
                     _tlst.pop_back();
-                    _tstate = -1;
+                    _tstate = 0;
                 }
                 else
                     _tstate = -1;
@@ -361,8 +362,9 @@ struct PPTokenizer
             }
             else
             {
+                _oidx_bt = _oidx;
                 _tlst.resize(0);
-                while (translate( _olst[_oidx++] ) > 0) 
+                while (translate( _olst[_oidx++] ) >= 0) 
                 {
                     if (_oidx >= _olst.size())
                     {
@@ -428,8 +430,9 @@ struct PPTokenizer
             }
             else
             {
+                _oidx_bt = _oidx;
                 _tlst.resize(0);
-                while (translate( _olst[_oidx++] ) > 0) 
+                while (translate( _olst[_oidx++] ) >= 0) 
                 {
                     if (_oidx >= _olst.size())
                     {
@@ -458,6 +461,16 @@ struct PPTokenizer
     int     _lahead; 
     int     _idx;
     bool    _rawStringMode;
+
+    string code2string(vector<int>& code)
+    {
+        string s;
+        for (unsigned int i=0; i<code.size(); i++)
+        {
+            s.push_back((char)code[i]); 
+        }
+        return s;
+    }
 
 
     void parse (vector<int>& inList)
@@ -493,8 +506,17 @@ struct PPTokenizer
                             {
                                 id.resize(0); 
                                 matchIdentifier(id); 
-                                result.insert(result.end(), id.begin(), id.end());
-                                output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                                unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
+                                if (it == Digraph_IdentifierLike_Operators.end())
+                                {
+                                    result.insert(result.end(), id.begin(), id.end());
+                                    output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                                }
+                                else
+                                {
+                                    output.emit_string_literal(UTF8Encoder::encode( result ));  
+                                    output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id));
+                                }
                             }
                             else
                             {
@@ -506,7 +528,7 @@ struct PPTokenizer
                             output.emit_identifier(UTF8Encoder::encode(id));
                         }
                     }
-                    else if (compareCodeToStr(id, "u") || compareCodeToStr(id,"u8") || compareCodeToStr(id,"U"))
+                    else if (compareCodeToStr(id, "u") || compareCodeToStr(id,"u8") || compareCodeToStr(id,"U") || compareCodeToStr(id,"L"))
                     {
                         if (peek() == '"')
                         {
@@ -519,8 +541,17 @@ struct PPTokenizer
                             {
                                 id.resize(0); 
                                 matchIdentifier(id); 
-                                result.insert(result.end(), id.begin(), id.end());
-                                output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                                unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
+                                if (it == Digraph_IdentifierLike_Operators.end())
+                                {
+                                    result.insert(result.end(), id.begin(), id.end());
+                                    output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                                }
+                                else 
+                                {
+                                    output.emit_string_literal(UTF8Encoder::encode( result ));  
+                                    output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id));
+                                }
                             }
                             else
                             {
@@ -538,39 +569,66 @@ struct PPTokenizer
                             {
                                 vector<int> id2;
                                 matchIdentifier(id2);
-                                result.insert(result.end(), id2.begin(), id2.end());
-                                output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                                unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id2));
+                                if (it == Digraph_IdentifierLike_Operators.end())
+                                {
+                                    result.insert(result.end(), id2.begin(), id2.end());
+                                    output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                                }
+                                else
+                                {
+                                    output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                                    output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id2));
+                                }
                             }
                             else
                             {
-                                output.emit_string_literal(UTF8Encoder::encode( result ));
+                                output.emit_character_literal(UTF8Encoder::encode( result ));
                             }
                         }
                     }
-                    else if (compareCodeToStr(id,"L"))
-                    {
-                        if (peek()=='\'')
-                        {
-                            vector<int> result;
-                            vector<int> cliteral;
-                            matchCharLiteral(cliteral);
-                            result.insert(result.end(), cliteral.begin(), cliteral.end());
-                            if (isNonDigit(peek()))
-                            {
-                                vector<int> id;
-                                matchIdentifier(id);
-                                result.insert(result.end(), id.begin(), id.end());
-                                output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
-                            }
-                            else
-                            {
-                                output.emit_string_literal(UTF8Encoder::encode( result ));
-                            }
-                        }
-                    }
+                    //else if (compareCodeToStr(id,"L"))
+                    //{
+                    //    if (peek()=='\'')
+                    //    {
+                    //        vector<int> result;
+                    //        vector<int> cliteral;
+                    //        matchCharLiteral(cliteral);
+                    //        result.insert(result.end(), id.begin(), id.end());
+                    //        result.insert(result.end(), cliteral.begin(), cliteral.end());
+                    //        if (isNonDigit(peek()))
+                    //        {
+                    //            vector<int> id2;
+                    //            matchIdentifier(id2);
+                    //            unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id2));
+                    //            if (it == Digraph_IdentifierLike_Operators.end())
+                    //            {
+                    //                result.insert(result.end(), id2.begin(), id2.end());
+                    //                output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                    //            }
+                    //            else
+                    //            {
+                    //                output.emit_character_literal(UTF8Encoder::encode( result ));
+                    //                output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id2));
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            output.emit_character_literal(UTF8Encoder::encode( result ));
+                    //        }
+                    //    }
+                    //}
                     else 
                     {
-                        output.emit_identifier(UTF8Encoder::encode(id));
+                        unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
+                        if (it == Digraph_IdentifierLike_Operators.end())
+                        {
+                            output.emit_identifier(UTF8Encoder::encode(id));
+                        }
+                        else
+                        {
+                            output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id));
+                        }
                     }
                 } // end of identifier and string literal matching
                 else if (peek() == '"')
@@ -583,8 +641,17 @@ struct PPTokenizer
                     {
                         vector<int> id;
                         matchIdentifier(id); 
-                        result.insert(result.end(), id.begin(), id.end());
-                        output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                        unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
+                        if (it == Digraph_IdentifierLike_Operators.end())
+                        {
+                            result.insert(result.end(), id.begin(), id.end());
+                            output.emit_user_defined_string_literal(UTF8Encoder::encode( result ));  
+                        }
+                        else
+                        {
+                            output.emit_string_literal(UTF8Encoder::encode( result ));  
+                            output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id));
+                        }
                     }
                     else
                     {
@@ -601,8 +668,17 @@ struct PPTokenizer
                     {
                         vector<int> id;
                         matchIdentifier(id);
-                        result.insert(result.end(), id.begin(), id.end());
-                        output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                        unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
+                        if (it == Digraph_IdentifierLike_Operators.end())
+                        {
+                            result.insert(result.end(), id.begin(), id.end());
+                            output.emit_user_defined_character_literal(UTF8Encoder::encode( result ));
+                        }
+                        else
+                        {
+                            output.emit_character_literal(UTF8Encoder::encode( result ));
+                            output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(id));
+                        }
                     }
                     else
                     {
@@ -611,10 +687,27 @@ struct PPTokenizer
                 }
                 else if (peek() == '.' || isDigit(peek()))
                 {
-                    vector<int> ppnum;
-                    if (matchPPnumber(ppnum))
+                    vector<int> data;
+                    if (peek()=='.')
                     {
-                        output.emit_pp_number(UTF8Encoder::encode( ppnum ));
+                        nextCode();
+                        if (isDigit(peek()))    
+                        {
+                            prevCode();
+                            matchPPnumber(data);
+                            output.emit_pp_number(UTF8Encoder::encode( data ));
+                        }
+                        else
+                        {
+                            prevCode();
+                            matchOp(data);
+                            output.emit_preprocessing_op_or_punc(UTF8Encoder::encode( data ));
+                        }
+                    }
+                    else 
+                    {
+                        matchPPnumber(data);
+                        output.emit_pp_number(UTF8Encoder::encode( data ));
                     }
                 }
                 else if (peek() == '/')
@@ -644,15 +737,19 @@ struct PPTokenizer
                         nextCode();  // skip 2nd '/'
                         while (peek() != -1)
                         {
-                            int c = nextCode();
-                            if (c=='\n')
+                            if (peek() == '\n')
                                 break;
+                            else
+                                nextCode();
                         }
                         output.emit_whitespace_sequence();
                     }
                     else
                     {
-                        output.emit_preprocessing_op_or_punc("/");
+                        prevCode();
+                        vector<int> op;
+                        matchOp(op);
+                        output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(op));
                     }
                 }
                 else if (peek() == '\n')
@@ -702,6 +799,12 @@ struct PPTokenizer
                         }
                     }
                 }
+                else if (isOpStart(peek()))
+                {
+                    vector<int> op;
+                    matchOp(op);
+                    output.emit_preprocessing_op_or_punc(UTF8Encoder::encode(op));
+                }
                 else if (isWhiteSpace(peek()))
                 {
                     nextCode();
@@ -722,7 +825,7 @@ struct PPTokenizer
         }
     }
 
-
+    
     bool compareCodeToStr(const vector<int>& code, const char* str)
     {
         if (code.size() == strlen(str))
@@ -779,6 +882,18 @@ struct PPTokenizer
     bool isDigit(int code)
     {
         if ( code >= '0' && code <= '9' )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool isOpStart(int code)
+    {
+        if (code=='{' || code=='}' || code=='[' || code==']' || code=='#' || code=='(' || code==')' ||
+            code=='<' || code==':' || code=='%' || code==';' || code=='.' || code=='?' || code=='+' ||
+            code=='-' || code=='*' || code=='/' || code=='^' || code=='&' || code=='|' || code=='~' ||
+            code=='!' || code=='=' || code=='>' || code==',')
         {
             return true;
         }
@@ -1260,6 +1375,243 @@ struct PPTokenizer
     }
 
 
+    bool matchOp(vector<int>& op)
+    {
+        if (peek()=='{' || peek()=='}' || peek()=='[' || peek()==']' || peek()=='(' || peek()==')' || peek()==';' ||
+            peek()=='?' || peek()==',' || peek()=='~' )
+        {
+            op.push_back(nextCode());
+            return true;
+        }
+        else if (peek()=='#')
+        {
+            nextCode();
+            if (peek() == '#')
+            {
+                op.push_back('#');
+                op.push_back(nextCode());
+            }
+            else
+            {
+                op.push_back('#');
+            }
+            return true;
+        }
+        else if (peek()=='<')
+        {
+            nextCode();
+            if ( peek()=='%' || peek()=='=')
+            {
+                op.push_back('<');
+                op.push_back(nextCode());
+            }
+            else if (peek()=='<')
+            {
+                nextCode();
+                if (peek()=='=')
+                {
+                    op.push_back('<');
+                    op.push_back('<');
+                    op.push_back(nextCode());
+                }
+                else
+                {
+                    op.push_back('<');
+                    op.push_back('<');
+                }
+            }
+            else if (peek()==':')
+            {
+                nextCode();
+                if (peek()==':')
+                {
+                    nextCode();
+                    if (peek()=='>' || peek()==':')
+                    {
+                        op.push_back('<');
+                        op.push_back(':');
+                        prevCode();
+                    }
+                    else
+                    {
+                        op.push_back('<');
+                        prevCode();
+                        prevCode();
+                    }
+                }
+                else
+                {
+                    op.push_back('<');
+                    op.push_back(':');
+                }
+            }
+            else
+            {
+                op.push_back('<');
+            }
+            return true;
+        }
+        else if (peek()==':')
+        {
+            nextCode();
+            if (peek()=='>' || peek()==':')
+            {
+                op.push_back(':');
+                op.push_back(nextCode());
+            }
+            else
+            {
+                op.push_back(':');
+            }
+            return true;
+        }
+        else if (peek()=='%')
+        {
+            op.push_back(nextCode());
+            if (peek()=='>' || peek()=='=')
+            {
+                op.push_back(nextCode());
+            }
+            else if (peek()==':')
+            {
+                op.push_back(nextCode());
+                if (peek() == '%')
+                {
+                    nextCode();
+                    if (peek()==':')
+                    {
+                        op.push_back('%');
+                        op.push_back(nextCode());
+                    }
+                    else
+                    {
+                        prevCode();
+                    }
+                }
+            }
+            return true;
+        } 
+        else if (peek()=='.')
+        {
+            nextCode();
+            if (peek()=='*')
+            {
+                op.push_back('.');
+                op.push_back(nextCode());
+            }
+            else if (peek()=='.')
+            {
+                nextCode();
+                if (peek()=='.')
+                {
+                    op.push_back('.');
+                    op.push_back('.');
+                    op.push_back(nextCode());
+                }
+                else
+                {
+                    op.push_back('.');
+                    prevCode();
+                }
+            }
+            else
+            {
+                op.push_back('.');
+            }
+            return true;
+        }
+        else if (peek()=='+')
+        {
+            nextCode();
+            if (peek()=='+' || peek()=='=')
+            {
+                op.push_back('+');
+                op.push_back(nextCode());
+            }
+            else
+            {
+                op.push_back('+');
+            }
+            return true;
+        }
+        else if (peek()=='-')
+        {
+            nextCode();
+            if (peek()=='=' || peek()=='-')
+            {
+                op.push_back('-');
+                op.push_back(nextCode());
+            }
+            else if (peek()=='>')
+            {
+                nextCode();
+                if (peek()=='*')
+                {
+                    op.push_back('-');
+                    op.push_back('>');
+                    op.push_back(nextCode());
+                }
+                else
+                {
+                    op.push_back('-');
+                    op.push_back('>');
+                }
+            }
+            else
+            {
+                op.push_back('-');
+            }
+            return true;
+        }
+        else if (peek()=='*' || peek()=='/' || peek()=='^' || peek()=='=' || peek()=='!')
+        {
+            op.push_back(nextCode());
+            if (peek()=='=')
+            {
+                op.push_back(nextCode());
+            }
+            return true;
+        }
+        else if (peek()=='&')
+        {
+            op.push_back(nextCode());
+            if (peek()=='&' || peek()=='=')
+            {
+                op.push_back(nextCode());
+            }
+            return true;
+        }
+        else if (peek()=='|')
+        {
+            op.push_back(nextCode());
+            if (peek()=='|' || peek()=='=')
+            {
+                op.push_back(nextCode());
+            }
+            return true;
+        }
+        else if (peek()=='>')
+        {
+            op.push_back(nextCode());
+            if (peek()=='>')
+            {
+                op.push_back(nextCode());
+                if (peek()=='=')
+                {
+                    op.push_back(nextCode());
+                }
+            }
+            else if (peek()=='=')
+            {
+                op.push_back(nextCode());
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+
     void process(int c)
     {
         if (c == EndOfFile)
@@ -1297,6 +1649,11 @@ int main()
             //tokenizer.process(code_unit);
             uncTokens.push_back(code_unit);
         }
+        if (uncTokens.size()>0 && uncTokens[uncTokens.size()-1]!='\n')
+        {
+            uncTokens.push_back('\n');
+        }
+
         tokenizer.parse(uncTokens);
 
         // for (char c : input)

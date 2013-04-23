@@ -1,2 +1,6 @@
-identifier 19 not_yet_implemented
+non-whitespace-character 2 π
+non-whitespace-character 1 \
+non-whitespace-character 1 
+identifier 4 D11E
+new-line 0 
 eof
