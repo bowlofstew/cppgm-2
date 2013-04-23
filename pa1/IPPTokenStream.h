@@ -1,5 +1,32 @@
 #pragma once
 
+enum PPTokenType {
+    PP_WHITESPACE = 0,
+    PP_NEWLINE = 1,
+    PP_HEADERNAME = 2,
+    PP_IDENTIFIER = 3,
+    PP_NUMBER = 4,
+    PP_CHAR_LITERAL = 5, 
+    PP_UD_CHAR_LITERAL = 6, 
+    PP_STRING_LITERAL = 7, 
+    PP_UD_STRING_LITERAL = 8, 
+    PP_OP = 9,
+    PP_NONWHITESPACE = 10,
+    PP_EOF = 11
+};
+
+
+class PPToken {
+public:
+    PPToken(PPTokenType t, string s) 
+        : type(t), data(s) 
+    {
+    }
+    PPTokenType type;
+    string data;
+};
+
+
 struct IPPTokenStream
 {
 	virtual void emit_whitespace_sequence() = 0;
