@@ -217,7 +217,7 @@ struct PPTokenizer
     int             _vhex;
 
     PPTokenizer(IPPTokenStream& output)
-        : output(output), _tstate(0), _chex(0), _vhex(0), _rawMode(false)
+        : output(output), _tstate(0), _chex(0), _vhex(0), _rawStringMode(false)
     {}
 
     //---------------------------------
@@ -330,7 +330,7 @@ struct PPTokenizer
                 _tstate = 4;
             else 
             {
-                _tstate = 0;
+                _tstate = -1;
             }
         }
 
@@ -338,7 +338,6 @@ struct PPTokenizer
     }
 
    
-    bool            _rawMode; 
     vector<int>     _olst;
     unsigned int    _oidx;
     unsigned int    _oidx_bt; // before translate
@@ -416,6 +415,36 @@ struct PPTokenizer
         }
     }
 
+
+    bool lastTokenNewLine()
+    {
+        if (_elst.size() == 0)
+        {
+            return true;
+        }
+
+        bool f = true;
+        unsigned int idx = _elst.size()-1;
+        for ( ; idx>=0 ; idx--)
+        {
+            if (_elst[idx].type == PP_WHITESPACE)
+            {
+                continue;
+            }
+            else if (_elst[idx].type == PP_NEWLINE)
+            {
+                f = true; 
+                break;
+            }
+            else
+            {
+                f = false;
+                break;
+            }
+        }
+        return f;
+    }
+
     
     int peek() 
     {
@@ -425,7 +454,7 @@ struct PPTokenizer
         }
         else if (_oidx < _olst.size())
         {
-            if (_rawMode)
+            if (_rawStringMode)
             {
                 return _olst[_oidx];
             }
@@ -884,7 +913,8 @@ struct PPTokenizer
                         }
                     }
                 }
-                else if (peek()=='#')
+                else if (peek()=='#' && lastTokenNewLine())
+                //else if (peek()=='#')
                 {
                     nextCode(); // skip '#'
                     if (peek()=='i')
