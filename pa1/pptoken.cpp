@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <list>
 
 using namespace std;
 
@@ -215,6 +216,7 @@ struct PPTokenizer
     int             _tstate;
     int             _chex;
     int             _vhex;
+    unsigned int    _tidx;
 
     PPTokenizer(IPPTokenStream& output)
         : output(output), _tstate(0), _chex(0), _vhex(0), _rawStringMode(false)
@@ -338,10 +340,9 @@ struct PPTokenizer
     }
 
    
-    vector<int>     _olst;
-    unsigned int    _oidx;
-    unsigned int    _oidx_bt; // before translate
-    unsigned int    _tidx;
+    list<int>           _olst;
+    list<int>::iterator _oidx;
+    bool                _rawStringMode;
 
 
     //---------------------------------------
@@ -349,33 +350,43 @@ struct PPTokenizer
     //
     int nextCode () 
     {
-        if (_tidx < _tlst.size())
-        {
-            return _tlst[_tidx++];
-        }
-        else if (_oidx < _olst.size())
+        if (_oidx != _olst.end())
         {
             if (_rawStringMode)
             {
-                _oidx_bt = _oidx+1;  
-                return _olst[_oidx++];
+                int v = *_oidx;
+                ++_oidx;
+                return v; 
             }
             else
             {
-                _oidx_bt = _oidx;
+                list<int>::iterator oripos = _oidx;
+
                 _tlst.resize(0);
-                while (translate( _olst[_oidx++] ) >= 0) 
+                while (translate( *_oidx ) >= 0) 
                 {
-                    if (_oidx >= _olst.size())
+                    ++_oidx;
+                    if (_oidx == _olst.end())
                     {
                         break;
                     }
                 }
+                ++_oidx;
                 
                 if (_tlst.size() > 0)
                 {
-                    _tidx = 0;
-                    return _tlst[_tidx++];
+                    // insert
+                    oripos = _olst.erase(oripos, _oidx);
+                    for (vector<int>::iterator vpos=_tlst.begin(); vpos!=_tlst.end() ; ++vpos)
+                    {
+                        if (vpos == _tlst.begin())
+                            _oidx = _olst.insert(oripos, *vpos);
+                        else
+                            _olst.insert(oripos, *vpos);
+                    }
+                    int v = *_oidx;
+                    ++_oidx;
+                    return v;
                 }
                 else
                 {
@@ -393,29 +404,66 @@ struct PPTokenizer
     
     int prevCode()
     {
-        if (_tidx > 0)
+        if (_oidx != _olst.begin())
         {
-            _tidx--;
-            return _tlst[_tidx];
-        } 
-        else  // _tidx==0
+            --_oidx;
+            return *_oidx;
+        }
+        else
         {
-            _tlst.resize(0);
-            _oidx = --_oidx_bt;
-            if (_oidx >= 0)
-            {
-                return _olst[_oidx];
-            }
-            else
-            {
-                _oidx = 0;
-                _oidx_bt = 0;
-                return -1;
-            }
+            return -1;
         }
     }
 
-
+    
+    int peek() 
+    {
+        if (_oidx != _olst.end())
+        {
+            if (_rawStringMode)
+            {
+                return *_oidx;
+            }
+            else
+            {
+                list<int>::iterator oripos = _oidx;
+                _tlst.resize(0);
+                while (translate( *_oidx ) >= 0) 
+                {
+                    ++_oidx;
+                    if (_oidx == _olst.end())
+                    {
+                        break;
+                    }
+                }
+                ++_oidx;
+                
+                if (_tlst.size() > 0)
+                {
+                    oripos = _olst.erase(oripos, _oidx);
+                    for (vector<int>::iterator vpos=_tlst.begin() ; vpos!=_tlst.end() ; ++vpos)
+                    {
+                        if (vpos == _tlst.begin())
+                            _oidx = _olst.insert(oripos, *vpos);
+                        else
+                            _olst.insert(oripos, *vpos);
+                    }
+                    int v = *_oidx;
+                    return v;
+                }
+                else
+                {
+                    cout << "TRANSLATE ERROR!" << endl;
+                    return -1;
+                }
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    } 
+  
     bool lastTokenNewLine()
     {
         if (_elst.size() == 0)
@@ -445,52 +493,7 @@ struct PPTokenizer
         return f;
     }
 
-    
-    int peek() 
-    {
-        if (_tidx < _tlst.size())
-        {
-            return _tlst[_tidx];
-        }
-        else if (_oidx < _olst.size())
-        {
-            if (_rawStringMode)
-            {
-                return _olst[_oidx];
-            }
-            else
-            {
-                _oidx_bt = _oidx;
-                _tlst.resize(0);
-                while (translate( _olst[_oidx++] ) >= 0) 
-                {
-                    if (_oidx >= _olst.size())
-                    {
-                        break;
-                    }
-                }
-                
-                if (_tlst.size() > 0)
-                {
-                    _tidx = 0;
-                    return _tlst[_tidx];
-                }
-                else
-                {
-                    cout << "TRANSLATE ERROR!" << endl;
-                    return -1;
-                }
-            }
-        }
-        else
-        {
-            return -1;
-        }
-    } 
-   
-    int     _lahead; 
-    int     _idx;
-    bool    _rawStringMode;
+ 
 
     string code2string(vector<int>& code)
     {
@@ -553,9 +556,9 @@ struct PPTokenizer
 
     void parse (vector<int>& inList)
     {
-        _olst = inList;
-        _oidx = 0;
-        _oidx_bt = 0;
+        _olst.insert(_olst.begin(), inList.begin(), inList.end());
+        //_olst = inList;
+        _oidx = _olst.begin();
         _tidx = 0;
         _rawStringMode = false;
 
