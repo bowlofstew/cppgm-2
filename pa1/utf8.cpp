@@ -159,8 +159,11 @@ public:
 
     void reportError (const char* msg) 
     {
-        delete [] _byteBuf; 
-        _is.close();
+        if (_sptr == NULL)
+        {
+            delete [] _byteBuf; 
+            _is.close();
+        }
         throw UTF8DecoderException(msg);
     }
 
@@ -207,10 +210,10 @@ public:
             out.push_back(hiByte);
             out.push_back(loByte);
         }
-        else if (code < 0xdfff)
-        {
-            return false;
-        }
+        //else if (code < 0xdfff)
+        //{
+        //    return false;
+        //}
         else if (code < 0xffff)
         {
             char b1 = 0xe0 | (code >> 12);
