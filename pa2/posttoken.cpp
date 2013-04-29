@@ -651,7 +651,6 @@ int main()
 	// In particular there is the DebugPostTokenOutputStream class which helps form the
 	// correct output format:
 
-
 	// example usage:
 	//DebugPostTokenOutputStream output;
 
@@ -660,7 +659,6 @@ int main()
 	//u16string bar = u"bar";
 	//output.emit_literal_array("u\"bar\"", bar.size()+1, FT_CHAR16_T, bar.data(), bar.size() * 2 + 2);
 	//output.emit_user_defined_literal_integer("123_ud1", "ud1", "123");
-
 
     try
     {
