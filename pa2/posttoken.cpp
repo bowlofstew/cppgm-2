@@ -639,6 +639,106 @@ long double PA2Decode_long_double(const string& s)
 	return x;
 }
 
+
+
+class PostTokenizerException : public exception
+{
+  public:
+    PostTokenizerException(const char* msg)
+        : _errMsg(msg)
+    {
+    } 
+
+    virtual ~PostTokenizerException() throw()
+    {
+    }
+
+    virtual const char* what() const throw()
+    {
+        return _errMsg.c_str();
+    }
+
+  private:
+    string _errMsg;
+};
+
+
+
+class PostTokenizer
+{
+  public:
+    PostTokenizer(vector<PPToken>& pplst)
+        : _pplst(pplst)
+    {
+    }
+   
+
+    ~PostTokenizer() 
+    {
+    }
+
+    void parse()
+    {
+        vector<PPToken>::iterator it = _pplst.begin();
+
+        while (it != _pplst.end())
+        {
+            PPTokenType type = (*it).type;
+            string str = UTF8Encoder::encode( (*it).data );
+            if (type == PP_WHITESPACE || type == PP_NEWLINE)
+            {
+                // do nothing, no-op
+            }
+            else if (type == PP_HEADERNAME || type == PP_NONWHITESPACE)
+            {
+                _out.emit_invalid(UTF8Encoder::encode( (*it).data ));
+            }
+            else if (type == PP_EOF)
+            {
+                _out.emit_eof();
+            }
+            else if (type == PP_OP || type == PP_IDENTIFIER)
+            {
+                unordered_map<string, ETokenType>::const_iterator eit = StringToTokenTypeMap.find(str);
+                if (eit == StringToTokenTypeMap.end())
+                {
+                    // normal identifier
+                    _out.emit_identifier( str );
+                }
+                else
+                {
+                    // op
+                    _out.emit_simple(str, eit->second); 
+                }
+            }
+            else if ( type == PP_NUMBER )
+            {
+            }
+            else if ( type == PP_CHAR_LITERAL || type == PP_UD_CHAR_LITERAL )
+            {
+            }
+            else if ( type == PP_STRING_LITERAL || type == PP_RAW_STRING_LITERAL || type == PP_UD_STRING_LITERAL || type == PP_UD_RAW_STRING_LITERAL)
+            {
+            }
+            else
+            {
+                throw PostTokenizerException("Bad Tokens");
+            }
+
+            it++; 
+        }
+    }
+    
+   
+  private:
+    vector<PPToken>            _pplst;
+    DebugPostTokenOutputStream _out;
+};
+
+
+
+
+
 int main()
 {
 	// TODO:
@@ -681,17 +781,12 @@ int main()
 
         // DebugPPTokenStream output;
         // PPTokenizer tokenizer(output);
-        PPTokenizer tokenizer;
-        tokenizer.parse(uncTokens);
+        PPTokenizer ppTokenizer;
+        ppTokenizer.parse(uncTokens);
 
         // PA2 start
-	    DebugPostTokenOutputStream output;
-
-	    output.emit_invalid("foo");
-	    output.emit_simple("auto", KW_AUTO);
-	    u16string bar = u"bar";
-	    output.emit_literal_array("u\"bar\"", bar.size()+1, FT_CHAR16_T, bar.data(), bar.size() * 2 + 2);
-	    output.emit_user_defined_literal_integer("123_ud1", "ud1", "123");
+        PostTokenizer postTokenizer(ppTokenizer._elst);         
+        postTokenizer.parse();
 
 
     }

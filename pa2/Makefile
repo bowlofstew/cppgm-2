@@ -16,5 +16,10 @@ ref-test:
 clean:
 	rm -rf posttoken pptoken a.out
 
+pa1-test:
+	g++ -g -std=gnu++11 -Wall -DPA1 -o pptoken pptoken.cpp
+	cp ./pptoken ../pa1/
+	cd ../pa1/; make test
+
 pa1:
 	g++ -g -std=gnu++11 -Wall -DPA1 -o pptoken pptoken.cpp

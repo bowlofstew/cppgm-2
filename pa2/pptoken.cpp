@@ -313,21 +313,23 @@ enum PPTokenType {
     PP_CHAR_LITERAL = 5, 
     PP_UD_CHAR_LITERAL = 6, 
     PP_STRING_LITERAL = 7, 
-    PP_UD_STRING_LITERAL = 8, 
-    PP_OP = 9,
-    PP_NONWHITESPACE = 10,
-    PP_EOF = 11
+    PP_RAW_STRING_LITERAL = 8, 
+    PP_UD_STRING_LITERAL = 9, 
+    PP_UD_RAW_STRING_LITERAL = 10, 
+    PP_OP = 11,
+    PP_NONWHITESPACE = 12,
+    PP_EOF = 13
 };
 
 
 class PPToken {
 public:
-    PPToken(PPTokenType t, string s) 
-        : type(t), data(s) 
+    PPToken(PPTokenType t, vector<int>& d) 
+        : type(t), data(d) 
     {
     }
     PPTokenType type;
-    string data;
+    vector<int> data;
 };
 
 
@@ -679,10 +681,22 @@ struct PPTokenizer
         return s;
     }
 
-
-    void createToken(PPTokenType type, string data)    
+    
+    vector<int> string2code(string s)
     {
-        _elst.push_back(PPToken(type,data));
+        vector<int> v;
+        for (unsigned int i=0; i<s.size(); i++)
+        {
+            v.push_back(s[i]);
+        }
+        return v;
+    }
+
+
+    void createToken(PPTokenType type, vector<int> token)    
+    {
+        string data = UTF8Encoder::encode(token);
+        _elst.push_back(PPToken(type,token));
 
 #ifdef PA1
         switch (type)
@@ -709,9 +723,11 @@ struct PPTokenizer
                 output.emit_user_defined_character_literal(data);
                 break;
             case PP_STRING_LITERAL: 
+            case PP_RAW_STRING_LITERAL: 
                 output.emit_string_literal(data);
                 break;
             case PP_UD_STRING_LITERAL:
+            case PP_UD_RAW_STRING_LITERAL:
                 output.emit_user_defined_string_literal(data);
                 break;
             case PP_OP: 
@@ -736,10 +752,11 @@ struct PPTokenizer
         _oidx = _olst.begin();
         _tidx = 0;
         _rawStringMode = false;
+        vector<int> empty;
 
         if (_olst.size() == 0)
         {
-            createToken(PP_EOF, "");
+            createToken(PP_EOF, empty);
         }  
         else 
         {
@@ -766,22 +783,22 @@ struct PPTokenizer
                                 if (it == Digraph_IdentifierLike_Operators.end())
                                 {
                                     result.insert(result.end(), id.begin(), id.end());
-                                    createToken(PP_UD_STRING_LITERAL, UTF8Encoder::encode( result ));
+                                    createToken(PP_UD_RAW_STRING_LITERAL, result );
                                 }
                                 else
                                 {
-                                    createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));     
-                                    createToken(PP_OP, UTF8Encoder::encode( id ));     
+                                    createToken(PP_RAW_STRING_LITERAL, result );     
+                                    createToken(PP_OP, id );     
                                 }
                             }
                             else
                             {
-                                createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));     
+                                createToken(PP_STRING_LITERAL, result );     
                             }
                         } 
                         else
                         {
-                            createToken(PP_IDENTIFIER, UTF8Encoder::encode( id ));     
+                            createToken(PP_IDENTIFIER, id );     
                         }
                     }
                     else if (compareCodeToStr(id, "u") || compareCodeToStr(id,"u8") || compareCodeToStr(id,"U") || compareCodeToStr(id,"L"))
@@ -801,17 +818,17 @@ struct PPTokenizer
                                 if (it == Digraph_IdentifierLike_Operators.end())
                                 {
                                     result.insert(result.end(), id.begin(), id.end());
-                                    createToken(PP_UD_STRING_LITERAL, UTF8Encoder::encode( result ));
+                                    createToken(PP_UD_STRING_LITERAL, result );
                                 }
                                 else 
                                 {
-                                    createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));     
-                                    createToken(PP_OP, UTF8Encoder::encode( id ));     
+                                    createToken(PP_STRING_LITERAL, result );     
+                                    createToken(PP_OP,  id );     
                                 }
                             }
                             else
                             {
-                                createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));
+                                createToken(PP_STRING_LITERAL, result );
                             }
                         }
                         else if (peek() == '\'' && compareCodeToStr(id,"u8")==false)
@@ -829,17 +846,17 @@ struct PPTokenizer
                                 if (it == Digraph_IdentifierLike_Operators.end())
                                 {
                                     result.insert(result.end(), id2.begin(), id2.end());
-                                    createToken(PP_UD_STRING_LITERAL, UTF8Encoder::encode( result ));
+                                    createToken(PP_UD_STRING_LITERAL, result );
                                 }
                                 else
                                 {
-                                    createToken(PP_UD_CHAR_LITERAL, UTF8Encoder::encode( result ));
-                                    createToken(PP_OP, UTF8Encoder::encode( id2 ));
+                                    createToken(PP_UD_CHAR_LITERAL, result );
+                                    createToken(PP_OP, id2 );
                                 }
                             }
                             else
                             {
-                                createToken(PP_CHAR_LITERAL, UTF8Encoder::encode( result ));
+                                createToken(PP_CHAR_LITERAL, result );
                             }
                         }
                     }
@@ -848,11 +865,11 @@ struct PPTokenizer
                         unordered_set<string>::const_iterator it = Digraph_IdentifierLike_Operators.find(code2string(id));
                         if (it == Digraph_IdentifierLike_Operators.end())
                         {
-                            createToken(PP_IDENTIFIER, UTF8Encoder::encode( id ));
+                            createToken(PP_IDENTIFIER, id );
                         }
                         else
                         {
-                            createToken(PP_OP, UTF8Encoder::encode( id ));
+                            createToken(PP_OP,  id );
                         }
                     }
                 } // end of identifier and string literal matching
@@ -870,17 +887,17 @@ struct PPTokenizer
                         if (it == Digraph_IdentifierLike_Operators.end())
                         {
                             result.insert(result.end(), id.begin(), id.end());
-                            createToken(PP_UD_STRING_LITERAL, UTF8Encoder::encode( result ));
+                            createToken(PP_UD_STRING_LITERAL,  result );
                         }
                         else
                         {
-                            createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));
-                            createToken(PP_OP, UTF8Encoder::encode( id ));
+                            createToken(PP_STRING_LITERAL, result );
+                            createToken(PP_OP, id );
                         }
                     }
                     else
                     {
-                        createToken(PP_STRING_LITERAL, UTF8Encoder::encode( result ));
+                        createToken(PP_STRING_LITERAL, result );
                     }
                 }
                 else if (peek() == '\'')
@@ -897,17 +914,17 @@ struct PPTokenizer
                         if (it == Digraph_IdentifierLike_Operators.end())
                         {
                             result.insert(result.end(), id.begin(), id.end());
-                            createToken(PP_UD_CHAR_LITERAL, UTF8Encoder::encode( result ));
+                            createToken(PP_UD_CHAR_LITERAL,  result );
                         }
                         else
                         {
-                            createToken(PP_CHAR_LITERAL, UTF8Encoder::encode( result ));
-                            createToken(PP_OP, UTF8Encoder::encode( id ));
+                            createToken(PP_CHAR_LITERAL, result );
+                            createToken(PP_OP, id );
                         }
                     }
                     else
                     {
-                        createToken(PP_CHAR_LITERAL, UTF8Encoder::encode( result ));
+                        createToken(PP_CHAR_LITERAL, result );
                     }
                 }
                 else if (peek() == '.' || isDigit(peek()))
@@ -920,19 +937,19 @@ struct PPTokenizer
                         {
                             prevCode();
                             matchPPnumber(data);
-                            createToken(PP_NUMBER, UTF8Encoder::encode( data ));
+                            createToken(PP_NUMBER,  data );
                         }
                         else
                         {
                             prevCode();
                             matchOp(data);
-                            createToken(PP_OP, UTF8Encoder::encode( data ));
+                            createToken(PP_OP,  data );
                         }
                     }
                     else 
                     {
                         matchPPnumber(data);
-                        createToken(PP_NUMBER, UTF8Encoder::encode( data ));
+                        createToken(PP_NUMBER,  data );
                     }
                 }
                 else if (peek() == '/')
@@ -950,7 +967,7 @@ struct PPTokenizer
                                 found = true;
                                 if (!lastTokenWhiteSpace())
                                 {
-                                    createToken(PP_WHITESPACE, "");
+                                    createToken(PP_WHITESPACE, empty);
                                 }
                                 break;
                             }
@@ -972,7 +989,7 @@ struct PPTokenizer
                         }
                         if (!lastTokenWhiteSpace())
                         {
-                            createToken(PP_WHITESPACE, "");
+                            createToken(PP_WHITESPACE, empty);
                         }
                     }
                     else
@@ -980,24 +997,24 @@ struct PPTokenizer
                         prevCode();
                         vector<int> op;
                         matchOp(op);
-                        createToken(PP_OP, UTF8Encoder::encode( op ));
+                        createToken(PP_OP,  op );
                     }
                 }
                 else if (peek() == '\n')
                 {
                     nextCode();  // skip '\n'
-                    createToken(PP_NEWLINE, "");
+                    createToken(PP_NEWLINE, empty);
                     if (peek()=='#')
                     {
                         nextCode(); // skip '#'
                         if (peek()=='i')
                         {
-                            createToken(PP_OP, "#" );
+                            createToken(PP_OP, string2code("#"));
                             vector<int> id;
                             matchIdentifier(id);
                             if (compareCodeToStr(id, "include"))
                             {
-                                createToken(PP_IDENTIFIER, "include" );
+                                createToken(PP_IDENTIFIER, string2code("include") );
                                 int space = 0;
                                 while (isWhiteSpace(peek()))
                                 {
@@ -1006,12 +1023,12 @@ struct PPTokenizer
                                 }
                                 if (space>0)
                                 {
-                                    createToken(PP_WHITESPACE, "");
+                                    createToken(PP_WHITESPACE, empty);
                                     if (peek()=='"'|| peek()=='<')
                                     {
                                         vector<int> header;
                                         matchHeaderName(header);
-                                        createToken(PP_HEADERNAME, UTF8Encoder::encode(header));
+                                        createToken(PP_HEADERNAME, header);
                                     }
                                     else
                                     {
@@ -1021,7 +1038,7 @@ struct PPTokenizer
                             }
                             else
                             {
-                                createToken(PP_IDENTIFIER, UTF8Encoder::encode(id));
+                                createToken(PP_IDENTIFIER, id);
                             }
                         }
                         else
@@ -1036,12 +1053,12 @@ struct PPTokenizer
                     nextCode(); // skip '#'
                     if (peek()=='i')
                     {
-                        createToken(PP_OP, "#");
+                        createToken(PP_OP, string2code("#"));
                         vector<int> id;
                         matchIdentifier(id);
                         if (compareCodeToStr(id, "include"))
                         {
-                            createToken(PP_IDENTIFIER, "include");
+                            createToken(PP_IDENTIFIER, string2code("include"));
                             int space = 0;
                             while (isWhiteSpace(peek()))
                             {
@@ -1050,12 +1067,12 @@ struct PPTokenizer
                             }
                             if (space>0)
                             {
-                                createToken(PP_WHITESPACE, "");
+                                createToken(PP_WHITESPACE, empty);
                                 if (peek()=='"'|| peek()=='<')
                                 {
                                     vector<int> header;
                                     matchHeaderName(header);
-                                    createToken(PP_HEADERNAME, UTF8Encoder::encode(header));
+                                    createToken(PP_HEADERNAME, header);
                                 }
                                 else
                                 {
@@ -1065,7 +1082,7 @@ struct PPTokenizer
                         }
                         else
                         {
-                            createToken(PP_IDENTIFIER, UTF8Encoder::encode(id));
+                            createToken(PP_IDENTIFIER, id);
                         }
                     }
                     else
@@ -1073,14 +1090,14 @@ struct PPTokenizer
                         prevCode();
                         vector<int> op;
                         matchOp(op);
-                        createToken(PP_OP, UTF8Encoder::encode(op));
+                        createToken(PP_OP, op);
                     }                  
                 }
                 else if (isOpStart(peek()))
                 {
                     vector<int> op;
                     matchOp(op);
-                    createToken(PP_OP, UTF8Encoder::encode(op));
+                    createToken(PP_OP, op);
                 }
                 else if (isWhiteSpace(peek()))
                 {
@@ -1089,16 +1106,16 @@ struct PPTokenizer
                     {
                         nextCode();
                     }
-                    createToken(PP_WHITESPACE, "");
+                    createToken(PP_WHITESPACE, empty);
                 }
                 else
                 {
                     vector<int> out;
                     out.push_back(nextCode());
-                    createToken(PP_NONWHITESPACE, UTF8Encoder::encode(out));
+                    createToken(PP_NONWHITESPACE, out);
                 }
             } // end of while
-            createToken(PP_EOF, "");
+            createToken(PP_EOF, empty);
         }
     }
 
