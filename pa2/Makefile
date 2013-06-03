@@ -1,7 +1,7 @@
 all: posttoken
 
 # build posttoken application
-posttoken: posttoken.cpp pptoken.cpp utf8.cpp
+posttoken: posttoken.cpp pptoken.cpp utf8.cpp utf16.cpp
 	g++ -g -std=gnu++11 -Wall -o posttoken posttoken.cpp
 
 # test posttoken application

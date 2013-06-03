@@ -304,6 +304,63 @@ bool isCchar(int code)
 }
 
 
+string code2string(vector<int>& code)
+{
+    string s;
+    for (unsigned int i=0; i<code.size(); i++)
+    {
+        s.push_back((char)code[i]); 
+    }
+    return s;
+}
+
+
+vector<int> string2code(string s)
+{
+    vector<int> v;
+    for (unsigned int i=0; i<s.size(); i++)
+    {
+        v.push_back(s[i]);
+    }
+    return v;
+}
+
+
+bool compareCodeToStr(const vector<int>& code, const char* str)
+{
+    if (code.size() == strlen(str))
+    {
+        for (unsigned int i=0 ; i< code.size(); i++)
+        {
+            if (code[i] != (int)str[i])
+            {
+                return false;
+            } 
+        } 
+        return true;
+    }
+    return false;
+}
+
+bool compareCodeToCode(const vector<int>& code1, const vector<int>& code2)
+{
+    if (code1.size() == code2.size())
+    {
+        for (unsigned int i=0 ; i<code1.size() ; i++)
+        {
+            if (code1[i] != code2[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+
+
+
 enum PPTokenType {
     PP_WHITESPACE = 0,
     PP_NEWLINE = 1,
@@ -671,28 +728,6 @@ struct PPTokenizer
     }
 
 
-    string code2string(vector<int>& code)
-    {
-        string s;
-        for (unsigned int i=0; i<code.size(); i++)
-        {
-            s.push_back((char)code[i]); 
-        }
-        return s;
-    }
-
-    
-    vector<int> string2code(string s)
-    {
-        vector<int> v;
-        for (unsigned int i=0; i<s.size(); i++)
-        {
-            v.push_back(s[i]);
-        }
-        return v;
-    }
-
-
     void createToken(PPTokenType type, vector<int> token)    
     {
         string data = UTF8Encoder::encode(token);
@@ -766,7 +801,8 @@ struct PPTokenizer
                 {
                     vector<int> id;
                     matchIdentifier(id);
-                    if (compareCodeToStr(id, "uR") || compareCodeToStr(id,"u8R") || compareCodeToStr(id,"UR") || compareCodeToStr(id, "R"))
+                    if (compareCodeToStr(id, "uR") || compareCodeToStr(id,"u8R") || compareCodeToStr(id,"UR") || 
+                        compareCodeToStr(id, "R") || compareCodeToStr(id, "LR"))
                     {
                         if (peek() == '"')
                         {
@@ -1120,38 +1156,6 @@ struct PPTokenizer
     }
 
     
-    bool compareCodeToStr(const vector<int>& code, const char* str)
-    {
-        if (code.size() == strlen(str))
-        {
-            for (unsigned int i=0 ; i< code.size(); i++)
-            {
-                if (code[i] != (int)str[i])
-                {
-                    return false;
-                } 
-            } 
-            return true;
-        }
-        return false;
-    }
-
-    bool compareCodeToCode(const vector<int>& code1, const vector<int>& code2)
-    {
-        if (code1.size() == code2.size())
-        {
-            for (unsigned int i=0 ; i<code1.size() ; i++)
-            {
-                if (code1[i] != code2[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
     
     bool matchPattern(vector<int>& pattern, vector<int>& result)
     {
