@@ -723,32 +723,37 @@ class PostTokenizer
 
     void parse()
     {
-        bool isStr = false;
         vector<PostTokenString> ppStrLst;
-
         vector<PPToken>::iterator it = _pplst.begin();
+
         while (it != _pplst.end())
         {
             PPTokenType type = (*it).type;
             string str = UTF8Encoder::encode( (*it).data );
+
+            if (type < PP_STRING_LITERAL || type > PP_UD_RAW_STRING_LITERAL )
+            {
+                // otherwise, no need to output concat strings yet.
+                if (type != PP_WHITESPACE && type != PP_NEWLINE)
+                {
+                    emit_strLst(ppStrLst);
+                }
+            }  
+
             if (type == PP_WHITESPACE || type == PP_NEWLINE)
             {
                 // do nothing, no-op
             }
             else if (type == PP_HEADERNAME || type == PP_NONWHITESPACE)
             {
-                emit_strLst(ppStrLst);
                 _out.emit_invalid(UTF8Encoder::encode( (*it).data ));
             }
             else if (type == PP_EOF)
             {
-                emit_strLst(ppStrLst);
                 _out.emit_eof();
             }
             else if (type == PP_OP || type == PP_IDENTIFIER)
             {
-                emit_strLst(ppStrLst);
-
                 unordered_map<string, ETokenType>::const_iterator eit = StringToTokenTypeMap.find(str);
                 if (eit == StringToTokenTypeMap.end())
                 {
@@ -765,12 +770,10 @@ class PostTokenizer
             }
             else if ( type == PP_NUMBER )
             {
-                emit_strLst(ppStrLst);
                 parse_ppnumber( (*it).data );
             }
             else if ( type == PP_CHAR_LITERAL || type == PP_UD_CHAR_LITERAL )
             {
-                emit_strLst(ppStrLst);
                 parse_ppchar( (*it).data );
             }
             else if ( type == PP_STRING_LITERAL || type == PP_RAW_STRING_LITERAL || type == PP_UD_STRING_LITERAL || type == PP_UD_RAW_STRING_LITERAL)
@@ -782,68 +785,12 @@ class PostTokenizer
                 int char_width;
                 if (parse_string( (*it).data, source, chars, udSuffix, char_width) == true)
                 {
-                    isStr = true;
                     PostTokenString p;
                     p.source = source;
                     p.chars = chars;
                     p.char_width = char_width;
                     p.udSuffix = UTF8Encoder::encode(udSuffix); 
                     ppStrLst.push_back(p);
-
-                    //if (udSuffix.size() > 0 && udSuffix[0] != '_')
-                    //{
-                    //    _out.emit_invalid(source);
-                    //}
-                    //else 
-                    //{
-                    //    suffix = UTF8Encoder::encode(udSuffix);
-                    //    if (char_width == 0 || char_width == 1)
-                    //    {
-                    //        string es = UTF8Encoder::encode(chars);
-                    //        if (suffix == "")
-                    //            _out.emit_literal_array(source, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                    //        else 
-	                //            _out.emit_user_defined_literal_string_array(source, suffix, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                    //    }
-                    //    else if (char_width == 2)
-                    //    {
-                    //        vector<short> utf16_codes = UTF16Encoder::encode( chars );
-                    //        char16_t* data = new char16_t[utf16_codes.size()];
-                    //        for (unsigned int i=0; i<utf16_codes.size(); ++i)
-                    //        {
-                    //            data[i] = utf16_codes[i];
-                    //        }
-                    //        if (suffix == "")
-                    //            _out.emit_literal_array(source, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                    //        else
-	                //            _out.emit_user_defined_literal_string_array(source, suffix, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                    //    } 
-                    //    else if (char_width == 3)
-                    //    {
-                    //        char32_t* data = new char32_t[chars.size()];
-                    //        for (unsigned int i=0; i<chars.size(); ++i)
-                    //        {
-                    //            data[i] = chars[i];
-                    //        }
-                    //        if (suffix == "")
-                    //            _out.emit_literal_array(source, chars.size(), FundamentalTypeOf<char32_t>(), data, chars.size()*4);
-                    //        else
-	                //            _out.emit_user_defined_literal_string_array(source, suffix, chars.size(), FundamentalTypeOf<char32_t>(), data, chars.size()*4);
-
-                    //    } 
-                    //    else if (char_width == 4)
-                    //    {
-                    //        wchar_t* data = new wchar_t[chars.size()];
-                    //        for (unsigned int i=0; i<chars.size(); ++i)
-                    //        {
-                    //            data[i] = chars[i];
-                    //        }
-                    //        if (suffix == "")
-                    //            _out.emit_literal_array(source, chars.size(), FundamentalTypeOf<wchar_t>(), data, chars.size()*4);
-                    //        else
-	                //            _out.emit_user_defined_literal_string_array(source, suffix, chars.size(), FundamentalTypeOf<wchar_t>(), data, chars.size()*4);
-                    //    } 
-                    //}
                 }
                 else
                 {
@@ -855,27 +802,11 @@ class PostTokenizer
             {
                 throw PostTokenizerException("Bad Tokens");
             }
-
-            if (!isStr && ppStrLst.size() > 0)
-            {
-                emit_strLst(ppStrLst);
-                ppStrLst.clear();
-            }
-
             it++; 
         }
 
         emit_strLst(ppStrLst);
     }
-
-//class PostTokenString
-//{
-//  public:
-//    vector<int> chars;
-//    string source;
-//    string udSuffix;
-//    int char_width;
-//};
 
 
     void emit_strLst( vector<PostTokenString>& ppStrLst )
@@ -889,7 +820,8 @@ class PostTokenizer
         vector<int> concatChars;
         string      concatSource;
 
-
+        //--- Check error, when there are two different suffix or two different types
+        //
         for (unsigned int i=0 ; i<ppStrLst.size(); i++)
         {
             if (suffix != "" && ppStrLst[i].udSuffix != "" && suffix != ppStrLst[i].udSuffix)
@@ -904,9 +836,9 @@ class PostTokenizer
 
             if (char_width==0)
             {
-               char_width = ppStrLst[i].char_width; 
+                char_width = ppStrLst[i].char_width; 
             }
-            else if (ppStrLst[i].char_width!=0 && char_width != ppStrLst[i].char_width)
+            else if (ppStrLst[i].char_width != 0 && char_width != ppStrLst[i].char_width)
             {
                 bErr = true;
                 break;
@@ -931,6 +863,8 @@ class PostTokenizer
             }
         }
 
+        //--- prepare the error message;
+        //
         if (bErr || (suffix!="" && suffix[0]!='_'))
         {
             string errStr = ppStrLst[0].source;
@@ -945,6 +879,8 @@ class PostTokenizer
             return;
         }
 
+        //--- otherwise, output the concated string
+        //
         if (char_width == 0 || char_width == 1)
         {
             string es = UTF8Encoder::encode(concatChars);
@@ -991,75 +927,11 @@ class PostTokenizer
             else
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, concatChars.size(), FundamentalTypeOf<wchar_t>(), data, concatChars.size()*4);
         }
+
+
+        //--- clear the list every time it is used
+        // 
         ppStrLst.clear();
-    }
-
-
-    void parse_ppstring( vector<int> codes, string& source, string& suffix, int& char_width)
-    {
-        vector<int> chars;
-        vector<int> udSuffix;
-        if (parse_string( codes, source, chars, udSuffix, char_width) == true)
-        {
-            if (udSuffix.size() > 0 && udSuffix[0] != '_')
-            {
-                _out.emit_invalid(source);
-            }
-            else 
-            {
-                suffix = UTF8Encoder::encode(udSuffix);
-                if (char_width == 0 || char_width == 1)
-                {
-                    string es = UTF8Encoder::encode(chars);
-                    if (suffix == "")
-                        _out.emit_literal_array(source, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                    else 
-	                    _out.emit_user_defined_literal_string_array(source, suffix, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                }
-                else if (char_width == 2)
-                {
-                    vector<short> utf16_codes = UTF16Encoder::encode( chars );
-                    char16_t* data = new char16_t[utf16_codes.size()];
-                    for (unsigned int i=0; i<utf16_codes.size(); ++i)
-                    {
-                        data[i] = utf16_codes[i];
-                    }
-                    if (suffix == "")
-                        _out.emit_literal_array(source, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                    else
-	                    _out.emit_user_defined_literal_string_array(source, suffix, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                } 
-                else if (char_width == 3)
-                {
-                    char32_t* data = new char32_t[chars.size()];
-                    for (unsigned int i=0; i<chars.size(); ++i)
-                    {
-                        data[i] = chars[i];
-                    }
-                    if (suffix == "")
-                        _out.emit_literal_array(source, chars.size(), FundamentalTypeOf<char32_t>(), data, chars.size()*4);
-                    else
-	                    _out.emit_user_defined_literal_string_array(source, suffix, chars.size(), FundamentalTypeOf<char32_t>(), data, chars.size()*4);
-
-                } 
-                else if (char_width == 4)
-                {
-                    wchar_t* data = new wchar_t[chars.size()];
-                    for (unsigned int i=0; i<chars.size(); ++i)
-                    {
-                        data[i] = chars[i];
-                    }
-                    if (suffix == "")
-                        _out.emit_literal_array(source, chars.size(), FundamentalTypeOf<wchar_t>(), data, chars.size()*4);
-                    else
-	                    _out.emit_user_defined_literal_string_array(source, suffix, chars.size(), FundamentalTypeOf<wchar_t>(), data, chars.size()*4);
-                } 
-            }
-        }
-        else
-        {
-            _out.emit_invalid(source);
-        }
     }
 
 
@@ -1542,6 +1414,7 @@ class PostTokenizer
         return true;
     }
 
+
     void parse_ppnumber(vector<int>& codes)
     {
         int la = -1;
@@ -1760,9 +1633,10 @@ class PostTokenizer
             vector<int> rest(idx, codes.end());
             string s = code2string(rest);
 
+            //--- user defined suffix
+            //
             if (s[0] == '_' && checkValidUserDefineSuffix(s))
             {
-                // user defined suffix
                 if (state == 6 || state == 9)
                     _out.emit_user_defined_literal_floating(source, s, numS);
                 else
@@ -1960,7 +1834,8 @@ class PostTokenizer
         val = value;
         return size;
     }
-    
+   
+
     int decimalBits(string s, unsigned long long& value)
     {
         unsigned long long val = 0;
@@ -1984,6 +1859,7 @@ class PostTokenizer
         value = val;
         return hb;
     }
+
 
     int octalBits(string s, unsigned long long& value)
     {
@@ -2013,6 +1889,7 @@ class PostTokenizer
         return size;
     }
 
+
     int highestBit(unsigned long long v)
     {
         int idx=0;
@@ -2025,98 +1902,6 @@ class PostTokenizer
     }
 
 
-    template<typename T> 
-    bool hexToInteger(string s, T& value)
-    {
-        int limit = sizeof(T) * 8;
-        EFundamentalType etype = FundamentalTypeOf<T>();
-        if (etype !=  FT_UNSIGNED_SHORT_INT && etype != FT_UNSIGNED_INT && etype != FT_UNSIGNED_LONG_INT && etype !=  FT_UNSIGNED_LONG_LONG_INT)
-        {
-            limit = limit -1;;
-        }
-
-        int size = 0; 
-        bool gotFirstNonZero = false;
-        T val = 0;
-        for (unsigned i=2; i<s.size(); i++)
-        {
-            int tmp = s[i] - '0';
-            val = (val << 4) + tmp;
-            if (tmp != 0 && gotFirstNonZero==false)
-            {
-                gotFirstNonZero = true;
-                if (tmp >= 8)
-                    size += 4;
-                else if (tmp >= 4)
-                    size += 3;
-                else if (tmp >= 2)
-                    size += 2;
-                else
-                    size += 1;
-            } 
-            else if (gotFirstNonZero==true)
-            { 
-                size += 4;
-            }
-        } 
-
-        if (size > limit)
-        {
-            return false;
-        }
-        else
-        {
-            value = val;
-            return true;
-        }
-    } 
-    
-  
-    template<typename T> 
-    bool octalToInteger(string s, T& value)
-    {
-        int limit = sizeof(T) * 8;
-        EFundamentalType etype = FundamentalTypeOf<T>();
-        if (etype !=  FT_UNSIGNED_SHORT_INT && etype != FT_UNSIGNED_INT && etype != FT_UNSIGNED_LONG_INT && etype !=  FT_UNSIGNED_LONG_LONG_INT)
-        {
-            limit = limit -1;;
-        }
-
-        int size = 0; 
-        bool gotFirstNonZero = false;
-        T val = 0;
-        for (unsigned i=2; i<s.size(); i++)
-        {
-            int tmp = s[i] - '0';
-            val = (val << 3) + tmp;
-            if (tmp != 0 && gotFirstNonZero==false)
-            {
-                gotFirstNonZero = true;
-                if (tmp >= 4)
-                    size += 3;
-                else if (tmp >= 2)
-                    size += 2;
-                else
-                    size += 1;
-            } 
-            else if (gotFirstNonZero==true)
-            { 
-                size += 4;
-            }
-        } 
-
-        if (size > limit)
-        {
-            return false;
-        }
-        else
-        {
-            value = val;
-            return true;
-        }
-    } 
- 
- 
     bool checkNumberLiteralSuffix(string s, bool& isUnsigned, bool& isLong, bool& isLonglong, bool& isFloat)
     {
         if (s == "u" || s == "U")
@@ -2172,21 +1957,6 @@ int main()
 	// 1. apply your code from PA1 to produce `preprocessing-tokens`
 	// 2. "post-tokenize" the `preprocessing-tokens` as described in PA2
 	// 3. write them out in the PA2 output format specifed
-
-	// You may optionally use the above starter code.
-	//
-	// In particular there is the DebugPostTokenOutputStream class which helps form the
-	// correct output format:
-
-	// example usage:
-	//DebugPostTokenOutputStream output;
-
-	//output.emit_invalid("foo");
-	//output.emit_simple("auto", KW_AUTO);
-	//u16string bar = u"bar";
-	//output.emit_literal_array("u\"bar\"", bar.size()+1, FT_CHAR16_T, bar.data(), bar.size() * 2 + 2);
-	//output.emit_user_defined_literal_integer("123_ud1", "ud1", "123");
-
     try
     {
         ostringstream oss;
@@ -2206,16 +1976,12 @@ int main()
             uncTokens.push_back('\n');
         }
 
-        // DebugPPTokenStream output;
-        // PPTokenizer tokenizer(output);
         PPTokenizer ppTokenizer;
         ppTokenizer.parse(uncTokens);
 
         // PA2 start
         PostTokenizer postTokenizer(ppTokenizer._elst);         
         postTokenizer.parse();
-
-
     }
     catch (exception& e)
     {
