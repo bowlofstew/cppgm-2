@@ -1,0 +1,68 @@
+simple + OP_PLUS
+literal 2 int 02000000
+simple - OP_MINUS
+literal 2 int 02000000
+simple ! OP_LNOT
+literal 2 int 02000000
+simple ~ OP_COMPL
+literal 2 int 02000000
+literal 2 int 02000000
+simple * OP_STAR
+literal 3 int 03000000
+literal 2 int 02000000
+simple / OP_DIV
+literal 3 int 03000000
+literal 2 int 02000000
+simple % OP_MOD
+literal 3 int 03000000
+literal 2 int 02000000
+simple + OP_PLUS
+literal 3 int 03000000
+literal 2 int 02000000
+simple - OP_MINUS
+literal 3 int 03000000
+literal 2 int 02000000
+simple << OP_LSHIFT
+literal 3 int 03000000
+literal 2 int 02000000
+simple >> OP_RSHIFT
+literal 3 int 03000000
+literal 2 int 02000000
+simple < OP_LT
+literal 3 int 03000000
+literal 2 int 02000000
+simple > OP_GT
+literal 3 int 03000000
+literal 2 int 02000000
+simple <= OP_LE
+literal 3 int 03000000
+literal 2 int 02000000
+simple >= OP_GE
+literal 3 int 03000000
+literal 2 int 02000000
+simple == OP_EQ
+literal 3 int 03000000
+literal 2 int 02000000
+simple != OP_NE
+literal 3 int 03000000
+literal 2 int 02000000
+simple & OP_AMP
+literal 3 int 03000000
+literal 2 int 02000000
+simple ^ OP_XOR
+literal 3 int 03000000
+literal 2 int 02000000
+simple | OP_BOR
+literal 3 int 03000000
+literal 2 int 02000000
+simple && OP_LAND
+literal 3 int 03000000
+literal 2 int 02000000
+simple || OP_LOR
+literal 3 int 03000000
+literal 2 int 02000000
+simple ? OP_QMARK
+literal 3 int 03000000
+simple : OP_COLON
+literal 4 int 04000000
+eof

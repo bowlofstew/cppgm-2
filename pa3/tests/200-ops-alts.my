@@ -1,0 +1,20 @@
+simple not OP_LNOT
+literal 2 int 02000000
+simple compl OP_COMPL
+literal 2 int 02000000
+literal 2 int 02000000
+simple bitand OP_AMP
+literal 3 int 03000000
+literal 2 int 02000000
+simple xor OP_XOR
+literal 3 int 03000000
+literal 2 int 02000000
+simple bitor OP_BOR
+literal 3 int 03000000
+literal 2 int 02000000
+simple and OP_LAND
+literal 3 int 03000000
+literal 2 int 02000000
+simple or OP_LOR
+literal 3 int 03000000
+eof

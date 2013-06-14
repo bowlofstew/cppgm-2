@@ -1,0 +1,25 @@
+simple true KW_TRUE
+simple false KW_FALSE
+literal 0 int 00000000
+literal 1 int 01000000
+literal 0x2 int 02000000
+literal 03 int 03000000
+literal 0u unsigned int 00000000
+literal 1u unsigned int 01000000
+literal 0x2u unsigned int 02000000
+literal 03u unsigned int 03000000
+literal 'a' char 61
+literal u'a' char16_t 6100
+literal U'a' char32_t 61000000
+literal L'a' wchar_t 61000000
+literal "foo" array of 4 char 666F6F00
+literal 3.2 double 9A99999999990940
+identifier ident
+simple auto KW_AUTO
+literal 9223372036854775807 long int FFFFFFFFFFFFFF7F
+literal 9223372036854775807l long int FFFFFFFFFFFFFF7F
+literal 9223372036854775807ll long long int FFFFFFFFFFFFFF7F
+literal 18446744073709551615u unsigned long int FFFFFFFFFFFFFFFF
+literal 18446744073709551615ul unsigned long int FFFFFFFFFFFFFFFF
+literal 18446744073709551615ull unsigned long long int FFFFFFFFFFFFFFFF
+eof

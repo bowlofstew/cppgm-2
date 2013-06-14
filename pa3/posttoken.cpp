@@ -112,7 +112,7 @@ const map<EFundamentalType, string> FundamentalTypeToStringMap
 enum ETokenType
 {
 	// keywords
-	KW_ALIGNAS,
+	KW_ALIGNAS = 0,
 	KW_ALIGNOF,
 	KW_ASM,
 	KW_AUTO,
@@ -700,19 +700,177 @@ class PostTokenizerException : public exception
 };
 
 
-class PostTokenString
+enum EPostTokenType
 {
-  public:
-    vector<int> chars;
+    PT_WHITESPACE=0,
+    PT_NEWLINE,
+    PT_EOF,
+
+    PT_HEADERNAME,
+    PT_SIMPLE,
+
+    PT_LITERAL,
+    PT_UD_LITERAL,
+
+    PT_INVALID,  // for testing
+
+	PT_KW_ALIGNAS,
+	PT_KW_ALIGNOF,
+	PT_KW_ASM,
+	PT_KW_AUTO,
+	PT_KW_BOOL,
+	PT_KW_BREAK,
+	PT_KW_CASE,
+	PT_KW_CATCH,
+	PT_KW_CHAR,
+	PT_KW_CHAR16_T,
+	PT_KW_CHAR32_T,
+	PT_KW_CLASS,
+	PT_KW_CONST,
+	PT_KW_CONSTEXPR,
+	PT_KW_CONST_CAST,
+	PT_KW_CONTINUE,
+	PT_KW_DECLTYPE,
+	PT_KW_DEFAULT,
+	PT_KW_DELETE,
+	PT_KW_DO,
+	PT_KW_DOUBLE,
+	PT_KW_DYNAMIC_CAST,
+	PT_KW_ELSE,
+	PT_KW_ENUM,
+	PT_KW_EXPLICIT,
+	PT_KW_EXPORT,
+	PT_KW_EXTERN,
+	PT_KW_FALSE,
+	PT_KW_FLOAT,
+	PT_KW_FOR,
+	PT_KW_FRIEND,
+	PT_KW_GOTO,
+	PT_KW_IF,
+	PT_KW_INLINE,
+	PT_KW_INT,
+	PT_KW_LONG,
+	PT_KW_MUTABLE,
+	PT_KW_NAMESPACE,
+	PT_KW_NEW,
+	PT_KW_NOEXCEPT,
+	PT_KW_NULLPTR,
+	PT_KW_OPERATOR,
+	PT_KW_PRIVATE,
+	PT_KW_PROTECTED,
+	PT_KW_PUBLIC,
+	PT_KW_REGISTER,
+	PT_KW_REINTERPET_CAST,
+	PT_KW_RETURN,
+	PT_KW_SHORT,
+	PT_KW_SIGNED,
+	PT_KW_SIZEOF,
+	PT_KW_STATIC,
+	PT_KW_STATIC_ASSERT,
+	PT_KW_STATIC_CAST,
+	PT_KW_STRUCT,
+	PT_KW_SWITCH,
+	PT_KW_TEMPLATE,
+	PT_KW_THIS,
+	PT_KW_THREAD_LOCAL,
+	PT_KW_THROW,
+	PT_KW_TRUE,
+	PT_KW_TRY,
+	PT_KW_TYPEDEF,
+	PT_KW_TYPEID,
+	PT_KW_TYPENAME,
+	PT_KW_UNION,
+	PT_KW_UNSIGNED,
+	PT_KW_USING,
+	PT_KW_VIRTUAL,
+	PT_KW_VOID,
+	PT_KW_VOLATILE,
+	PT_KW_WCHAR_T,
+	PT_KW_WHILE,
+
+	// operators/punctuation
+	PT_OP_LBRACE,
+	PT_OP_RBRACE,
+	PT_OP_LSQUARE,
+	PT_OP_RSQUARE,
+	PT_OP_LPAREN,
+	PT_OP_RPAREN,
+	PT_OP_BOR,
+	PT_OP_XOR,
+	PT_OP_COMPL,
+	PT_OP_AMP,
+	PT_OP_LNOT,
+	PT_OP_SEMICOLON,
+	PT_OP_COLON,
+	PT_OP_DOTS,
+	PT_OP_QMARK,
+	PT_OP_COLON2,
+	PT_OP_DOT,
+	PT_OP_DOTSTAR,
+	PT_OP_PLUS,
+	PT_OP_MINUS,
+	PT_OP_STAR,
+	PT_OP_DIV,
+	PT_OP_MOD,
+	PT_OP_ASS,
+	PT_OP_LT,
+	PT_OP_GT,
+	PT_OP_PLUSASS,
+	PT_OP_MINUSASS,
+	PT_OP_STARASS,
+	PT_OP_DIVASS,
+	PT_OP_MODASS,
+	PT_OP_XORASS,
+	PT_OP_BANDASS,
+	PT_OP_BORASS,
+	PT_OP_LSHIFT,
+	PT_OP_RSHIFT,
+	PT_OP_RSHIFTASS,
+	PT_OP_LSHIFTASS,
+	PT_OP_EQ,
+	PT_OP_NE,
+	PT_OP_LE,
+	PT_OP_GE,
+	PT_OP_LAND,
+	PT_OP_LOR,
+	PT_OP_INC,
+	PT_OP_DEC,
+	PT_OP_COMMA,
+	PT_OP_ARROWSTAR,
+	PT_OP_ARROW,
+
+    PT_OP_HASH,      // #
+    PT_OP_HASHHASH   // ##
+};
+
+
+
+struct PostToken
+{
+    EPostTokenType type;
     string source;
     string udSuffix;
-    int char_width;
+
+    // for literal
+    //
+    EFundamentalType ltype;
+    int   size;
+    void* data;
 };
 
 
 class PostTokenizer
 {
   public:
+    class PostTokenString
+    {
+      public:
+        vector<int> chars;
+        string source;
+        string udSuffix;
+        int char_width;
+    };
+
     PostTokenizer(vector<PPToken>& pplst)
         : _pplst(pplst)
     {
@@ -722,6 +880,57 @@ class PostTokenizer
     ~PostTokenizer() 
     {
     }
+
+    vector<PostToken>  _tokens;
+
+
+    void addToken(EPostTokenType type, string src="", string udSuffix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
+    {
+        PostToken pt;
+        pt.type = type;
+        pt.source = src;
+        pt.udSuffix = udSuffix;
+        pt.ltype = ltype;
+        pt.size = size;
+        
+        // for different type
+        if (size > 0)
+        {
+            int bsize = size;
+            if (ltype==FT_SIGNED_CHAR || ltype==FT_UNSIGNED_CHAR || ltype==FT_CHAR || ltype==FT_BOOL)
+            {
+                bsize *= 1;
+            }
+            else if (ltype==FT_SHORT_INT || ltype==FT_UNSIGNED_SHORT_INT || ltype==FT_CHAR16_T)
+            {
+                bsize *= 2;
+            }
+            else if (ltype==FT_INT || ltype==FT_UNSIGNED_INT || ltype==FT_CHAR32_T || ltype==FT_WCHAR_T || ltype==FT_FLOAT)
+            {
+                bsize *= 4;
+            }
+            else if (ltype==FT_LONG_INT || ltype==FT_LONG_LONG_INT || ltype==FT_UNSIGNED_LONG_INT || ltype==FT_UNSIGNED_LONG_LONG_INT || ltype==FT_DOUBLE || ltype==FT_NULLPTR_T)
+            {
+                bsize *= 8;
+            }
+            else if (ltype==FT_LONG_DOUBLE)
+            {
+                bsize *= 16;
+            }
+
+            char* ary = new char[bsize];
+            memcpy(ary, (char*)addr, size); 
+            pt.data = ary;
+        }
+        else
+        {
+            pt.data = 0;
+        }
+
+        _tokens.push_back(pt);
+    }
+
+
 
     void parse()
     {
@@ -742,32 +951,57 @@ class PostTokenizer
                 }
             }  
 
-            if (type == PP_WHITESPACE || type == PP_NEWLINE)
+            if (type == PP_WHITESPACE)
             {
                 // do nothing, no-op
+                addToken(PT_WHITESPACE);
             }
-            else if (type == PP_HEADERNAME || type == PP_NONWHITESPACE)
+            else if ( type == PP_NEWLINE)
+            {
+                // do nothing, no-op
+                addToken(PT_NEWLINE);
+            }
+            else if (type == PP_HEADERNAME)
             {
                 _out.emit_invalid(UTF8Encoder::encode( (*it).data ));
+                addToken(PT_HEADERNAME, UTF8Encoder::encode( (*it).data ));
+            }
+            else if (type == PP_NONWHITESPACE)
+            {
+                _out.emit_invalid(UTF8Encoder::encode( (*it).data ));
+                addToken(PT_INVALID, UTF8Encoder::encode( (*it).data ));
             }
             else if (type == PP_EOF)
             {
                 _out.emit_eof();
+                addToken(PT_EOF);
             }
             else if (type == PP_OP || type == PP_IDENTIFIER)
             {
                 unordered_map<string, ETokenType>::const_iterator eit = StringToTokenTypeMap.find(str);
                 if (eit == StringToTokenTypeMap.end())
                 {
-                    if ( str == "#" || str == "##" || str == "%:" || str == "%:%:")
+                    if ( str == "#" || str == "%:" )
+                    {
                         _out.emit_invalid( str );
+                        addToken(PT_OP_HASH);
+                    }
+                    else if (str == "##" || str == "%:%:")
+                    {
+                        _out.emit_invalid( str );
+                        addToken(PT_OP_HASHHASH);
+                    }
                     else 
+                    {
                         _out.emit_identifier( str );
+                        addToken(PT_SIMPLE, str);
+                    }
                 }
                 else
                 {
                     // op
                     _out.emit_simple(str, eit->second); 
+                    addToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID));
                 }
             }
             else if ( type == PP_NUMBER )
@@ -798,6 +1032,7 @@ class PostTokenizer
                 {
                     emit_strLst(ppStrLst);
                     _out.emit_invalid(source);
+                    addToken(PT_INVALID, source);
                 }
             }
             else
@@ -877,6 +1112,7 @@ class PostTokenizer
             }
 
             _out.emit_invalid(errStr);
+            addToken(PT_INVALID, errStr);
             ppStrLst.clear();
             return;
         }
@@ -887,9 +1123,15 @@ class PostTokenizer
         {
             string es = UTF8Encoder::encode(concatChars);
             if (suffix == "")
+            {
                 _out.emit_literal_array(concatSource, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
+                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR, es.size(), es.c_str());
+            }
             else 
+            {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
+                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR, es.size(), es.c_str());
+            }
         }
         else if (char_width == 2)
         {
@@ -900,9 +1142,15 @@ class PostTokenizer
                 data[i] = utf16_codes[i];
             }
             if (suffix == "")
+            {
                 _out.emit_literal_array(concatSource, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
+                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR16_T, utf16_codes.size(), data);
+            }
             else
+            {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
+                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR16_T, utf16_codes.size(), data);
+            }
         } 
         else if (char_width == 3)
         {
@@ -912,9 +1160,15 @@ class PostTokenizer
                 data[i] = concatChars[i];
             }
             if (suffix == "")
+            {
                 _out.emit_literal_array(concatSource, concatChars.size(), FundamentalTypeOf<char32_t>(), data, concatChars.size()*4);
+                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR32_T, concatChars.size(), data);
+            }
             else
+            {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, concatChars.size(), FundamentalTypeOf<char32_t>(), data, concatChars.size()*4);
+                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR32_T, concatChars.size(), data);
+            }
 
         } 
         else if (char_width == 4)
@@ -925,9 +1179,15 @@ class PostTokenizer
                 data[i] = concatChars[i];
             }
             if (suffix == "")
+            {
                 _out.emit_literal_array(concatSource, concatChars.size(), FundamentalTypeOf<wchar_t>(), data, concatChars.size()*4);
+                addToken(PT_LITERAL, concatSource, suffix, FT_WCHAR_T, concatChars.size(), data);
+            }
             else
+            {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, concatChars.size(), FundamentalTypeOf<wchar_t>(), data, concatChars.size()*4);
+                addToken(PT_UD_LITERAL, concatSource, suffix, FT_WCHAR_T, concatChars.size(), data);
+            }
         }
 
 
@@ -1331,6 +1591,7 @@ class PostTokenizer
             if (stop == true) // invalid
             {
                 _out.emit_invalid(source);
+                addToken(PT_INVALID, source);
                 return;
             }
             idx++;
@@ -1340,10 +1601,12 @@ class PostTokenizer
         if (cchars.size() > 1)
         {
             _out.emit_invalid(source);
+            addToken(PT_INVALID, source);
         }
         else if (suffix.size() > 0 && suffix[0] != '_')
         {
             _out.emit_invalid(source);
+            addToken(PT_INVALID, source);
         }
         else 
         {
@@ -1352,46 +1615,77 @@ class PostTokenizer
             if (isChar32)
             {
                 if (cs == "")
+                {
 	                _out.emit_literal(source, FundamentalTypeOf<char32_t>(), &c, 4);
+                    addToken(PT_LITERAL, source, cs, FT_CHAR32_T, 1, &c);
+                }
                 else 
+                {
 	                _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char32_t>(), &c, 4);
+                    addToken(PT_UD_LITERAL, source, cs, FT_CHAR32_T, 1, &c);
+                }
             }
             else if (isChar16)
             {
                 if (c > 0xFFFF)
                 {
                     _out.emit_invalid(source);
+                    addToken(PT_INVALID, source);
                 }
                 else
                 {
                     if (cs =="")
+                    {
 	                    _out.emit_literal(source, FundamentalTypeOf<char16_t>(), &c, 2);
+                        addToken(PT_LITERAL, source, cs, FT_CHAR16_T, 1, &c);
+                    }
                     else 
+                    {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char16_t>(), &c, 2);
+                        addToken(PT_UD_LITERAL, source, cs, FT_CHAR16_T, 1, &c);
+                    }
                 }
             }
             else if (isWchar)
             {
                 if (cs == "")
+                {
 	                _out.emit_literal(source, FundamentalTypeOf<wchar_t>(), &c, 4);
+                    addToken(PT_LITERAL, source, cs, FT_WCHAR_T, 1, &c);
+                }
                 else
+                {
 	                _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<wchar_t>(), &c, 4);
+                    addToken(PT_UD_LITERAL, source, cs, FT_WCHAR_T, 1, &c);
+                }
             }
             else
             {
                 if (c > 0xFF)
                 {
                     if (cs == "")
+                    {
 	                    _out.emit_literal(source, FundamentalTypeOf<int>(), &c, 4);
+                        addToken(PT_LITERAL, source, cs, FT_INT, 1, &c);
+                    }
                     else 
+                    {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<int>(), &c, 4);
+                        addToken(PT_UD_LITERAL, source, cs, FT_INT, 1, &c);
+                    }
                 }
                 else
                 {
                     if (cs == "")
+                    {
 	                    _out.emit_literal(source, FundamentalTypeOf<char>(), &c, 1);
+                        addToken(PT_LITERAL, source, cs, FT_INT, 1, &c);
+                    }
                     else
+                    {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char>(), &c, 1);
+                        addToken(PT_UD_LITERAL, source, cs, FT_INT, 1, &c);
+                    }
                 }
             }
         }
@@ -1626,6 +1920,7 @@ class PostTokenizer
         else  // invalid
         {
 	        _out.emit_invalid(source);
+            addToken(PT_INVALID, source);
             return;
         }
         
@@ -1639,10 +1934,17 @@ class PostTokenizer
             //
             if (s[0] == '_' && checkValidUserDefineSuffix(s))
             {
+                float f = PA2Decode_float( numS );
                 if (state == 6 || state == 9)
+                {
                     _out.emit_user_defined_literal_floating(source, s, numS);
+                    addToken(PT_UD_LITERAL, source, s, FT_FLOAT, 1, &f);
+                }
                 else
+                {
 	                _out.emit_user_defined_literal_integer(source, s, numS);
+                    addToken(PT_UD_LITERAL, source, s, FT_FLOAT, 1, &f);
+                }
             }
             else if ( checkNumberLiteralSuffix(s, isUnsigned, isLong, isLonglong, isFloat) )
             {
@@ -1665,6 +1967,7 @@ class PostTokenizer
                     // float
                     float f = PA2Decode_float( numS );
     	            _out.emit_literal(source, FundamentalTypeOf<float>(), &f, 4);
+                    addToken(PT_LITERAL, source, s, FT_FLOAT, 1, &f);
                 }
 
                 if (isDecimalInteger || isHexInteger || isOctalInteger)
@@ -1673,28 +1976,50 @@ class PostTokenizer
                     {
                         // error 
 	                    _out.emit_invalid(source);
+                        addToken(PT_INVALID, source);
                     } 
                     else if ( bs == 64)
                     {
                         if (isUnsigned && isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned && isLonglong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isLong) // long , long long
                         {
                             if (isDecimalInteger)
+                            {
 	                            _out.emit_invalid(source);
+                                addToken(PT_INVALID, source);
+                            }
                             else
+                            {
     	                        _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                                addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            }
                         }
                         else // (isLonglong)
                         {
                             if (isDecimalInteger)
+                            {
 	                            _out.emit_invalid(source);
+                                addToken(PT_INVALID, source);
+                            }
                             else
+                            {
     	                        _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
+                                addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            }
                         }
 
                     }
@@ -1702,51 +2027,98 @@ class PostTokenizer
                     {
                         // long
                         if (isUnsigned && isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned && isLonglong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                        }
                         else // long long
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                        }
                     }
                     else if (bs == 32)
                     {
                         if (isUnsigned && isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned && isLonglong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned)
+                        {
 	                        _out.emit_literal(source, FundamentalTypeOf<unsigned int>(), &value, 4);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_INT, 1, &value);
+                        }
                         else if (isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                        }
                         else // long long
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                        }
                     }
                     else
                     {
                         if (isUnsigned && isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned && isLonglong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
                         else if (isUnsigned)
+                        {
 	                        _out.emit_literal(source, FundamentalTypeOf<unsigned int>(), &value, 4);
+                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_INT, 1, &value);
+                        }
                         else if (isLong)
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                        }
                         else // long long
+                        {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
+                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                        }
                     }
                 }
             }
             else //invalid
             {
 	            _out.emit_invalid(source);
+                addToken(PT_INVALID, source);
             }
         }
         else
         {
+            string s="";
             if (isDecimalInteger || isHexInteger || isOctalInteger)
             {
                 unsigned long long value;
@@ -1768,36 +2140,52 @@ class PostTokenizer
                 {
                     // error 
 	                _out.emit_invalid(source);
+                    addToken(PT_INVALID, source);
                 } 
                 else if ( bs == 64)
                 {
                     if (isDecimalInteger)
+                    {
 	                    _out.emit_invalid(source);
+                        addToken(PT_INVALID, source);
+                    }
                     else
+                    {
 	                    _out.emit_literal(numS, FundamentalTypeOf<unsigned long>(), &value, 8);
+                        addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                    }
                 }
                 else if ( bs > 32)
                 {
                     // long
 	                _out.emit_literal(numS, FundamentalTypeOf<long>(), &value, 8);
+                    addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
                 }
                 else if (bs == 32)
                 {
                     if (isDecimalInteger)
+                    {
 	                    _out.emit_literal(numS, FundamentalTypeOf<long>(), &value, 8);
+                        addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                    }
                     else 
+                    {
 	                    _out.emit_literal(numS, FundamentalTypeOf<unsigned int>(), &value, 4);
+                        addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                    }
                 }
                 else
                 {
                     // int
 	                _out.emit_literal(numS, FundamentalTypeOf<int>(), &value, 4);
+                    addToken(PT_LITERAL, source, s, FT_INT, 1, &value);
                 }
             }
             else if (isFloatPoint)  // float
             {
-                double v = PA2Decode_double(numS);
-	            _out.emit_literal(numS, FundamentalTypeOf<double>(), &v, 8);
+                double value = PA2Decode_double(numS);
+	            _out.emit_literal(numS, FundamentalTypeOf<double>(), &value, 8);
+                addToken(PT_LITERAL, source, s, FT_DOUBLE, 1, &value);
             }
             else
             {
@@ -1939,10 +2327,6 @@ class PostTokenizer
         return true;
     } 
 
-
-             
-    
-        
    
   private:
     vector<PPToken>            _pplst;
