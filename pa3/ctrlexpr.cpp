@@ -19,6 +19,26 @@ bool PA3Mock_IsDefinedIdentifier(const string& identifier)
 }
 
 
+int evalCtrlExpr(vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    vector<PostToken>::iterator idx = it; 
+    if (idx == tend)
+    {
+        return 0;
+    }
+    
+    while (idx != tend)
+    {
+        EPostTokenType e = idx->type;    
+        string s = idx->source;
+        cout << PostTokenTypeToStringMap.at(e) << " " << s << endl;
+        idx++;
+    }
+     
+    return 1;
+}
+
+
 int main()
 {
 	// TODO:
@@ -50,6 +70,12 @@ int main()
         // PA2 start
         PostTokenizer postTokenizer(ppTokenizer._elst);         
         postTokenizer.parse();
+
+        // PA3 start
+        evalCtrlExpr(postTokenizer._tokens.begin(), postTokenizer._tokens.end());
+        
+        
+        
     }
     catch (exception& e)
     {
