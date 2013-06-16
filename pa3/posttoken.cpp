@@ -588,6 +588,7 @@ string HexDump(const void* pdata, size_t nbytes)
 // DebugPostTokenOutputStream: helper class to produce PA2 output format
 struct DebugPostTokenOutputStream
 {
+#ifdef PA2
 	// output: invalid <source>
 	void emit_invalid(const string& source)
 	{
@@ -647,6 +648,19 @@ struct DebugPostTokenOutputStream
 	{
 		cout << "eof" << endl;
 	}
+
+#else
+	void emit_invalid(const string& source) { }
+	void emit_simple(const string& source, ETokenType token_type) { }
+	void emit_identifier(const string& source) { }
+	void emit_literal(const string& source, EFundamentalType type, const void* data, size_t nbytes) { }
+	void emit_literal_array(const string& source, size_t num_elements, EFundamentalType type, const void* data, size_t nbytes) { }
+	void emit_user_defined_literal_character(const string& source, const string& ud_suffix, EFundamentalType type, const void* data, size_t nbytes) { }
+	void emit_user_defined_literal_string_array(const string& source, const string& ud_suffix, size_t num_elements, EFundamentalType type, const void* data, size_t nbytes) { }
+	void emit_user_defined_literal_integer(const string& source, const string& ud_suffix, const string& prefix) { }
+	void emit_user_defined_literal_floating(const string& source, const string& ud_suffix, const string& prefix) { }
+	void emit_eof() { }
+#endif
 };
 
 
@@ -1063,7 +1077,7 @@ class PostTokenizer
             }
 
             char* ary = new char[bsize];
-            memcpy(ary, (char*)addr, size); 
+            memcpy(ary, (char*)addr, bsize); 
             pt.data = ary;
         }
         else
@@ -1098,7 +1112,7 @@ class PostTokenizer
             if (type == PP_WHITESPACE)
             {
                 // do nothing, no-op
-                addToken(PT_WHITESPACE);
+                // addToken(PT_WHITESPACE);
             }
             else if ( type == PP_NEWLINE)
             {
