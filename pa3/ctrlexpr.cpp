@@ -19,6 +19,70 @@ bool PA3Mock_IsDefinedIdentifier(const string& identifier)
 }
 
 
+int eval_primary (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+
+int eval_unary (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+
+int eval_multiplicative (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+
+int eval_additive (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_shift (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_relational (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_equality (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_and (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_exclusive_or (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_inclusive_or (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_logical_and (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    return 0;
+}
+
+int eval_logical_or (vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
+{
+    
+    return 0;
+}
+
 int evalCtrlExpr(vector<PostToken>::iterator it, vector<PostToken>::iterator tend)
 {
     vector<PostToken>::iterator idx = it; 
