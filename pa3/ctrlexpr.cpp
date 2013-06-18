@@ -205,7 +205,7 @@ class PPCtrlExprResult
         bool tErr;
 
         tUnsigned = _isUnsigned || a._isUnsigned;
-        tNegative = _isNegative || a._isNegative;
+        tNegative = _isNegative;
         tErr = _isErr || a._isErr;
 
         if (a._value != 0)
@@ -268,12 +268,19 @@ class PPCtrlExprResult
     }
 
 
-    PPCtrlExprResult operator>(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator>(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned = false;
         bool tNegative = false;
         bool tErr = _isErr || a._isErr;
+
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
+
 
         if (_isNegative == false && a._isNegative == false)
         {
@@ -298,12 +305,18 @@ class PPCtrlExprResult
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
     }
 
-    PPCtrlExprResult operator>=(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator>=(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned = false;
         bool tNegative = false;
         bool tErr = _isErr || a._isErr;
+
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
 
         if (_isNegative == false && a._isNegative == false)
         {
@@ -328,12 +341,18 @@ class PPCtrlExprResult
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
     }
 
-    PPCtrlExprResult operator<(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator<(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned = false;
         bool tNegative = false;
         bool tErr = _isErr || a._isErr;
+
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
 
         if (_isNegative == false && a._isNegative == false)
         {
@@ -358,12 +377,18 @@ class PPCtrlExprResult
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
     }
 
-    PPCtrlExprResult operator<=(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator<=(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned = false;
         bool tNegative = false;
         bool tErr = _isErr || a._isErr;
+
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
 
         if (_isNegative == false && a._isNegative == false)
         {
@@ -400,21 +425,24 @@ class PPCtrlExprResult
         {
             tv = 0;
         }
-        if (_isNegative == false && a._isNegative == false)
+        else
         {
-            tv = (_value != a._value);
-        }
-        else if (_isNegative == false && a._isNegative == true)
-        {
-            tv = 1; 
-        }
-        else if (_isNegative == true && a._isNegative == false)
-        {
-            tv = 1;
-        }
-        else //if (_isNegative == true && a._isNegative == true)
-        {
-            tv = (_value != a._value);
+            if (_isNegative == false && a._isNegative == false)
+            {
+                tv = (_value != a._value);
+            }
+            else if (_isNegative == false && a._isNegative == true)
+            {
+                tv = 1; 
+            }
+            else if (_isNegative == true && a._isNegative == false)
+            {
+                tv = 1;
+            }
+            else //if (_isNegative == true && a._isNegative == true)
+            {
+                tv = (_value != a._value);
+            }
         }
 
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
@@ -432,21 +460,24 @@ class PPCtrlExprResult
         {
             tv = 1;
         }
-        else if (_isNegative == false && a._isNegative == false)
+        else
         {
-            tv = (_value == a._value);
-        }
-        else if (_isNegative == false && a._isNegative == true)
-        {
-            tv = 0;
-        }
-        else if (_isNegative == true && a._isNegative == false)
-        {
-            tv = 0;
-        }
-        else //if (_isNegative == true && a._isNegative == true)
-        {
-            tv = (_value == a._value);
+            if (_isNegative == false && a._isNegative == false)
+            {
+                tv = (_value == a._value);
+            }
+            else if (_isNegative == false && a._isNegative == true)
+            {
+                tv = 0;
+            }
+            else if (_isNegative == true && a._isNegative == false)
+            {
+                tv = 0;
+            }
+            else //if (_isNegative == true && a._isNegative == true)
+            {
+                tv = (_value == a._value);
+            }
         }
 
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
@@ -913,33 +944,95 @@ class PPCtrlExprEvaluator
     
     PPCtrlExprResult eval_multiplicative ()
     {
+        vector<PPCtrlExprResult> plist;
+        vector<EPostTokenType>   tlist;
+
         PPCtrlExprResult term1, term2;
         term1 = eval_unary ();
+
+        //while (_idx != _end)
+        //{
+        //    if (_idx->type == PT_OP_STAR)
+        //    {
+        //        _idx++;
+        //        term2 = eval_unary (); 
+        //        term1 = (term1 * term2);
+        //    }
+        //    else if (_idx->type == PT_OP_DIV)
+        //    {
+        //        _idx++;
+        //        term2 = eval_unary (); 
+        //        term1 = (term1 / term2);
+        //    }
+        //    else if (_idx->type == PT_OP_MOD)
+        //    {
+        //        _idx++;
+        //        term2 = eval_unary ();
+        //        term1 = (term1 % term2);
+        //    }
+        //    else
+        //    {
+        //        break;
+        //    }
+        //} 
+        bool isPromote = term1.isUnsigned();
         while (_idx != _end)
         {
             if (_idx->type == PT_OP_STAR)
             {
                 _idx++;
                 term2 = eval_unary (); 
-                term1 = (term1 * term2);
+                tlist.push_back(PT_OP_STAR);
+                plist.push_back(term2);
+                isPromote = isPromote || term2.isUnsigned();
+                // term2 = eval_unary (); 
+                //term1 = (term1 * term2);
             }
             else if (_idx->type == PT_OP_DIV)
             {
                 _idx++;
                 term2 = eval_unary (); 
-                term1 = (term1 / term2);
+                tlist.push_back(PT_OP_DIV);
+                plist.push_back(term2);
+                isPromote = isPromote || term2.isUnsigned();
+                // term2 = eval_unary (); 
+                // term1 = (term1 / term2);
             }
             else if (_idx->type == PT_OP_MOD)
             {
                 _idx++;
-                term2 = eval_unary ();
-                term1 = (term1 % term2);
+                term2 = eval_unary (); 
+                tlist.push_back(PT_OP_MOD);
+                plist.push_back(term2);
+                isPromote = isPromote || term2.isUnsigned();
+                //term2 = eval_unary ();
+                //term1 = (term1 % term2);
             }
             else
             {
                 break;
             }
-        } 
+        }
+
+        if (isPromote)
+        {
+            term1.promote();
+        }
+
+        for (unsigned i=0; i<plist.size(); i++)
+        {
+            if (isPromote)
+            {
+                plist[i].promote();
+            }
+
+            if (tlist[i] == PT_OP_STAR)
+                term1 = term1 * plist[i];
+            else if (tlist[i] == PT_OP_DIV)
+                term1 = term1 / plist[i];
+            else
+                term1 = term1 % plist[i];
+        }
         return term1;
     }
     
