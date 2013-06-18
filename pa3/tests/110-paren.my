@@ -1,8 +1,4 @@
-simple ( OP_LPAREN
-literal 123 int 7B000000
-simple ) OP_RPAREN
-simple ( OP_LPAREN
-literal 123 int 7B000000
-simple ( OP_LPAREN
-simple ) OP_RPAREN
+123
+error
+error
 eof

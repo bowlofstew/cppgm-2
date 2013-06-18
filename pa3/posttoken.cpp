@@ -1102,11 +1102,15 @@ class PostTokenizer
 
             if (type < PP_STRING_LITERAL || type > PP_UD_RAW_STRING_LITERAL )
             {
+#ifdef PA2
                 // otherwise, no need to output concat strings yet.
                 if (type != PP_WHITESPACE && type != PP_NEWLINE)
                 {
                     emit_strLst(ppStrLst);
                 }
+#else
+                emit_strLst(ppStrLst);
+#endif
             }  
 
             if (type == PP_WHITESPACE)

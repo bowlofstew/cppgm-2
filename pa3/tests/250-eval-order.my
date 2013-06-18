@@ -1,133 +1,19 @@
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple : OP_COLON
-literal 5 int 05000000
-simple / OP_DIV
-literal 0 int 00000000
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple / OP_DIV
-literal 0 int 00000000
-simple : OP_COLON
-literal 5 int 05000000
-literal 5 int 05000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple % OP_MOD
-literal 0 int 00000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple % OP_MOD
-literal 0 int 00000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple / OP_DIV
-literal 0 int 00000000
-simple ) OP_RPAREN
-literal 5 int 05000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple / OP_DIV
-literal 0 int 00000000
-simple ) OP_RPAREN
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple : OP_COLON
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple : OP_COLON
-literal 5 int 05000000
-literal 5 int 05000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple ) OP_RPAREN
-literal 5 int 05000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-literal 64 int 40000000
-simple ) OP_RPAREN
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple : OP_COLON
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple true KW_TRUE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple : OP_COLON
-literal 5 int 05000000
-literal 5 int 05000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple || OP_LOR
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple ) OP_RPAREN
-literal 0 int 00000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple ) OP_RPAREN
-literal 5 int 05000000
-simple && OP_LAND
-simple ( OP_LPAREN
-literal 5 int 05000000
-simple << OP_LSHIFT
-simple - OP_MINUS
-literal 1 int 01000000
-simple ) OP_RPAREN
+5
+error
+1
+error
+0
+error
+5
+error
+1
+error
+0
+error
+5
+error
+1
+error
+0
+error
 eof

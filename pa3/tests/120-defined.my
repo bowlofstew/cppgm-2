@@ -1,25 +1,9 @@
-identifier defined
-identifier foo
-identifier defined
-identifier aha
-identifier defined
-identifier bar
-identifier defined
-identifier car
-identifier defined
-simple ( OP_LPAREN
-identifier foo
-simple ) OP_RPAREN
-identifier defined
-simple ( OP_LPAREN
-identifier aha
-simple ) OP_RPAREN
-identifier defined
-simple ( OP_LPAREN
-identifier bar
-simple ) OP_RPAREN
-identifier defined
-simple ( OP_LPAREN
-identifier car
-simple ) OP_RPAREN
+0
+1
+0
+1
+0
+1
+0
+1
 eof

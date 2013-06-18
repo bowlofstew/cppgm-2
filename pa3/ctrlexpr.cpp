@@ -44,13 +44,40 @@ class PPCtrlExprResult
 {
   public:
     PPCtrlExprResult(unsigned long v=0, bool isNegative=false, bool isUnsigned=false, bool isErr=false) 
-        : _value(v), _isNegative(isNegative), _isUnsigned(isUnsigned)  
+        : _value(v), _isNegative(isNegative), _isUnsigned(isUnsigned), _isErr(isErr)  
     {
-        _isErr = false;
+        if (_isUnsigned && _isNegative)
+        {
+            long t = _value * -1; 
+            _value = t;
+            _isNegative = false;
+        }
+    }
+
+    PPCtrlExprResult(const PPCtrlExprResult &a)
+    {
+        _value = a._value;
+        _isNegative = a._isNegative;
+        _isUnsigned = a._isUnsigned;
+        _isErr = a._isErr;
     }
 
     ~PPCtrlExprResult() 
     {
+    }
+
+    void promote()
+    {
+        _isUnsigned = true; 
+
+        long t;
+        if (_isNegative)
+            t = _value * -1;
+        else
+            t = _value;
+        
+        _value = t;
+        _isNegative = false;
     }
 
     PPCtrlExprResult operator+(const PPCtrlExprResult& a)
@@ -118,22 +145,28 @@ class PPCtrlExprResult
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
     }
 
-    PPCtrlExprResult operator*(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator*(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned;
         bool tNegative;
         bool tErr;
 
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
+
         tUnsigned = _isUnsigned || a._isUnsigned;
-        tNegative = _isNegative || a._isNegative;
+        tNegative = _isNegative ^ a._isNegative;
         tErr = _isErr || a._isErr;
         tv = _value * a._value;
 
         return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
     }
 
-    PPCtrlExprResult operator/(const PPCtrlExprResult& a)
+    PPCtrlExprResult operator/(PPCtrlExprResult a)
     {
         unsigned long tv;
         bool tUnsigned;
@@ -141,8 +174,14 @@ class PPCtrlExprResult
         bool tErr;
 
         tUnsigned = _isUnsigned || a._isUnsigned;
-        tNegative = _isNegative || a._isNegative;
+        tNegative = _isNegative ^ a._isNegative;
         tErr = _isErr || a._isErr;
+
+        if (_isUnsigned || a.isUnsigned())
+        {
+            this->promote();
+            a.promote();
+        }
 
         if (a._value != 0)
         {
@@ -193,7 +232,7 @@ class PPCtrlExprResult
         tNegative = _isNegative;
         tErr = _isErr || a._isErr;
 
-        if (a._isNegative || a._value > 64)
+        if (a._isNegative || a._value >= 64)
         {
             tErr = true;
             tv = 0;
@@ -216,7 +255,7 @@ class PPCtrlExprResult
         tNegative = _isNegative;
         tErr = _isErr || a._isErr;
 
-        if (a._isNegative || a._value > 64)
+        if (a._isNegative || a._value >= 64)
         {
             tErr = true;
             tv = 0;
@@ -414,8 +453,167 @@ class PPCtrlExprResult
     }
 
 
+    PPCtrlExprResult operator&(const PPCtrlExprResult& a)
+    {
+        unsigned long tv;
+        bool tUnsigned = _isUnsigned || a._isUnsigned;
+        bool tNegative = false;
+        bool tErr = _isErr || a._isErr;
+
+        unsigned long t1, t2; 
+
+        if (_isNegative)
+            t1 = _value * -1;
+        else
+            t1 = _value;
+
+        if (a._isNegative)
+            t2 = a._value * -1;
+        else
+            t2 = a._value;
+
+        tv = t1 & t2;
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
 
 
+    PPCtrlExprResult operator|(const PPCtrlExprResult& a)
+    {
+        unsigned long tv;
+        bool tUnsigned = _isUnsigned || a._isUnsigned;
+        bool tNegative = false;
+        bool tErr = _isErr || a._isErr;
+
+        unsigned long t1, t2; 
+
+        if (_isNegative)
+            t1 = _value * -1;
+        else
+            t1 = _value;
+
+        if (a._isNegative)
+            t2 = a._value * -1;
+        else
+            t2 = a._value;
+
+        tv = t1 | t2;
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
+
+    PPCtrlExprResult operator^(const PPCtrlExprResult& a)
+    {
+        unsigned long tv;
+        bool tUnsigned = _isUnsigned || a._isUnsigned;
+        bool tNegative = false;
+        bool tErr = _isErr || a._isErr;
+
+        unsigned long t1, t2; 
+
+        if (_isNegative)
+            t1 = _value * -1;
+        else
+            t1 = _value;
+
+        if (a._isNegative)
+            t2 = a._value * -1;
+        else
+            t2 = a._value;
+
+        tv = t1 ^ t2;
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
+
+    PPCtrlExprResult operator&&(const PPCtrlExprResult& a)
+    {
+        unsigned long tv;
+        bool tUnsigned = false;
+        bool tNegative = false;
+        bool tErr = _isErr || a._isErr;
+
+        tv = (_value != 0) && (a._value !=0);
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
+
+
+    PPCtrlExprResult operator||(const PPCtrlExprResult& a)
+    {
+        unsigned long tv;
+        bool tUnsigned = false;
+        bool tNegative = false;
+        bool tErr = _isErr || a._isErr;
+
+        tv = (_value != 0) || (a._value !=0);
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
+
+
+    PPCtrlExprResult operator~()
+    {
+        unsigned long tv;
+        bool tUnsigned = _isUnsigned;
+        bool tNegative = false;
+        bool tErr = _isErr; 
+       
+        long t = _value; 
+        if (_isNegative)
+        {
+            t = t * -1;
+        }
+        t = ~t;
+        
+        if (t>0)
+        {
+            tv = t;
+            tNegative = false;
+        }
+        else
+        {
+            tv = -1 * t;
+            tNegative = true;
+        }
+
+        return PPCtrlExprResult(tv, tNegative, tUnsigned, tErr);
+    }
+
+
+    PPCtrlExprResult& operator=(const unsigned long v)
+    {
+        _value = v;
+        return (*this);
+    }
+
+    PPCtrlExprResult& operator=(const PPCtrlExprResult &a)
+    {
+        if (this == &a)
+        {
+            return (*this);
+        }
+
+        _value = a._value;
+        _isNegative = a._isNegative;
+        _isUnsigned = a._isUnsigned;
+        _isErr = a._isErr;
+
+        return (*this);
+    }
+
+    friend ostream& operator<<(ostream &out, PPCtrlExprResult &pp);
+
+    void setNegative(bool f) { _isNegative = f; }
+    void setUnsigned(bool f) { _isUnsigned = f; }
+    void setErr(bool f) { _isErr = f; }
+    void setValue(unsigned long v) { _value = v; }
+    void reset() { _value=0; _isNegative=false; _isUnsigned=false; _isErr=false;}
+
+    bool isNegative() { return _isNegative; }
+    bool isUnsigned() { return _isUnsigned; }
+    bool isErr() { return _isErr; }
+    unsigned long value() { return _value; }
 
   private:
     unsigned long _value;
@@ -424,6 +622,37 @@ class PPCtrlExprResult
     bool          _isErr;
 };
 
+ostream& operator<<(ostream &out, PPCtrlExprResult &pp)
+{
+    if (pp._isErr)
+    {
+        out << "error";
+        return out;
+    }
+
+    if (pp._isUnsigned)
+    {
+        unsigned long t; 
+        if (pp._isNegative)
+        {
+            t = pp._value * -1;
+        }
+        else
+        {
+            t = pp._value;
+        }
+        out << t << "u";
+    }
+    else
+    {
+        long t = pp._value;
+        if (pp._isNegative)
+            out << t*-1;
+        else
+            out << t;
+    }
+    return out;
+}
 
 
 class PPCtrlExprEvaluator
@@ -449,18 +678,18 @@ class PPCtrlExprEvaluator
     {
     }
 
-    unsigned long long eval_primary ()
+    PPCtrlExprResult eval_primary ()
     {
 
+        PPCtrlExprResult term1 = 0;
         if (_idx->type == PT_LITERAL)
         {
-            unsigned long long term1 = 0;
-
             // skip all array type
             if (_idx->size > 1)
             {
                 ++_idx;
-                return 0;
+                term1.setErr(true);
+                return term1;
             }
 
             if (_idx->ltype == FT_SIGNED_CHAR)
@@ -493,26 +722,31 @@ class PPCtrlExprEvaluator
             {
                 unsigned char* v = (unsigned char*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_UNSIGNED_SHORT_INT)
             {
                 unsigned short int* v = (unsigned short int*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_UNSIGNED_INT)
             {
                 unsigned int* v = (unsigned int*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_UNSIGNED_LONG_INT)
             {
                 unsigned long int* v = (unsigned long int*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_UNSIGNED_LONG_LONG_INT)
             {
                 unsigned long long int* v = (unsigned long long int*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_WCHAR_T)
             {
@@ -528,11 +762,13 @@ class PPCtrlExprEvaluator
             {
                 char16_t* v = (char16_t*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_CHAR32_T)
             {
                 char32_t* v = (char32_t*)_idx->data;
                 term1 = *v;
+                term1.setUnsigned(true);
             }
             else if (_idx->ltype == FT_BOOL)
             {
@@ -559,7 +795,6 @@ class PPCtrlExprEvaluator
         }
         else if (_idx->type == PT_OP_LPAREN )
         {
-            unsigned long long term1;
             _idx++;
             term1 = evalCtrlExpr();
             if (_idx->type == PT_OP_RPAREN)
@@ -574,7 +809,6 @@ class PPCtrlExprEvaluator
         }
         else if (_idx->type == PT_SIMPLE || (_idx->type >= PT_KW_ALIGNAS && _idx->type<=PT_KW_WHILE))
         {
-            unsigned long long term1;
             if (_idx->source == "defined")
             {
                 _idx++;
@@ -628,17 +862,20 @@ class PPCtrlExprEvaluator
                 _idx++;
                 term1 = 0;
             }
-            return term1;
         }
-        return 0;
+        else
+        {
+             throw PPCtrlExprEvalException("error");
+        }
+        return term1;
     }
     
     
-    unsigned long long eval_unary ()
+    PPCtrlExprResult eval_unary ()
     {
-        unsigned long long term1, term2;
-        while (_idx != _end)
-        {
+        PPCtrlExprResult term1, term2;
+        // while (_idx != _end)
+        // {
             if (_idx->type == PT_OP_PLUS)
             {
                 _idx++;
@@ -648,13 +885,15 @@ class PPCtrlExprEvaluator
             {
                 _idx++;
                 term2 = eval_unary (); 
-                term1 = -1 * term2; 
+                PPCtrlExprResult temp(1,true/*isNegative*/);
+                term1 = temp * term2;
             }
             else if (_idx->type == PT_OP_LNOT)
             {
                 _idx++;
                 term2 = eval_unary();
-                term1 = !term2; 
+                PPCtrlExprResult temp(0);
+                term1 = temp == term2;; 
             }
             else if (_idx->type == PT_OP_COMPL)
             {
@@ -667,14 +906,14 @@ class PPCtrlExprEvaluator
                 term1 = eval_primary ();
                 return term1;
             }
-        } 
+        //} 
         return term1;
     }
     
     
-    unsigned long long eval_multiplicative ()
+    PPCtrlExprResult eval_multiplicative ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_unary ();
         while (_idx != _end)
         {
@@ -705,9 +944,9 @@ class PPCtrlExprEvaluator
     }
     
     
-    unsigned long long eval_additive ()
+    PPCtrlExprResult eval_additive ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_multiplicative ();
         while (_idx != _end)
         {
@@ -731,9 +970,9 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_shift ()
+    PPCtrlExprResult eval_shift ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_additive ();
         while (_idx != _end)
         {
@@ -757,9 +996,9 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_relational ()
+    PPCtrlExprResult eval_relational ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_shift ();
         while (_idx != _end)
         {
@@ -795,9 +1034,9 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_equality ()
+    PPCtrlExprResult eval_equality ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_relational ();
         while (_idx != _end)
         {
@@ -821,9 +1060,9 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_and ()
+    PPCtrlExprResult eval_and ()
     {   
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_equality ();
         while (_idx != _end)
         {
@@ -841,13 +1080,13 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_exclusive_or ()
+    PPCtrlExprResult eval_exclusive_or ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_and ();
         while (_idx != _end)
         {
-            if (_idx->type == PT_OP_LAND)
+            if (_idx->type == PT_OP_XOR)
             {
                 _idx++;
                 term2 = eval_and (); 
@@ -861,13 +1100,13 @@ class PPCtrlExprEvaluator
         return term1;
     }
     
-    unsigned long long eval_inclusive_or ()
+    PPCtrlExprResult eval_inclusive_or ()
     {
-        unsigned long long term1, term2;
+        PPCtrlExprResult term1, term2;
         term1 = eval_exclusive_or ();
         while (_idx != _end)
         {
-            if (_idx->type == PT_OP_LAND)
+            if (_idx->type == PT_OP_BOR)
             {
                 _idx++;
                 term2 = eval_exclusive_or (); 
@@ -882,49 +1121,79 @@ class PPCtrlExprEvaluator
 
     }
     
-    unsigned long long eval_logical_and ()
+    PPCtrlExprResult eval_logical_and ()
     {
-        unsigned long long term1, term2;
+        bool foundZero = false; 
+        PPCtrlExprResult term1, term2, r;
         term1 = eval_inclusive_or();
+        
         while (_idx != _end)
         {
             if (_idx->type == PT_OP_LAND)
             {
+                if (term1.value()==0 || term1.isErr()==true) 
+                {
+                    r = term1 && PPCtrlExprResult(0);
+                    foundZero = true;
+                }
                 _idx++;
                 term2 = eval_inclusive_or(); 
                 term1 = term1 && term2;
+                // if (foundZero==false && (term1.value()==0 || term1.isErr()==true)) 
+                // {
+                //     r = term1;
+                //     foundZero = true;
+                // }
             }
             else
             {
                 break;
             }
         } 
-        return term1;
+        if (foundZero)
+            return r;
+        else
+            return term1;
     }
     
-    unsigned long long eval_logical_or ()
+    PPCtrlExprResult eval_logical_or ()
     {
-        unsigned long long term1, term2; 
+        bool foundOne = false;
+        PPCtrlExprResult term1, term2, r; 
         term1 = eval_logical_and ();
         while (_idx != _end)
         {
             if ( _idx->type == PT_OP_LOR )
             {
+                if (foundOne==false && (term1.value()!=0 || term1.isErr()))
+                {
+                    r = term1 || PPCtrlExprResult(1);
+                    foundOne = true;
+                }
+
                 _idx++;
                 term2 = eval_logical_and();
                 term1 = term1 || term2;
+                // if (foundOne==false && (term1.value()!=0 || term1.isErr()))
+                // {
+                //     r = term1;
+                //     foundOne = true;
+                // }
             }
             else
             {
                 break;
             }
         }
-        return term1;
+        if (foundOne)
+            return r;
+        else
+            return term1;
     }
     
-    unsigned long long evalCtrlExpr()
+    PPCtrlExprResult evalCtrlExpr()
     {
-        unsigned long long term1, term2, term3;
+        PPCtrlExprResult term1, term2, term3;
         term1 = eval_logical_or();     
 
         if (_idx->type == PT_OP_QMARK)
@@ -936,8 +1205,30 @@ class PPCtrlExprEvaluator
                 _idx++;
                 term3 = evalCtrlExpr();
             }
+        
+            PPCtrlExprResult zero(0);
 
-            return (term1 ? term2 : term3);
+            if (term1.isErr()) 
+            {
+                return term1;
+            }
+
+            if (term1.value() != 0)
+            {
+                if (term3.isUnsigned())
+                {
+                    term2.setUnsigned(true);
+                }
+                return term2;
+            }
+            else
+            {
+                if (term2.isUnsigned())
+                {
+                    term3.setUnsigned(true);
+                }
+                return term3;
+            }
         }
         else
         {
@@ -955,7 +1246,7 @@ class PPCtrlExprEvaluator
                 return;
             }
  
-            unsigned long long result = evalCtrlExpr();
+            PPCtrlExprResult result = evalCtrlExpr();
             if (_idx != _end)
             {
                 throw PPCtrlExprEvalException("error");

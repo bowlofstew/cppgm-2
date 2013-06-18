@@ -1,15 +1,3 @@
-simple false KW_FALSE
-simple ? OP_QMARK
-literal 5u unsigned int 05000000
-simple : OP_COLON
-simple - OP_MINUS
-literal 5 int 05000000
-simple false KW_FALSE
-simple ? OP_QMARK
-literal 5 int 05000000
-simple / OP_DIV
-literal 0u unsigned int 00000000
-simple : OP_COLON
-simple - OP_MINUS
-literal 5 int 05000000
+18446744073709551611u
+18446744073709551611u
 eof
