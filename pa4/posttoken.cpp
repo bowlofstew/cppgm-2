@@ -588,7 +588,8 @@ string HexDump(const void* pdata, size_t nbytes)
 // DebugPostTokenOutputStream: helper class to produce PA2 output format
 struct DebugPostTokenOutputStream
 {
-#ifdef PA2
+//#ifdef PA2
+#ifdef rich 
 	// output: invalid <source>
 	void emit_invalid(const string& source)
 	{
@@ -858,6 +859,151 @@ enum EPostTokenType
 };
 
 
+// StringToETokenTypeMap map of `simple` `preprocessing-tokens` to ETokenType
+const unordered_map<string, EPostTokenType> StringToPostTokenTypeMap =
+{
+	// keywords
+	{"alignas", PT_KW_ALIGNAS},
+	{"alignof", PT_KW_ALIGNOF},
+	{"asm", PT_KW_ASM},
+	{"auto", PT_KW_AUTO},
+	{"bool", PT_KW_BOOL},
+	{"break", PT_KW_BREAK},
+	{"case", PT_KW_CASE},
+	{"catch", PT_KW_CATCH},
+	{"char", PT_KW_CHAR},
+	{"char16_t", PT_KW_CHAR16_T},
+	{"char32_t", PT_KW_CHAR32_T},
+	{"class", PT_KW_CLASS},
+	{"const", PT_KW_CONST},
+	{"constexpr", PT_KW_CONSTEXPR},
+	{"const_cast", PT_KW_CONST_CAST},
+	{"continue", PT_KW_CONTINUE},
+	{"decltype", PT_KW_DECLTYPE},
+	{"default", PT_KW_DEFAULT},
+	{"delete", PT_KW_DELETE},
+	{"do", PT_KW_DO},
+	{"double", PT_KW_DOUBLE},
+	{"dynamic_cast", PT_KW_DYNAMIC_CAST},
+	{"else", PT_KW_ELSE},
+	{"enum", PT_KW_ENUM},
+	{"explicit", PT_KW_EXPLICIT},
+	{"export", PT_KW_EXPORT},
+	{"extern", PT_KW_EXTERN},
+	{"false", PT_KW_FALSE},
+	{"float", PT_KW_FLOAT},
+	{"for", PT_KW_FOR},
+	{"friend", PT_KW_FRIEND},
+	{"goto", PT_KW_GOTO},
+	{"if", PT_KW_IF},
+	{"inline", PT_KW_INLINE},
+	{"int", PT_KW_INT},
+	{"long", PT_KW_LONG},
+	{"mutable", PT_KW_MUTABLE},
+	{"namespace", PT_KW_NAMESPACE},
+	{"new", PT_KW_NEW},
+	{"noexcept", PT_KW_NOEXCEPT},
+	{"nullptr", PT_KW_NULLPTR},
+	{"operator", PT_KW_OPERATOR},
+	{"private", PT_KW_PRIVATE},
+	{"protected", PT_KW_PROTECTED},
+	{"public", PT_KW_PUBLIC},
+	{"register", PT_KW_REGISTER},
+	{"reinterpret_cast", PT_KW_REINTERPET_CAST},
+	{"return", PT_KW_RETURN},
+	{"short", PT_KW_SHORT},
+	{"signed", PT_KW_SIGNED},
+	{"sizeof", PT_KW_SIZEOF},
+	{"static", PT_KW_STATIC},
+	{"static_assert", PT_KW_STATIC_ASSERT},
+	{"static_cast", PT_KW_STATIC_CAST},
+	{"struct", PT_KW_STRUCT},
+	{"switch", PT_KW_SWITCH},
+	{"template", PT_KW_TEMPLATE},
+	{"this", PT_KW_THIS},
+	{"thread_local", PT_KW_THREAD_LOCAL},
+	{"throw", PT_KW_THROW},
+	{"true", PT_KW_TRUE},
+	{"try", PT_KW_TRY},
+	{"typedef", PT_KW_TYPEDEF},
+	{"typeid", PT_KW_TYPEID},
+	{"typename", PT_KW_TYPENAME},
+	{"union", PT_KW_UNION},
+	{"unsigned", PT_KW_UNSIGNED},
+	{"using", PT_KW_USING},
+	{"virtual", PT_KW_VIRTUAL},
+	{"void", PT_KW_VOID},
+	{"volatile", PT_KW_VOLATILE},
+	{"wchar_t", PT_KW_WCHAR_T},
+	{"while", PT_KW_WHILE},
+
+	// operators/punctuation
+	{"{", PT_OP_LBRACE},
+	{"<%", PT_OP_LBRACE},
+	{"}", PT_OP_RBRACE},
+	{"%>", PT_OP_RBRACE},
+	{"[", PT_OP_LSQUARE},
+	{"<:", PT_OP_LSQUARE},
+	{"]", PT_OP_RSQUARE},
+	{":>", PT_OP_RSQUARE},
+	{"(", PT_OP_LPAREN},
+	{")", PT_OP_RPAREN},
+	{"|", PT_OP_BOR},
+	{"bitor", PT_OP_BOR},
+	{"^", PT_OP_XOR},
+	{"xor", PT_OP_XOR},
+	{"~", PT_OP_COMPL},
+	{"compl", PT_OP_COMPL},
+	{"&", PT_OP_AMP},
+	{"bitand", PT_OP_AMP},
+	{"!", PT_OP_LNOT},
+	{"not", PT_OP_LNOT},
+	{";", PT_OP_SEMICOLON},
+	{":", PT_OP_COLON},
+	{"...", PT_OP_DOTS},
+	{"?", PT_OP_QMARK},
+	{"::", PT_OP_COLON2},
+	{".", PT_OP_DOT},
+	{".*", PT_OP_DOTSTAR},
+	{"+", PT_OP_PLUS},
+	{"-", PT_OP_MINUS},
+	{"*", PT_OP_STAR},
+	{"/", PT_OP_DIV},
+	{"%", PT_OP_MOD},
+	{"=", PT_OP_ASS},
+	{"<", PT_OP_LT},
+	{">", PT_OP_GT},
+	{"+=", PT_OP_PLUSASS},
+	{"-=", PT_OP_MINUSASS},
+	{"*=", PT_OP_STARASS},
+	{"/=", PT_OP_DIVASS},
+	{"%=", PT_OP_MODASS},
+	{"^=", PT_OP_XORASS},
+	{"xor_eq", PT_OP_XORASS},
+	{"&=", PT_OP_BANDASS},
+	{"and_eq", PT_OP_BANDASS},
+	{"|=", PT_OP_BORASS},
+	{"or_eq", PT_OP_BORASS},
+	{"<<", PT_OP_LSHIFT},
+	{">>", PT_OP_RSHIFT},
+	{">>=", PT_OP_RSHIFTASS},
+	{"<<=", PT_OP_LSHIFTASS},
+	{"==", PT_OP_EQ},
+	{"!=", PT_OP_NE},
+	{"not_eq", PT_OP_NE},
+	{"<=", PT_OP_LE},
+	{">=", PT_OP_GE},
+	{"&&", PT_OP_LAND},
+	{"and", PT_OP_LAND},
+	{"||", PT_OP_LOR},
+	{"or", PT_OP_LOR},
+	{"++", PT_OP_INC},
+	{"--", PT_OP_DEC},
+	{",", PT_OP_COMMA},
+	{"->*", PT_OP_ARROWSTAR},
+	{"->", PT_OP_ARROW}
+};
+
 
 const map<EPostTokenType, string> PostTokenTypeToStringMap =
 {
@@ -873,8 +1019,8 @@ const map<EPostTokenType, string> PostTokenTypeToStringMap =
 
     {PT_INVALID, "INVALID"},  // for testing
 
-	{PT_KW_ALIGNAS, "PT_KW_ALIGNAS"},
-	{PT_KW_ALIGNOF, "PT_KW_ALIGNOF"},
+	{PT_KW_ALIGNAS, "KW_ALIGNAS"},
+	{PT_KW_ALIGNOF, "KW_ALIGNOF"},
 	{PT_KW_ASM, "KW_ASM"},
 	{PT_KW_AUTO, "KW_AUTO"},
 	{PT_KW_BOOL, "KW_BOOL"},
@@ -1008,12 +1154,114 @@ struct PostToken
     EPostTokenType type;
     string source;
     string udSuffix;
+    string udPrefix;
 
     // for literal
     //
     EFundamentalType ltype;
     int   size;
     void* data;
+
+    int bytes()
+    {
+        int bsize = size;
+        if (ltype==FT_SIGNED_CHAR || ltype==FT_UNSIGNED_CHAR || ltype==FT_CHAR || ltype==FT_BOOL)
+        {
+            bsize *= 1;
+        }
+        else if (ltype==FT_SHORT_INT || ltype==FT_UNSIGNED_SHORT_INT || ltype==FT_CHAR16_T)
+        {
+            bsize *= 2;
+        }
+        else if (ltype==FT_INT || ltype==FT_UNSIGNED_INT || ltype==FT_CHAR32_T || ltype==FT_WCHAR_T || ltype==FT_FLOAT)
+        {
+            bsize *= 4;
+        }
+        else if (ltype==FT_LONG_INT || ltype==FT_LONG_LONG_INT || ltype==FT_UNSIGNED_LONG_INT || ltype==FT_UNSIGNED_LONG_LONG_INT || ltype==FT_DOUBLE || ltype==FT_NULLPTR_T)
+        {
+            bsize *= 8;
+        }
+        else if (ltype==FT_LONG_DOUBLE)
+        {
+            bsize *= 16;
+        }
+        return bsize;
+    }
+
+    void emit()
+    {
+        int nbytes = bytes();
+
+        if (type == PT_INVALID)
+        {
+		    cout << "invalid " << source << endl;
+        }
+        else if (type == PT_SIMPLE)
+        {
+		    cout << "identifier " << source << endl;
+        }
+        else if (type == PT_LITERAL && size == 1)
+        {
+            if (source[source.size()-1] == '"')
+            {
+		        cout << "literal " << source << " array of " << size << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+            }
+            else
+            {
+		        cout << "literal " << source << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+            }
+        }
+        else if (type == PT_LITERAL)
+        {
+		    cout << "literal " << source << " array of " << size << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+        } 
+        else if (type == PT_UD_LITERAL && size == 1)
+        {
+            if (ltype == FT_CHAR || ltype == FT_CHAR16_T || ltype == FT_CHAR32_T || ltype == FT_WCHAR_T)
+            {
+		        cout << "user-defined-literal " << source << " " << udSuffix << " character " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+            }
+            else if (ltype == FT_INT)
+            {
+		        cout << "user-defined-literal " << source << " " << udSuffix << " integer " << udPrefix << endl;
+            }
+            else if (ltype == FT_FLOAT)
+            {
+		        cout << "user-defined-literal " << source << " " << udSuffix << " floating " << udPrefix << endl;
+            }
+        }
+        else if (type == PT_UD_LITERAL)
+        {
+		    cout << "user-defined-literal " << source << " " << udSuffix << " string array of " << size << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+        }
+        else if (type == PT_EOF)
+        {
+		    cout << "eof" << endl;
+        } 
+        else if (type == PT_NEWLINE)
+        {
+            // do nothing
+        }
+        else if (type == PT_WHITESPACE)
+        {
+            // do nothing
+        }
+        else if (type > PT_INVALID)
+        {
+            if (type == PT_OP_HASH || type == PT_OP_HASHHASH)
+            {
+                cout << "invalid " << source << endl;
+            }
+            else {
+		        cout << "simple " << source << " " << PostTokenTypeToStringMap.at(type) << endl;
+            }
+        }
+        else
+        {
+            cout << "emit error" << endl;
+        }
+    }
+
 };
 
 
@@ -1041,13 +1289,13 @@ class PostTokenizer
 
     vector<PostToken>  _tokens;
 
-
-    void addToken(EPostTokenType type, string src="", string udSuffix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
+    PostToken createToken (EPostTokenType type, string src="", string udSuffix="", string udPrefix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
     {
         PostToken pt;
         pt.type = type;
         pt.source = src;
         pt.udSuffix = udSuffix;
+        pt.udPrefix = udPrefix;
         pt.ltype = ltype;
         pt.size = size;
         
@@ -1084,10 +1332,106 @@ class PostTokenizer
         {
             pt.data = 0;
         }
+        return pt;
+    }
 
+
+    void addToken(EPostTokenType type, string src="", string udSuffix="", string udPrefix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
+    {
+        PostToken pt = createToken(type, src, udSuffix, udPrefix, ltype, size, addr);
         _tokens.push_back(pt);
     }
 
+
+    PostToken parseOne (PPToken& pp)
+    {
+        PPTokenType type = pp.type;
+        string str = UTF8Encoder::encode( pp.data );
+
+        if (type == PP_WHITESPACE)
+        {
+            return createToken(PT_WHITESPACE);
+        }
+        else if ( type == PP_NEWLINE)
+        {
+            return createToken(PT_NEWLINE);
+        }
+        else if (type == PP_HEADERNAME)
+        {
+            return createToken(PT_HEADERNAME, str);
+        }
+        else if (type == PP_NONWHITESPACE)
+        {
+            return createToken(PT_INVALID, str);
+        }
+        else if (type == PP_EOF)
+        {
+            return createToken(PT_EOF);
+        }
+        else if (type == PP_OP || type == PP_IDENTIFIER)
+        {
+            unordered_map<string, ETokenType>::const_iterator eit = StringToTokenTypeMap.find(str);
+            if (eit == StringToTokenTypeMap.end())
+            {
+                if ( str == "#" || str == "%:" )
+                {
+                    return createToken(PT_OP_HASH, str);
+                }
+                else if (str == "##" || str == "%:%:")
+                {
+                    return createToken(PT_OP_HASHHASH, str);
+                }
+                else 
+                {
+                    return createToken(PT_SIMPLE, str);
+                }
+            }
+            else
+            {
+                // op
+                return createToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID + 1), str);
+            }
+        }
+        else if ( type == PP_NUMBER )
+        {
+            return parse_one_ppnumber( pp.data );
+        }
+        else if ( type == PP_CHAR_LITERAL || type == PP_UD_CHAR_LITERAL )
+        {
+            return parse_one_ppchar( pp.data );
+        }
+        else if ( type == PP_STRING_LITERAL || type == PP_RAW_STRING_LITERAL || type == PP_UD_STRING_LITERAL || type == PP_UD_RAW_STRING_LITERAL)
+        {
+            // string source;
+            // string suffix;
+            // vector<int> chars;
+            // vector<int> udSuffix;
+            // int char_width;
+            // if (parse_string( pp.data, source, chars, udSuffix, char_width) == true)
+            // {
+            //     PostTokenString p;
+            //     p.source = source;
+            //     p.chars = chars;
+            //     p.char_width = char_width;
+            //     p.udSuffix = UTF8Encoder::encode(udSuffix); 
+            //     ppStrLst.push_back(p);
+            // }
+            // else
+            // {
+            //     emit_strLst(ppStrLst);
+            //     _out.emit_invalid(source);
+            //     addToken(PT_INVALID, source);
+            // }
+            // return parse_one_string(pp.data);
+            return parse_one_string( pp.data );
+        }
+        else
+        {
+            throw PostTokenizerException("Bad Tokens");
+        }
+
+        return createToken(PT_INVALID, UTF8Encoder::encode( pp.data ));
+    }
 
 
     void parse()
@@ -1146,24 +1490,24 @@ class PostTokenizer
                     if ( str == "#" || str == "%:" )
                     {
                         _out.emit_invalid( str );
-                        addToken(PT_OP_HASH);
+                        addToken(PT_OP_HASH, str);
                     }
                     else if (str == "##" || str == "%:%:")
                     {
                         _out.emit_invalid( str );
-                        addToken(PT_OP_HASHHASH);
+                        addToken(PT_OP_HASHHASH, str);
                     }
                     else 
                     {
                         _out.emit_identifier( str );
-                        addToken(PT_SIMPLE, str);
+                        addToken(PT_SIMPLE, str, str);
                     }
                 }
                 else
                 {
                     // op
                     _out.emit_simple(str, eit->second); 
-                    addToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID + 1));
+                    addToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID + 1), str);
                 }
             }
             else if ( type == PP_NUMBER )
@@ -1205,6 +1549,7 @@ class PostTokenizer
         }
 
         emit_strLst(ppStrLst);
+
     }
 
 
@@ -1281,18 +1626,18 @@ class PostTokenizer
 
         //--- otherwise, output the concated string
         //
+        string es = UTF8Encoder::encode(concatChars);
         if (char_width == 0 || char_width == 1)
         {
-            string es = UTF8Encoder::encode(concatChars);
             if (suffix == "")
             {
                 _out.emit_literal_array(concatSource, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR, es.size(), es.c_str());
+                addToken(PT_LITERAL, concatSource, suffix, es, FT_CHAR, es.size(), es.c_str());
             }
             else 
             {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, es.size(), FundamentalTypeOf<char>(), es.c_str(), es.size());
-                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR, es.size(), es.c_str());
+                addToken(PT_UD_LITERAL, concatSource, suffix, es, FT_CHAR, es.size(), es.c_str());
             }
         }
         else if (char_width == 2)
@@ -1306,12 +1651,12 @@ class PostTokenizer
             if (suffix == "")
             {
                 _out.emit_literal_array(concatSource, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR16_T, utf16_codes.size(), data);
+                addToken(PT_LITERAL, concatSource, suffix, es, FT_CHAR16_T, utf16_codes.size(), data);
             }
             else
             {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, utf16_codes.size(), FundamentalTypeOf<char16_t>(), data, utf16_codes.size()*2);
-                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR16_T, utf16_codes.size(), data);
+                addToken(PT_UD_LITERAL, concatSource, suffix, es, FT_CHAR16_T, utf16_codes.size(), data);
             }
         } 
         else if (char_width == 3)
@@ -1324,12 +1669,12 @@ class PostTokenizer
             if (suffix == "")
             {
                 _out.emit_literal_array(concatSource, concatChars.size(), FundamentalTypeOf<char32_t>(), data, concatChars.size()*4);
-                addToken(PT_LITERAL, concatSource, suffix, FT_CHAR32_T, concatChars.size(), data);
+                addToken(PT_LITERAL, concatSource, suffix, es, FT_CHAR32_T, concatChars.size(), data);
             }
             else
             {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, concatChars.size(), FundamentalTypeOf<char32_t>(), data, concatChars.size()*4);
-                addToken(PT_UD_LITERAL, concatSource, suffix, FT_CHAR32_T, concatChars.size(), data);
+                addToken(PT_UD_LITERAL, concatSource, suffix, es, FT_CHAR32_T, concatChars.size(), data);
             }
 
         } 
@@ -1343,12 +1688,12 @@ class PostTokenizer
             if (suffix == "")
             {
                 _out.emit_literal_array(concatSource, concatChars.size(), FundamentalTypeOf<wchar_t>(), data, concatChars.size()*4);
-                addToken(PT_LITERAL, concatSource, suffix, FT_WCHAR_T, concatChars.size(), data);
+                addToken(PT_LITERAL, concatSource, suffix, es, FT_WCHAR_T, concatChars.size(), data);
             }
             else
             {
 	            _out.emit_user_defined_literal_string_array(concatSource, suffix, concatChars.size(), FundamentalTypeOf<wchar_t>(), data, concatChars.size()*4);
-                addToken(PT_UD_LITERAL, concatSource, suffix, FT_WCHAR_T, concatChars.size(), data);
+                addToken(PT_UD_LITERAL, concatSource, suffix, es, FT_WCHAR_T, concatChars.size(), data);
             }
         }
 
@@ -1357,6 +1702,343 @@ class PostTokenizer
         // 
         ppStrLst.clear();
     }
+
+
+    PostToken parse_one_string(vector<int>& codes)
+    {
+        string source;
+        vector<int> chars;
+        vector<int> udSuffix;
+        int char_width;
+
+        int la = -1;
+        int state = 0;
+        bool isChar8 = false;
+        bool isChar16 = false;
+        bool isChar32 = false;
+        bool isWchar  = false;
+        bool stop = false;
+        source = UTF8Encoder::encode(codes);
+        vector<int> rawSuffix;
+        vector<int> rawPrefix;
+        bool isRawSuffix = false;
+
+        vector<int>::iterator idx = codes.begin();
+        while ( idx != codes.end() )
+        {
+            la = (*idx);
+            switch (state)
+            {
+                case 0:
+                    if ( la == 'u' )
+                    {
+                        state = 1;
+                        isChar16 = true;
+                    }
+                    else if ( la == 'U')
+                    {
+                        state = 2;
+                        isChar32 = true;
+                    }
+                    else if ( la == 'L')
+                    {
+                        state = 3;
+                        isWchar = true;
+                    }
+                    else if ( la == 'R')
+                    {
+                        state = 5;
+                    }
+                    else if (la == '"')
+                    {
+                        state = 6;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 1:
+                    if (la=='8')
+                    {
+                        isChar8 = true;
+                        isChar16 = false;
+                        state = 4;
+                    }
+                    else if (la =='R')
+                        state = 5;
+                    else if (la =='"')
+                        state = 6;
+                    else
+                        stop = true;
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    if (la == 'R')
+                        state = 5;
+                    else if (la=='"')
+                        state = 6;
+                    else
+                        stop = true;
+                    break;
+                case 5:
+                    if (la == '"')
+                        state = 9;
+                    else
+                        stop = true;
+                    break;
+                case 6:
+                    if (la == '"')
+                        state = 8;
+                    else if (la == '\\')
+                        state = 7;
+                    else
+                    {
+                        chars.push_back(la);
+                        state = 6;
+                    }
+                    break;
+                case 7:
+                    if (la=='\'' || la=='"' || la == '\?' || la == '\\')
+                        chars.push_back(la);
+                    else if (la == 'a')
+                        chars.push_back('\a');
+                    else if (la == 'b')
+                        chars.push_back('\b');
+                    else if (la == 'f')
+                        chars.push_back('\f');
+                    else if (la == 'n')
+                        chars.push_back('\n');
+                    else if (la == 'r')
+                        chars.push_back('\r');
+                    else if (la == 't')
+                        chars.push_back('\t');
+                    else if (la == 'v')
+                        chars.push_back('\v');
+                    else if ( isOctal(la) )
+                    {
+                        chars.push_back( HexCharToValue(la) );
+                        state = 14;
+                        break;
+                    }
+                    else if (la == 'x')
+                    {
+                        state = 11;
+                        break;
+                    }
+                    state = 6;
+                    break;
+                case 8:
+                    udSuffix.push_back(la);
+                    state = 8;
+                    break;
+                case 9:
+                    if (la == '(')
+                        state = 10;
+                    else 
+                    {
+                        rawPrefix.push_back(la);
+                        state = 9;
+                    }
+                    break;
+                case 10:
+                    if (la == ')')
+                    {
+                        if (isRawSuffix)
+                        {
+                            chars.push_back(')');
+                            chars.insert(chars.end(), rawSuffix.begin(), rawSuffix.end());
+                        }
+                        isRawSuffix = true;
+                        rawSuffix.clear();
+                    }
+                    else if (la == '"')
+                    {
+                        if (isRawSuffix)
+                        {
+                            if (compareCodeToCode(rawPrefix, rawSuffix) == true)
+                            {
+                                state = 8; 
+                                break;
+                            }
+                            else
+                            {
+                                chars.push_back(')');
+                                chars.insert(chars.end(), rawSuffix.begin(), rawSuffix.end());
+                                chars.push_back('"');
+                                isRawSuffix = false;
+                                rawSuffix.clear();
+                            }
+                        } 
+                        else
+                        {
+                             chars.push_back(la);
+                        }
+                    }
+                    else
+                    {                    
+                        if (isRawSuffix)
+                            rawSuffix.push_back(la);
+                        else
+                            chars.push_back(la);
+                    }
+                    state = 10;
+                    break;
+                case 11:
+                    if ( isHex(la) )
+                    {
+                        chars.push_back( HexCharToValue(la) );
+                        state = 13;
+                    } 
+                    else
+                        stop = true;
+                    break;
+                case 12:
+                    if ( isOctal(la) )
+                    {
+                        chars.push_back( HexCharToValue(la) );
+                        state = 14;
+                    }
+                    else
+                        stop = true;
+                    break;
+                case 13:
+                    if ( isHex(la) )
+                    {
+                        chars[chars.size()-1] = (chars[chars.size()-1]<<4) + HexCharToValue(la);
+                        state = 13;
+                    }
+                    else if (la == '"')
+                        state = 8;
+                    else if (la == '\\')
+                        state = 7;
+                    else 
+                    {
+                        chars.push_back(la);
+                        state = 6;
+                    }
+                    break;
+                case 14:
+                    if ( isOctal(la) )
+                    {
+                        chars[chars.size()-1] = (chars[chars.size()-1]<<3) + HexCharToValue(la);
+                        state = 14;
+                    }
+                    else if (la == '"')
+                        state = 8;
+                    else if (la == '\\')
+                        state = 7;
+                    else 
+                    {
+                        chars.push_back(la);
+                        state = 6;
+                    }
+                    break;
+                default:
+                    stop = true;
+                    break;
+            }
+
+            if (stop)
+            {
+                break;
+            }
+            idx++;
+        }  
+
+        if (state != 8)
+        {
+            return createToken(PT_INVALID, source);
+        }
+        else
+        {
+            chars.push_back(0);  //string end
+            if (isChar8)
+                char_width = 1;
+            else if (isChar16)
+                char_width = 2;
+            else if (isChar32)
+                char_width = 3;
+            else if (isWchar)
+                char_width = 4;
+            else
+                char_width = 0;
+        }
+
+
+        string suffix = UTF8Encoder::encode(udSuffix);
+
+        if (char_width == 0 || char_width == 1)
+        {
+            string es = UTF8Encoder::encode(chars);
+            if (suffix == "")
+            {
+                return createToken(PT_LITERAL, source, suffix, es, FT_CHAR, es.size(), es.c_str());
+            }
+            else 
+            {
+                return createToken(PT_UD_LITERAL, source, suffix, es, FT_CHAR, es.size(), es.c_str());
+            }
+        }
+        else if (char_width == 2)
+        {
+            string es = UTF8Encoder::encode(chars);
+            vector<short> utf16_codes = UTF16Encoder::encode( chars );
+            char16_t* data = new char16_t[utf16_codes.size()];
+            for (unsigned int i=0; i<utf16_codes.size(); ++i)
+            {
+                data[i] = utf16_codes[i];
+            }
+            if (suffix == "")
+            {
+                return createToken(PT_LITERAL, source, suffix, es, FT_CHAR16_T, utf16_codes.size(), data);
+            }
+            else
+            {
+                return createToken(PT_UD_LITERAL, source, suffix, es, FT_CHAR16_T, utf16_codes.size(), data);
+            }
+        } 
+        else if (char_width == 3)
+        {
+            string es = UTF8Encoder::encode(chars);
+            char32_t* data = new char32_t[chars.size()];
+            for (unsigned int i=0; i<chars.size(); ++i)
+            {
+                data[i] = chars[i];
+            }
+            if (suffix == "")
+            {
+                return createToken(PT_LITERAL, source, suffix, es, FT_CHAR32_T, chars.size(), data);
+            }
+            else
+            {
+                return createToken(PT_UD_LITERAL, source, suffix, es, FT_CHAR32_T, chars.size(), data);
+            }
+
+        } 
+        else if (char_width == 4)
+        {
+            string es = UTF8Encoder::encode(chars);
+            wchar_t* data = new wchar_t[chars.size()];
+            for (unsigned int i=0; i<chars.size(); ++i)
+            {
+                data[i] = chars[i];
+            }
+            if (suffix == "")
+            {
+                return createToken(PT_LITERAL, source , suffix, es, FT_WCHAR_T, chars.size(), data);
+            }
+            else
+            {
+                return createToken(PT_UD_LITERAL, source, suffix, es, FT_WCHAR_T, chars.size(), data);
+            }
+        }
+
+        return createToken(PT_INVALID, source);
+
+    }
+
 
 
     bool parse_string(vector<int>& codes, string& source, vector<int>& chars, vector<int>& udSuffix, int& char_width)
@@ -1617,6 +2299,233 @@ class PostTokenizer
     }
 
 
+    PostToken parse_one_ppchar(vector<int>& codes)
+    {
+        int la = -1;
+        int state = 0;
+        bool isChar16 = false;
+        bool isChar32 = false;
+        bool isWchar  = false;
+        bool stop = false;
+        string source = UTF8Encoder::encode(codes);
+        vector<int> cchars;
+        vector<int> suffix;
+
+        vector<int>::iterator idx = codes.begin();
+        while ( idx != codes.end() )
+        {
+            la = (*idx);
+            switch (state)
+            {
+                case 0:
+                    if ( la == 'u' || la == 'U' || la == 'L')
+                    {
+                        if (la == 'u') 
+                            isChar16 = true;
+                        else if (la=='U')
+                            isChar32 = true;
+                        else
+                            isWchar = true;
+                        state = 1;
+                    }
+                    else if ( la == '\'' )
+                    {
+                        state = 2;
+                    }
+                    else 
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 1:
+                    if ( la == '\'')
+                        state = 2;
+                    else
+                        stop = true;
+                    break;
+                case 2:
+                    if (la == '\\')
+                        state = 3; 
+                    else
+                    {
+                        cchars.push_back(la);
+                        state = 8; 
+                    }
+                    break;
+                case 3:
+                    if (la=='\'' || la=='"' || la == '\?' || la == '\\')
+                        cchars.push_back(la);
+                    else if (la == 'a')
+                        cchars.push_back('\a');
+                    else if (la == 'b')
+                        cchars.push_back('\b');
+                    else if (la == 'f')
+                        cchars.push_back('\f');
+                    else if (la == 'n')
+                        cchars.push_back('\n');
+                    else if (la == 'r')
+                        cchars.push_back('\r');
+                    else if (la == 't')
+                        cchars.push_back('\t');
+                    else if (la == 'v')
+                        cchars.push_back('\v');
+                    else if ( isOctal(la) )
+                    {
+                        cchars.push_back( HexCharToValue(la) );
+                        state = 5;
+                        break;
+                    }
+                    else if (la == 'x')
+                    {
+                        state = 6;
+                        break;
+                    }
+                    state = 4;
+                    break;
+                case 4:
+                    if (la=='\'')
+                        state = 10;
+                    else
+                        stop = true;
+                    break;
+                case 5:
+                    if ( isOctal(la) )
+                    {
+                        cchars[cchars.size()-1] = (cchars[cchars.size()-1] << 3) + HexCharToValue(la);
+                        state = 5;
+                    }
+                    else if (la == '\'')
+                        state = 10;
+                    else
+                        stop = true;
+                    break;
+                case 6:
+                    if ( isHex(la) )
+                    {
+                        cchars.push_back( HexCharToValue(la) );
+                        state = 7;
+                    }
+                    else
+                        stop = true;
+                    break;
+                case 7:
+                    if ( isHex(la) )
+                    {
+                        cchars[cchars.size()-1] = (cchars[cchars.size()-1] << 4) + HexCharToValue(la);
+                        state = 7;
+                    }
+                    else if (la == '\'')
+                        state = 10;
+                    else
+                        stop = true;
+                    break;
+                case 8:
+                    if (la == '\'')
+                        state = 10;
+                    else
+                        stop = true;
+                    break;
+                case 10:
+                    // success
+                    suffix.push_back(la);
+                    state = 10;
+                    break;
+            }
+
+            if (stop == true) // invalid
+            {
+                return createToken(PT_INVALID, source);
+            }
+            idx++;
+        }
+
+
+        if (cchars.size() > 1)
+        {
+            return createToken(PT_INVALID, source);
+        }
+        else if (suffix.size() > 0 && suffix[0] != '_')
+        {
+            return createToken(PT_INVALID, source);
+        }
+        else 
+        {
+            string cs = UTF8Encoder::encode(suffix);
+            string es = UTF8Encoder::encode(cchars);
+            unsigned int c = (unsigned int) cchars[0];
+            if (isChar32)
+            {
+                if (cs == "")
+                {
+                    return createToken(PT_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
+                }
+                else 
+                {
+                    return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
+                }
+            }
+            else if (isChar16)
+            {
+                if (c > 0xFFFF)
+                {
+                    return createToken(PT_INVALID, source);
+                }
+                else
+                {
+                    if (cs =="")
+                    {
+                        return createToken(PT_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
+                    }
+                    else 
+                    {
+                        return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
+                    }
+                }
+            }
+            else if (isWchar)
+            {
+                if (cs == "")
+                {
+                    return createToken(PT_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
+                }
+                else
+                {
+                    return createToken(PT_UD_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
+                }
+            }
+            else
+            {
+                if (c > 0xFF)
+                {
+                    if (cs == "")
+                    {
+                        return createToken(PT_LITERAL, source, cs, es, FT_INT, 1, &c);
+                    }
+                    else 
+                    {
+                        return createToken(PT_UD_LITERAL, source, cs, es, FT_INT, 1, &c);
+                    }
+                }
+                else
+                {
+                    if (cs == "")
+                    {
+                        return createToken(PT_LITERAL, source, cs, es, FT_CHAR, 1, &c);
+                    }
+                    else
+                    {
+                        return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR, 1, &c);
+                    }
+                }
+            }
+        }
+
+        return createToken(PT_INVALID, source);
+    }
+
+
+
+
     void parse_ppchar(vector<int>& codes)
     {
         int la = -1;
@@ -1626,7 +2535,7 @@ class PostTokenizer
         bool isWchar  = false;
         bool stop = false;
         string source = UTF8Encoder::encode(codes);
-        vector<unsigned int> cchars;
+        vector<int> cchars;
         vector<int> suffix;
 
         vector<int>::iterator idx = codes.begin();
@@ -1773,18 +2682,19 @@ class PostTokenizer
         else 
         {
             string cs = UTF8Encoder::encode(suffix);
-            unsigned int c = cchars[0];
+            string es = UTF8Encoder::encode(cchars);
+            unsigned int c = (unsigned int) cchars[0];
             if (isChar32)
             {
                 if (cs == "")
                 {
 	                _out.emit_literal(source, FundamentalTypeOf<char32_t>(), &c, 4);
-                    addToken(PT_LITERAL, source, cs, FT_CHAR32_T, 1, &c);
+                    addToken(PT_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
                 }
                 else 
                 {
 	                _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char32_t>(), &c, 4);
-                    addToken(PT_UD_LITERAL, source, cs, FT_CHAR32_T, 1, &c);
+                    addToken(PT_UD_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
                 }
             }
             else if (isChar16)
@@ -1799,12 +2709,12 @@ class PostTokenizer
                     if (cs =="")
                     {
 	                    _out.emit_literal(source, FundamentalTypeOf<char16_t>(), &c, 2);
-                        addToken(PT_LITERAL, source, cs, FT_CHAR16_T, 1, &c);
+                        addToken(PT_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
                     }
                     else 
                     {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char16_t>(), &c, 2);
-                        addToken(PT_UD_LITERAL, source, cs, FT_CHAR16_T, 1, &c);
+                        addToken(PT_UD_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
                     }
                 }
             }
@@ -1813,12 +2723,12 @@ class PostTokenizer
                 if (cs == "")
                 {
 	                _out.emit_literal(source, FundamentalTypeOf<wchar_t>(), &c, 4);
-                    addToken(PT_LITERAL, source, cs, FT_WCHAR_T, 1, &c);
+                    addToken(PT_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
                 }
                 else
                 {
 	                _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<wchar_t>(), &c, 4);
-                    addToken(PT_UD_LITERAL, source, cs, FT_WCHAR_T, 1, &c);
+                    addToken(PT_UD_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
                 }
             }
             else
@@ -1828,12 +2738,12 @@ class PostTokenizer
                     if (cs == "")
                     {
 	                    _out.emit_literal(source, FundamentalTypeOf<int>(), &c, 4);
-                        addToken(PT_LITERAL, source, cs, FT_INT, 1, &c);
+                        addToken(PT_LITERAL, source, cs, es, FT_INT, 1, &c);
                     }
                     else 
                     {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<int>(), &c, 4);
-                        addToken(PT_UD_LITERAL, source, cs, FT_INT, 1, &c);
+                        addToken(PT_UD_LITERAL, source, cs, es, FT_INT, 1, &c);
                     }
                 }
                 else
@@ -1841,12 +2751,12 @@ class PostTokenizer
                     if (cs == "")
                     {
 	                    _out.emit_literal(source, FundamentalTypeOf<char>(), &c, 1);
-                        addToken(PT_LITERAL, source, cs, FT_INT, 1, &c);
+                        addToken(PT_LITERAL, source, cs, es, FT_CHAR, 1, &c);
                     }
                     else
                     {
 	                    _out.emit_user_defined_literal_character(source, cs, FundamentalTypeOf<char>(), &c, 1);
-                        addToken(PT_UD_LITERAL, source, cs, FT_INT, 1, &c);
+                        addToken(PT_UD_LITERAL, source, cs, es, FT_CHAR, 1, &c);
                     }
                 }
             }
@@ -1871,6 +2781,454 @@ class PostTokenizer
 
         return true;
     }
+
+
+    PostToken parse_one_ppnumber(vector<int>& codes)
+    {
+        int la = -1;
+        int state = 0;  // initial state 
+        vector<int>::iterator idx = codes.begin();
+        bool stop = false;
+       
+        while ( idx != codes.end() )
+        {
+            la = (*idx);
+       
+            switch (state)
+            { 
+                case 0 :
+                    if (la == '0')
+                    {
+                        state = 1;
+                    }
+                    else if (la == '.')
+                    {
+                        state = 6;
+                    }
+                    else if (la >= '1' && la <= '9')
+                    {
+                        state = 7;
+                    }
+                    else 
+                    {
+                        throw PostTokenizerException("Bad number state 0");
+                    }
+                    break;
+                case 1:
+                    if (la == 'x')
+                    {
+                        state = 2;
+                    }
+                    else if ( isOctal(la) )
+                    {
+                        state = 4;
+                    } 
+                    else if (la == '8' || la == '9') // non-octal
+                    {
+                        state = 5;
+                    }
+                    else if (la == '.')
+                    {
+                        state = 6;
+                    }
+                    else if (la == 'e' || la == 'E')
+                    {
+                        state = 8;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 2:
+                    if ( isHex(la) ) 
+                    {
+                        state = 3; 
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 3:
+                    if ( isHex(la) )
+                    {
+                        state = 3;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 4:
+                    if ( isOctal(la) )
+                    {
+                        state = 4;
+                    }
+                    else if (la == '8' || la == '9') // non-octal
+                    {
+                        state = 5;
+                    }
+                    else if (la == '.')
+                    {
+                        state = 6;
+                    }
+                    else 
+                    {
+                        stop = true;
+                    }
+                    break; 
+                case 5:
+                    if ( isDecimal(la) )
+                    {
+                        state = 5;
+                    }
+                    else if ( la == '.')
+                    {
+                        state = 6;
+                    }
+                    else if ( la == 'e' || 'E' )
+                    {
+                        state = 8;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 6:
+                    if ( isDecimal(la) )
+                    {
+                        state = 6;
+                    }
+                    else if (la == 'e' || la == 'E')
+                    {
+                        state = 8;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 7:
+                    if ( isDecimal(la) )
+                    {
+                        state = 7;
+                    }
+                    else if (la == '.')
+                    {
+                        state = 6;
+                    }
+                    else if (la == 'e' || la == 'E')
+                    {
+                        state = 8;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                case 8:
+                    if ( la == '+' || la == '-' || isDecimal(la) )
+                    {
+                        state = 9;
+                    }
+                    else 
+                    {
+                        throw PostTokenizerException("Bad number state 8");
+                    }
+                    break;
+                case 9:
+                    if ( isDecimal(la) )
+                    {
+                        state = 9;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    break;
+                default:
+                    throw PostTokenizerException("Bad number");
+                    break;
+            }
+
+            // break the loop and start to handle the suffix part
+            if (stop == true)
+            {
+                break;
+            }
+            idx++;
+        }
+
+        string source = code2string(codes);
+        vector<int> numV(codes.begin(), idx);
+        string numS = code2string(numV);
+        bool isUnsigned = false;
+        bool isLong = false;
+        bool isLonglong = false;
+        bool isFloat = false;
+        // dispatch
+        bool isHexInteger = false;
+        bool isOctalInteger = false;
+        bool isDecimalInteger = false;
+        bool isFloatPoint = false;
+        if (state == 1 || state == 5 || state == 7)  // decimial integer
+        {
+            isDecimalInteger = true;
+        }
+        else if (state == 3)  // hex 
+        {
+            isHexInteger = true;
+        }
+        else if (state == 4) // octal
+        {
+            isOctalInteger = true;
+        }
+        else if (state == 6 || state == 9)
+        {
+            isFloatPoint = true;
+        }
+        else  // invalid
+        {
+            return createToken(PT_INVALID, source);
+        }
+        
+        if (stop == true)
+        {
+            // suffix string
+            vector<int> rest(idx, codes.end());
+            string s = code2string(rest);
+
+            //--- user defined suffix
+            //
+            if (s[0] == '_' && checkValidUserDefineSuffix(s))
+            {
+                float f = PA2Decode_float( numS );
+                if (state == 6 || state == 9)
+                {
+                    return createToken(PT_UD_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
+                }
+                else
+                {
+                    return createToken(PT_UD_LITERAL, source, s, numS, FT_INT, 1, &f);
+                }
+            }
+            else if ( checkNumberLiteralSuffix(s, isUnsigned, isLong, isLonglong, isFloat) )
+            {
+                unsigned long long value;
+                int bs;
+                if (isDecimalInteger)  // decimial integer
+                {
+                    bs = decimalBits( numS , value );
+                }
+                else if (isHexInteger)  // hex 
+                {
+                    bs = hexBits ( numS , value);
+                }
+                else if (isOctalInteger) // octal
+                {
+                    bs = octalBits ( numS , value);
+                }
+                else if (isFloatPoint)
+                {
+                    // float
+                    float f = PA2Decode_float( numS );
+                    return createToken(PT_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
+                }
+
+                if (isDecimalInteger || isHexInteger || isOctalInteger)
+                {
+                    if ( bs > 64 )
+                    {
+                        // error 
+                        return createToken(PT_INVALID, source);
+                    } 
+                    else if ( bs == 64)
+                    {
+                        if (isUnsigned && isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned && isLonglong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isLong) // long , long long
+                        {
+                            if (isDecimalInteger)
+                            {
+                                return createToken(PT_INVALID, source);
+                            }
+                            else
+                            {
+                                return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            }
+                        }
+                        else // (isLonglong)
+                        {
+                            if (isDecimalInteger)
+                            {
+                                return createToken(PT_INVALID, source);
+                            }
+                            else
+                            {
+                                return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            }
+                        }
+
+                    }
+                    else if ( bs > 32)
+                    {
+                        // long
+                        if (isUnsigned && isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned && isLonglong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                        }
+                        else // long long
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                        }
+                    }
+                    else if (bs == 32)
+                    {
+                        if (isUnsigned && isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned && isLonglong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                        }
+                        else if (isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                        }
+                        else // long long
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                        }
+                    }
+                    else
+                    {
+                        if (isUnsigned && isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned && isLonglong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                        }
+                        else if (isUnsigned)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                        }
+                        else if (isLong)
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                        }
+                        else // long long
+                        {
+                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                        }
+                    }
+                }
+            }
+            else //invalid
+            {
+                return createToken(PT_INVALID, source);
+            }
+        }
+        else
+        {
+            string s="";
+            if (isDecimalInteger || isHexInteger || isOctalInteger)
+            {
+                unsigned long long value;
+                int bs;
+                if (isDecimalInteger)  // decimial integer
+                {
+                    bs = decimalBits( numS , value );
+                }
+                else if (isHexInteger)  // hex 
+                {
+                    bs = hexBits ( numS , value);
+                }
+                else // octal
+                {
+                    bs = octalBits ( numS , value);
+                }
+    
+                if ( bs > 64 )
+                {
+                    // error 
+                    return createToken(PT_INVALID, source);
+                } 
+                else if ( bs == 64)
+                {
+                    if (isDecimalInteger)
+                    {
+                        return createToken(PT_INVALID, source);
+                    }
+                    else
+                    {
+                        return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                    }
+                }
+                else if ( bs > 32)
+                {
+                    // long
+                    return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                }
+                else if (bs == 32)
+                {
+                    if (isDecimalInteger)
+                    {
+                        return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                    }
+                    else 
+                    {
+                        return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                    }
+                }
+                else
+                {
+                    // int
+                    return createToken(PT_LITERAL, source, s, numS, FT_INT, 1, &value);
+                }
+            }
+            else if (isFloatPoint)  // float
+            {
+                double value = PA2Decode_double(numS);
+                return createToken(PT_LITERAL, source, s, numS, FT_DOUBLE, 1, &value);
+            }
+            else
+            {
+            }
+        }
+        return createToken(PT_INVALID, source);
+    }
+
 
 
     void parse_ppnumber(vector<int>& codes)
@@ -2100,12 +3458,12 @@ class PostTokenizer
                 if (state == 6 || state == 9)
                 {
                     _out.emit_user_defined_literal_floating(source, s, numS);
-                    addToken(PT_UD_LITERAL, source, s, FT_FLOAT, 1, &f);
+                    addToken(PT_UD_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
                 }
                 else
                 {
 	                _out.emit_user_defined_literal_integer(source, s, numS);
-                    addToken(PT_UD_LITERAL, source, s, FT_FLOAT, 1, &f);
+                    addToken(PT_UD_LITERAL, source, s, numS, FT_INT, 1, &f);
                 }
             }
             else if ( checkNumberLiteralSuffix(s, isUnsigned, isLong, isLonglong, isFloat) )
@@ -2129,7 +3487,7 @@ class PostTokenizer
                     // float
                     float f = PA2Decode_float( numS );
     	            _out.emit_literal(source, FundamentalTypeOf<float>(), &f, 4);
-                    addToken(PT_LITERAL, source, s, FT_FLOAT, 1, &f);
+                    addToken(PT_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
                 }
 
                 if (isDecimalInteger || isHexInteger || isOctalInteger)
@@ -2145,17 +3503,17 @@ class PostTokenizer
                         if (isUnsigned && isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isLong) // long , long long
                         {
@@ -2167,7 +3525,7 @@ class PostTokenizer
                             else
                             {
     	                        _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                                addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                                addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                             }
                         }
                         else // (isLonglong)
@@ -2180,7 +3538,7 @@ class PostTokenizer
                             else
                             {
     	                        _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
-                                addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                                addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                             }
                         }
 
@@ -2191,27 +3549,27 @@ class PostTokenizer
                         if (isUnsigned && isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                     else if (bs == 32)
@@ -2219,27 +3577,27 @@ class PostTokenizer
                         if (isUnsigned && isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
 	                        _out.emit_literal(source, FundamentalTypeOf<unsigned int>(), &value, 4);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
                         }
                         else if (isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                     else
@@ -2247,27 +3605,27 @@ class PostTokenizer
                         if (isUnsigned && isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<unsigned long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
 	                        _out.emit_literal(source, FundamentalTypeOf<unsigned int>(), &value, 4);
-                            addToken(PT_LITERAL, source, s, FT_UNSIGNED_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
                         }
                         else if (isLong)
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
     	                    _out.emit_literal(source, FundamentalTypeOf<long long>(), &value, 8);
-                            addToken(PT_LITERAL, source, s, FT_LONG_LONG_INT, 1, &value);
+                            addToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                 }
@@ -2314,40 +3672,40 @@ class PostTokenizer
                     else
                     {
 	                    _out.emit_literal(numS, FundamentalTypeOf<unsigned long>(), &value, 8);
-                        addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                     }
                 }
                 else if ( bs > 32)
                 {
                     // long
 	                _out.emit_literal(numS, FundamentalTypeOf<long>(), &value, 8);
-                    addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                    addToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
                 }
                 else if (bs == 32)
                 {
                     if (isDecimalInteger)
                     {
 	                    _out.emit_literal(numS, FundamentalTypeOf<long>(), &value, 8);
-                        addToken(PT_LITERAL, source, s, FT_LONG_INT, 1, &value);
+                        addToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
                     }
                     else 
                     {
 	                    _out.emit_literal(numS, FundamentalTypeOf<unsigned int>(), &value, 4);
-                        addToken(PT_LITERAL, source, s, FT_UNSIGNED_LONG_INT, 1, &value);
+                        addToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
                     }
                 }
                 else
                 {
                     // int
 	                _out.emit_literal(numS, FundamentalTypeOf<int>(), &value, 4);
-                    addToken(PT_LITERAL, source, s, FT_INT, 1, &value);
+                    addToken(PT_LITERAL, source, s, numS, FT_INT, 1, &value);
                 }
             }
             else if (isFloatPoint)  // float
             {
                 double value = PA2Decode_double(numS);
 	            _out.emit_literal(numS, FundamentalTypeOf<double>(), &value, 8);
-                addToken(PT_LITERAL, source, s, FT_DOUBLE, 1, &value);
+                addToken(PT_LITERAL, source, s, numS, FT_DOUBLE, 1, &value);
             }
             else
             {
@@ -2530,6 +3888,12 @@ int main()
         // PA2 start
         PostTokenizer postTokenizer(ppTokenizer._elst);         
         postTokenizer.parse();
+
+        for (unsigned i=0 ; i<postTokenizer._tokens.size() ; i++)
+        {
+            postTokenizer._tokens[i].emit();
+        }
+
     }
     catch (exception& e)
     {
