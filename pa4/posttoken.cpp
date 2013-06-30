@@ -1285,6 +1285,9 @@ class PostTokenizer
         : _pplst(pplst)
     {
     }
+
+    PostTokenizer()
+    {}
    
 
     ~PostTokenizer() 

@@ -375,18 +375,20 @@ enum PPTokenType {
     PP_UD_RAW_STRING_LITERAL = 10, 
     PP_OP = 11,
     PP_NONWHITESPACE = 12,
-    PP_EOF = 13
+    PP_EOF = 13,
+    PP_MACRO = 14
 };
 
 
 class PPToken {
 public:
-    PPToken(PPTokenType t, vector<int>& d) 
-        : type(t), data(d) 
+    PPToken(PPTokenType t, vector<int>& d, string s) 
+        : type(t), data(d), utf8str(s) 
     {
     }
     PPTokenType type;
     vector<int> data;
+    string      utf8str;
 };
 
 
@@ -731,7 +733,7 @@ struct PPTokenizer
     void createToken(PPTokenType type, vector<int> token)    
     {
         string data = UTF8Encoder::encode(token);
-        _elst.push_back(PPToken(type,token));
+        _elst.push_back(PPToken(type,token,data));
 
 #ifdef PA1
         switch (type)
