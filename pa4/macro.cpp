@@ -73,7 +73,7 @@ struct Directive {
     int             type;     //0: object , 1:func
     int             paraNum;
 
-    vector<string>  paramLst;
+    map<string,int> paramLst;
     vector<PPToken> replaceLst;
 };
 
@@ -124,33 +124,149 @@ class DirectiveHandler {
         return true;
     }
 
-    //
-    // consumes all text lines  until the next directive start
-    //
-    bool processTextLines(MacroPPToken& macro)
-    {
 
+    list<PPToken> replaceText( list<PPToken> tokens )
+    {
+        list<PPToken> result;
         list<PPToken>::iterator ppit; 
-        while (macro.pplst.size() != 0)
+        while (tokens.size() != 0)
         { 
-            ppit = macro.pplst.begin();
+            ppit = tokens.begin();
            
             if (ppit->type == PP_IDENTIFIER) 
             {
                 map<string, Directive*>::iterator dit = _directiveLst.find( ppit->utf8str );
-                if (dit != _directiveLst.end())
+
+                if (dit != _directiveLst.end() &&
+                    ppit->blackLst.find( dit->second ) == ppit->blackLst.end())
                 {
                     // macro replace
                     Directive* dir = dit->second;
                     if (dir->type == Directive::FUN)
                     {
+                        //-----
+                        // collect arguments
+                        // and then run arguments replacement
+                        //
+                        PPToken curFun = *ppit;
+                        int quoteStack = 0;
+                        int argIdx = -1;
+                        vector< list<PPToken> > args;
+                        tokens.pop_front();
+                        while (tokens.size() != 0)
+                        {
+                            ppit = tokens.begin();
+                            if (ppit->type == PP_WHITESPACE)    
+                            {
+                                ;
+                            }
+                            else if (ppit->utf8str == "(")
+                            {
+                                quoteStack++;
+                                if (quoteStack == 1)
+                                {
+                                    argIdx++;
+                                    args.push_back( list<PPToken>() );
+                                }
+                                else
+                                {
+                                    args[argIdx].push_back( *ppit );
+                                }
+                            }
+                            else if (ppit->utf8str == ")")
+                            {
+                                quoteStack--;
+                                if (quoteStack != 0)
+                                {
+                                    args[argIdx].push_back( *ppit );
+                                }
+                                else
+                                {
+                                    tokens.pop_front();
+                                    break;
+                                }
+                            }
+                            else if (ppit->utf8str == ",")
+                            {
+                                if (quoteStack == 1)
+                                {
+                                    argIdx++;
+                                    args.push_back( list<PPToken>() );
+                                }
+                                else
+                                {
+                                    args[argIdx].push_back( *ppit );
+                                }
+                            }
+                            else
+                            {
+                                if (quoteStack > 0)
+                                {
+                                    args[argIdx].push_back( *ppit );
+                                }
+                                else
+                                {
+                                    // the token does not have argument list
+                                    // treat it as normal identifier.
+                                    //
+                                    result.push_back( curFun );
+                                    result.push_back( *ppit );
+                                    tokens.pop_front();
+                                    break;
+                                }
+                            }
+
+                            tokens.pop_front();
+                        }
+
+
+                        if (quoteStack != 0)
+                        {
+                            throw DirectiveHandlerException("Unbalanced quotes");
+                        }
+
+                        if (args.size() == 0)
+                        {
+                            continue;
+                        }
+
+                        //-----
+                        // scan through all the replacement list
+                        //
+                        for (unsigned i=dir->replaceLst.size() ; i>0; i--)
+                        {
+                            PPToken p = dir->replaceLst[i-1];
+
+                            map<string,int>::iterator pmit = dir->paramLst.find( p.utf8str );
+                            if (pmit != dir->paramLst.end())
+                            {
+                                int idx = pmit->second; 
+
+                                // recursive replace arguments
+                                list<PPToken> rarg = replaceText( args[idx] );
+
+                                // put the corresponding argument here
+                                tokens.insert(tokens.begin(), rarg.begin(), rarg.end());
+                            }
+                            else
+                            {
+                                p.blackLst.insert( dir );
+                                tokens.push_front( p );
+                            }
+                        }
+                        continue;
                     }
                     else  // Directive::OBJ
                     {
-                        macro.pplst.pop_front();
+                        tokens.pop_front();  // remove the current token, 
                         for (unsigned i=dir->replaceLst.size(); i>0; i--)
                         {
-                            macro.pplst.push_front( dir->replaceLst[i-1] );
+                            PPToken p = dir->replaceLst[i-1];
+                            if (p.type == PP_IDENTIFIER)
+                            {
+                                p.blackLst.insert( dir );
+                            }
+                            tokens.push_front( p );
                         }
                         continue;
                     }
@@ -158,18 +274,191 @@ class DirectiveHandler {
                 else
                 {
                     // normal identifier
-                    _result.push_back( *ppit );
+                    result.push_back( *ppit );
                 }
             }
             else
             {
-                _result.push_back( *ppit );
+                result.push_back( *ppit );
+            }
+
+            tokens.pop_front();
+        }
+        return result;
+    }
+
+
+
+
+    //
+    // consumes all text lines  until the next directive start
+    //
+    bool processTextLines(MacroPPToken& macro)
+    {
+
+        list<PPToken> result = replaceText( macro.pplst );
+        _result.insert(_result.end(), result.begin(), result.end());
+
+        return true;
+    }
+
+
+    bool processDirectiveDefine(MacroPPToken& macro)
+    {
+        Directive* dir = new Directive;
+        //-----
+        // 0 -> # -> 1 -> define -> 2 -> id -> 3 -> !( -> 5 -> replacelst
+        //                                       -> (  -> 4 -> paramlst -> )  -> 5 -> replacelst
+        //
+        list<PPToken>::iterator ppit;
+        int state = 0;
+        int argIdx = 0;
+
+        while (macro.pplst.size() > 0)
+        {
+            ppit = macro.pplst.begin();
+
+            if (ppit->type == PP_WHITESPACE)
+            {
+                // skip whitespace
+            }
+            else
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (ppit->utf8str == "#")
+                        {
+                            state = 1;
+                        }
+                        break;
+                    case 1:
+                        if (ppit->utf8str == "define")
+                        {
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        if (ppit->type == PP_IDENTIFIER)
+                        {
+                            state = 3;
+                            dir->name = ppit->utf8str;
+                        }
+                        break;
+                    case 3:
+                        if (ppit->type == PP_OP && ppit->utf8str == "(")
+                        {
+                            dir->type = Directive::FUN;
+                            state = 4;
+                        }
+                        else 
+                        {
+                            dir->type = Directive::OBJ;
+                            state = 5;
+                            continue;
+                        }
+                        break;
+                    case 4:
+                        while (ppit->utf8str != ")")
+                        {
+                            if (ppit->type == PP_IDENTIFIER)
+                            {
+                                dir->paramLst[ ppit->utf8str ] = argIdx;
+                                argIdx++;
+                                // dir->paramLst.push_back(ppit->utf8str);
+                            }
+                            else if (ppit->type == PP_OP)
+                            {
+                                if (ppit->utf8str == ",")
+                                {
+                                    // do nothing
+                                }
+                                else if (ppit->utf8str == "...")
+                                {
+                                    dir->paramLst[ ppit->utf8str ] = argIdx;
+                                    argIdx++;
+                                    // dir->paramLst.push_back(ppit->utf8str);
+                                }
+                            }
+                            else
+                            {
+                                throw DirectiveHandlerException("Bad directive type");
+                            }
+                            macro.pplst.pop_front();
+                            ppit = macro.pplst.begin();
+                        }
+                        state = 5;
+                        break;
+                    case 5:
+                        dir->replaceLst.push_back( *ppit ); 
+                        break;
+                    default:
+                        throw DirectiveHandlerException("Bad define syntax");
+                        break;
+                }
             }
 
             macro.pplst.pop_front();
         }
+
+        _directiveLst[ dir->name ] = dir;
+
         return true;
     }
+
+
+    bool processDirectiveUndefine (MacroPPToken& macro)
+    {
+        list<PPToken>::iterator ppit;
+        int state = 0;
+        while (macro.pplst.size() > 0)
+        {
+            ppit = macro.pplst.begin();
+
+            if (ppit->type == PP_WHITESPACE)
+            {
+                // skip whitespace
+            }
+            else
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (ppit->utf8str == "#")
+                        {
+                            state = 1;
+                        }
+                        break;
+                    case 1:
+                        if (ppit->utf8str == "undef")
+                        {
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        if (ppit->type == PP_IDENTIFIER)
+                        {
+                            state = 3;
+                            map<string, Directive*>::iterator mit = _directiveLst.find(ppit->utf8str);
+                            _directiveLst.erase( mit );
+                        }
+                        else
+                        {
+                            throw DirectiveHandlerException("Bad undef argument");
+                        }
+                        break;
+                    default:
+                        throw DirectiveHandlerException("Bad undef syntax");
+                        break;
+                }
+            }
+
+            macro.pplst.pop_front();
+        }
+
+        return true;
+    }
+
 
 
 
@@ -204,53 +493,6 @@ class DirectiveHandler {
                     {
                         macro.type = mit->second;
                     }
-                    // if (it->utf8str == "define")
-                    // {
-                    //     macro.type = MacroPPToken::DEFINE;
-                    // }
-                    // else if (it->utf8str == "undef") 
-                    // {
-                    //     macro.type = MacroPPToken::UNDEF;
-                    // }
-                    // else if (it->utf8str == "ifdef") 
-                    // {
-                    //     macro.type = MacroPPToken::IFDEF;
-                    // }
-                    // else if (it->utf8str == "ifndef") 
-                    // {
-                    //     macro.type = MacroPPToken::IFNDEF;
-                    // }
-                    // else if (it->utf8str == "elif") 
-                    // {
-                    //     macro.type = MacroPPToken::ELIF;
-                    // }
-                    // else if (it->utf8str == "else") 
-                    // {
-                    //     macro.type = MacroPPToken::ELSE;
-                    // }
-                    // else if (it->utf8str == "endif") 
-                    // {
-                    //     macro.type = MacroPPToken::ENDIF;
-                    // }
-                    // else if (it->utf8str == "undef") 
-                    // {
-                    //     macro.type = MacroPPToken::INCLUDE;
-                    // }
-                    // else if (it->utf8str == "line")
-                    // {
-                    //     macro.type = MacroPPToken::LINE;
-                    // }
-                    // else if (it->utf8str == "erro")
-                    // {
-                    //     macro.type = MacroPPToken::ERROR;
-                    // }
-                    // else if (it->utf8str == "pragma")
-                    // {
-                    //     macro.type = MacroPPToken::PRAGMA;
-                    // }
-                    // else
-                    // {
-                    // }
                 }
                 else if (it->type == PP_NEWLINE)
                 {
@@ -338,97 +580,11 @@ class DirectiveHandler {
         {
             if (lit->type == DEFINE)
             {
-                Directive* dir = new Directive;
-                //-----
-                // 0 -> # -> 1 -> define -> 2 -> id -> 3 -> !( -> 5 -> replacelst
-                //                                       -> (  -> 4 -> paramlst -> )  -> 5 -> replacelst
-                //
-                list<PPToken>::iterator ppit;
-                int state = 0;
-                while (lit->pplst.size() > 0)
-                {
-                    ppit = lit->pplst.begin();
-
-                    if (ppit->type == PP_WHITESPACE)
-                    {
-                        // skip whitespace
-                    }
-                    else
-                    {
-                        switch (state)
-                        {
-                            case 0:
-                                if (ppit->utf8str == "#")
-                                {
-                                    state = 1;
-                                }
-                                break;
-                            case 1:
-                                if (ppit->utf8str == "define")
-                                {
-                                    state = 2;
-                                }
-                                break;
-                            case 2:
-                                if (ppit->type == PP_IDENTIFIER)
-                                {
-                                    state = 3;
-                                    dir->name = ppit->utf8str;
-                                }
-                                break;
-                            case 3:
-                                if (ppit->type == PP_OP && ppit->utf8str == "(")
-                                {
-                                    dir->type = Directive::FUN;
-                                    state = 4;
-                                }
-                                else 
-                                {
-                                    dir->type = Directive::OBJ;
-                                    state = 5;
-                                    continue;
-                                }
-                                break;
-                            case 4:
-                                while (ppit->utf8str != ")")
-                                {
-                                    if (ppit->type == PP_IDENTIFIER)
-                                    {
-                                        dir->paramLst.push_back(ppit->utf8str);
-                                    }
-                                    else if (ppit->type == PP_OP)
-                                    {
-                                        if (ppit->utf8str == ",")
-                                        {
-                                            // do nothing
-                                        }
-                                        else if (ppit->utf8str == "...")
-                                        {
-                                            dir->paramLst.push_back(ppit->utf8str);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        throw DirectiveHandlerException("Bad directive type");
-                                    }
-                                    lit->pplst.pop_front();
-                                    ppit = lit->pplst.begin();
-                                }
-                                state = 5;
-                                break;
-                            case 5:
-                                dir->replaceLst.push_back( *ppit ); 
-                                break;
-                        }
-                    }
-
-                    lit->pplst.pop_front();
-                }
-
-                _directiveLst[ dir->name ] = dir;
+                processDirectiveDefine( *lit );
             } 
             else if (lit->type == UNDEF)
             {
+                processDirectiveUndefine( *lit );
             }
             else if (lit->type == TXT)
             {

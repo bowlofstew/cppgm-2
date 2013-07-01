@@ -12,6 +12,7 @@
 #include <cstring>
 #include <string>
 #include <list>
+#include <set>
 
 using namespace std;
 
@@ -379,6 +380,7 @@ enum PPTokenType {
     PP_MACRO = 14
 };
 
+class Directive;
 
 class PPToken {
 public:
@@ -389,6 +391,7 @@ public:
     PPTokenType type;
     vector<int> data;
     string      utf8str;
+    set<Directive*> blackLst;
 };
 
 
