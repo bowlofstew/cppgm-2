@@ -73,7 +73,8 @@ struct Directive {
     int             type;     //0: object , 1:func
     int             paraNum;
 
-    map<string,int> paramLst;
+    map<string,int> paramMap;
+    vector<string>  paramLst;
     vector<PPToken> replaceLst;
 };
 
@@ -107,7 +108,7 @@ class DirectiveHandler {
     ~DirectiveHandler () {}
 
 
-    PPToken mergePPToken ( PPToken& p1, PPToken& p2)
+    vector<PPToken> mergePPToken ( PPToken& p1, PPToken& p2)
     {
         vector<int> mergedUNC;
         mergedUNC.insert(mergedUNC.end(), p1.data.begin(), p1.data.end());
@@ -115,14 +116,65 @@ class DirectiveHandler {
 
         PPTokenizer tokenizer;
         tokenizer.parse( mergedUNC );
-        return tokenizer._elst[0];
+        return tokenizer._elst;
     }
 
-    bool processDirective(MacroPPToken& macro)
+    PPToken stringize( list<PPToken>& ll )
     {
-        
-        return true;
+        vector<int> mergedCodes;
+        list<PPToken> tmp1, tmp2;
+        bool bStripe = true; 
+        for ( list<PPToken>::iterator lt = ll.begin(); lt != ll.end() ; ++lt )
+        {
+            if (lt->type == PP_WHITESPACE && bStripe == true)
+            {
+                continue; 
+            }
+            else
+            {
+                tmp1.push_back( *lt );
+                bStripe = false;
+            }
+        }
+
+        bStripe = true;
+        for ( list<PPToken>::reverse_iterator lt = tmp1.rbegin(); lt != tmp1.rend() ; ++lt )
+        {
+            if (lt->type == PP_WHITESPACE && bStripe == true)
+            {
+                continue; 
+            }
+            else
+            {
+                tmp2.push_front( *lt );
+                bStripe = false;
+            }
+        }
+
+        //-----
+        // merge all tmp2 elements to a signle code list 
+        //
+        vector<int> tmpCode;
+        tmpCode.push_back('"');
+        for (list<PPToken>::iterator lt = tmp2.begin(); lt != tmp2.end() ; ++lt)
+        {
+            for (unsigned i=0; i<lt->data.size(); i++)
+            {
+                //if (lt->data[i] == '"' || lt->data[i] == '\\')
+                if (lt->data[i] == '"')
+                {
+                    tmpCode.push_back('\\');
+                }
+                tmpCode.push_back( lt->data[i] );
+            }
+        }
+        tmpCode.push_back('"');
+
+        string utf8str = UTF8Encoder::encode(tmpCode);
+
+        return PPToken(PP_STRING_LITERAL, tmpCode, utf8str);
     }
+
 
 
     list<PPToken> replaceText( list<PPToken> tokens )
@@ -141,17 +193,36 @@ class DirectiveHandler {
                     ppit->blackLst.find( dit->second ) == ppit->blackLst.end())
                 {
                     // macro replace
+                    PPToken curFunc = *ppit;
                     Directive* dir = dit->second;
                     if (dir->type == Directive::FUN)
                     {
                         //-----
+                        // make sure the function is valid with a '(' behind.
+                        // 
+                        list<PPToken>::iterator quoteIt = ppit;
+                        quoteIt++;
+                        while (quoteIt != tokens.end())
+                        {
+                            if (quoteIt->type == PP_WHITESPACE)
+                                quoteIt++;
+                            else
+                                break;
+                        }
+                        if (quoteIt == tokens.end() || quoteIt->utf8str != "(")
+                        {
+                            result.push_back( *ppit );
+                            tokens.pop_front();
+                            continue;
+                        }
+
+                        //-----
                         // collect arguments
                         // and then run arguments replacement
                         //
-                        PPToken curFun = *ppit;
-                        int quoteStack = 0;
-                        int argIdx = -1;
                         vector< list<PPToken> > args;
+                        int argIdx = -1;
+                        int quoteStack = 0;
                         tokens.pop_front();
                         while (tokens.size() != 0)
                         {
@@ -200,58 +271,100 @@ class DirectiveHandler {
                             }
                             else
                             {
-                                if (quoteStack > 0)
-                                {
-                                    args[argIdx].push_back( *ppit );
-                                }
-                                else
-                                {
-                                    // the token does not have argument list
-                                    // treat it as normal identifier.
-                                    //
-                                    result.push_back( curFun );
-                                    result.push_back( *ppit );
-                                    tokens.pop_front();
-                                    break;
-                                }
+                                args[argIdx].push_back( *ppit );
                             }
 
                             tokens.pop_front();
                         }
-
 
                         if (quoteStack != 0)
                         {
                             throw DirectiveHandlerException("Unbalanced quotes");
                         }
 
-                        if (args.size() == 0)
-                        {
-                            continue;
-                        }
-
                         //-----
                         // scan through all the replacement list
+                        // and put each replacement token back to the scan list
                         //
                         for (unsigned i=dir->replaceLst.size() ; i>0; i--)
                         {
                             PPToken p = dir->replaceLst[i-1];
 
-                            map<string,int>::iterator pmit = dir->paramLst.find( p.utf8str );
-                            if (pmit != dir->paramLst.end())
+                            if (p.utf8str == "##")
+                            {
+                                continue;
+                            }
+
+                            map<string,int>::iterator pmit = dir->paramMap.find( p.utf8str );
+                            if (pmit != dir->paramMap.end())
                             {
                                 int idx = pmit->second; 
+                                
+                                if (i >= 2 && dir->replaceLst[i-2].utf8str== "#" )
+                                {
+                                    // no need to replace, and stringize the token
+                                    PPToken ps = stringize( args[idx] );
+                                    tokens.insert(tokens.begin(), ps);
+                                    i--; // skip the "#" token
+                                }
+                                else if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i+1].utf8str == "##")
+                                {
+                                    PPToken pr = *(tokens.begin());
+                                    PPToken pl = (args[idx].size() > 0) ? args[idx].back() : PPToken(PP_PLACEMARKER);
 
-                                // recursive replace arguments
-                                list<PPToken> rarg = replaceText( args[idx] );
+                                    list<PPToken> tmp = args[idx];
+                                    if (tmp.size() > 0)
+                                    {
+                                        tmp.pop_back();
+                                    }
 
-                                // put the corresponding argument here
-                                tokens.insert(tokens.begin(), rarg.begin(), rarg.end());
+                                    vector<PPToken> tmpv = mergePPToken(pl, pr);
+                                    tmp.insert(tmp.end(), tmpv.begin(), tmpv.end());
+
+                                    tokens.insert(tokens.begin(), tmp.begin(), tmp.end());
+                                }
+                                else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
+                                {
+                                    if (args[idx].size() == 0)
+                                    {
+                                        tokens.insert( tokens.begin(), PPToken(PP_PLACEMARKER) );
+                                    }
+                                    else
+                                    {
+                                        tokens.insert(tokens.begin(), args[idx].begin(), args[idx].end());
+                                    }
+                                    i--; // skip concat
+                                }
+                                else
+                                {
+                                    // recursive replace arguments
+                                    list<PPToken> rarg = replaceText( args[idx] );
+
+                                    // put the corresponding argument here
+                                    tokens.insert(tokens.begin(), rarg.begin(), rarg.end());
+                                }
                             }
-                            else
+                            else // not parameter
                             {
-                                p.blackLst.insert( dir );
-                                tokens.push_front( p );
+                                if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i+1].utf8str == "##")
+                                {
+                                    PPToken pr = *(tokens.begin());
+                                    PPToken pl = p; 
+
+                                    vector<PPToken> tmpv = mergePPToken(pl, pr);
+                                    tokens.insert(tokens.begin(), tmpv.begin(), tmpv.end());
+                                }
+                                else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
+                                {
+                                    tokens.insert(tokens.begin(), p);
+                                    i--; // skip concat
+                                }
+                                else 
+                                {
+                                    p.blackLst.insert( curFunc.blackLst.begin(), curFunc.blackLst.end() );
+                                    p.blackLst.insert( dir );
+                                    tokens.push_front( p );
+                                }
                             }
                         }
                         continue;
@@ -264,6 +377,7 @@ class DirectiveHandler {
                             PPToken p = dir->replaceLst[i-1];
                             if (p.type == PP_IDENTIFIER)
                             {
+                                p.blackLst.insert( curFunc.blackLst.begin(), curFunc.blackLst.end() );
                                 p.blackLst.insert( dir );
                             }
                             tokens.push_front( p );
@@ -288,8 +402,6 @@ class DirectiveHandler {
     }
 
 
-
-
     //
     // consumes all text lines  until the next directive start
     //
@@ -308,7 +420,7 @@ class DirectiveHandler {
         Directive* dir = new Directive;
         //-----
         // 0 -> # -> 1 -> define -> 2 -> id -> 3 -> !( -> 5 -> replacelst
-        //                                       -> (  -> 4 -> paramlst -> )  -> 5 -> replacelst
+        //                                       -> (  -> 4 -> paramList -> )  -> 5 -> replacelst
         //
         list<PPToken>::iterator ppit;
         int state = 0;
@@ -363,9 +475,9 @@ class DirectiveHandler {
                         {
                             if (ppit->type == PP_IDENTIFIER)
                             {
-                                dir->paramLst[ ppit->utf8str ] = argIdx;
+                                dir->paramMap[ ppit->utf8str ] = argIdx;
+                                dir->paramLst.push_back( ppit->utf8str );
                                 argIdx++;
-                                // dir->paramLst.push_back(ppit->utf8str);
                             }
                             else if (ppit->type == PP_OP)
                             {
@@ -375,10 +487,14 @@ class DirectiveHandler {
                                 }
                                 else if (ppit->utf8str == "...")
                                 {
-                                    dir->paramLst[ ppit->utf8str ] = argIdx;
+                                    dir->paramMap[ ppit->utf8str ] = argIdx;
+                                    dir->paramLst.push_back( ppit->utf8str );
                                     argIdx++;
-                                    // dir->paramLst.push_back(ppit->utf8str);
                                 }
+                            }
+                            else if (ppit->type == PP_WHITESPACE)
+                            {
+                                ;
                             }
                             else
                             {
@@ -401,8 +517,90 @@ class DirectiveHandler {
             macro.pplst.pop_front();
         }
 
-        _directiveLst[ dir->name ] = dir;
+        if (checkValidDirective(dir) == false)
+        {
+            throw DirectiveHandlerException("Bad define syntax");
+        }
 
+        _directiveLst[ dir->name ] = dir;
+        return true;
+    }
+
+
+    bool checkValidDirective(Directive* dir)
+    {
+        //-----
+        // check directive correctness
+        //
+        // 1. __VA_ARGS__
+        // 2. ## should have two arguments
+        // 3. #  shold follow parameter
+        //
+
+        if (dir->name == "__VA_ARGS__")
+        {
+            return false;
+        }
+
+        bool bVarArgs = false;
+        for (unsigned i=0; i<dir->paramLst.size(); i++)
+        {
+            if (dir->paramLst[i] == "...")
+            {
+                if (i == dir->paramLst.size()-1)
+                {
+                    // valid
+                    bVarArgs = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        for (unsigned i=0; i<dir->replaceLst.size(); i++)
+        {
+            if (dir->replaceLst[i].utf8str == "__VA_ARGS__" && bVarArgs == false)
+            {
+                return false;
+            }
+        }
+        
+        // 2.  ## shoudl have two operands 
+        //
+        if ( dir->replaceLst.size() > 0 )
+        {
+            if (dir->replaceLst[0].utf8str == "##")
+            {
+                return false;
+            }
+            if (dir->replaceLst[dir->replaceLst.size()-1].utf8str == "##")
+            {
+                return false;
+            }
+        }
+
+        // 3. in function-like macro, # should be followd by a parameter
+        // 
+        if (dir->type == Directive::FUN)
+        {
+            for (unsigned i=0; i<dir->replaceLst.size(); i++)
+            {
+                if (dir->replaceLst[i].utf8str == "@")
+                {
+                    if (i == dir->replaceLst.size()-1)
+                    {
+                        return false;
+                    }
+                    map<string,int>::iterator mit = dir->paramMap.find( dir->replaceLst[i+1].utf8str );
+                    if ( mit == dir->paramMap.end() ) 
+                    {
+                        return false;
+                    }
+                }
+            }
+            
+        }
         return true;
     }
 
@@ -541,11 +739,11 @@ class DirectiveHandler {
                     //
                     vector<PPToken>::iterator it2 = it;  // it is now newline
                     it2++;
-                    while ( it2->type == PP_WHITESPACE )
+                    while ( it2->type == PP_WHITESPACE || it2->type == PP_NEWLINE )
                     {
                         it2++;
                     }
-                    if (it2->type == PP_OP && str == "#")
+                    if (it2->type == PP_OP && it2->utf8str == "#")
                     {
                         foundDirective = true;
                     }
@@ -683,6 +881,11 @@ int main()
         for (unsigned i=0 ; i<postTokenizer._tokens.size() ; i++)
         {
             PostToken pt = postTokenizer._tokens[i];
+
+            if (pt.type == PT_SIMPLE && pt.source == "__VA_ARGS__")
+            {
+                throw DirectiveHandlerException("\"__VA_ARGS__\" is not valid identifier");
+            }
 
             if (pt.type == PT_LITERAL_ARRAY || pt.type == PT_UD_LITERAL_ARRAY)
             {

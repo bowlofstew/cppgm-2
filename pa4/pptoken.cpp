@@ -377,7 +377,8 @@ enum PPTokenType {
     PP_OP = 11,
     PP_NONWHITESPACE = 12,
     PP_EOF = 13,
-    PP_MACRO = 14
+    PP_MACRO = 14,
+    PP_PLACEMARKER = 16
 };
 
 class Directive;
@@ -388,6 +389,12 @@ public:
         : type(t), data(d), utf8str(s) 
     {
     }
+
+    PPToken(PPTokenType t) 
+        : type(t) 
+    {
+    }
+
     PPTokenType type;
     vector<int> data;
     string      utf8str;
