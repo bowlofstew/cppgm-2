@@ -388,17 +388,23 @@ public:
     PPToken(PPTokenType t, vector<int>& d, string s) 
         : type(t), data(d), utf8str(s) 
     {
+        leftConcat = false;
+        rightConcat = false;
     }
 
     PPToken(PPTokenType t) 
         : type(t) 
     {
+        leftConcat = false;
+        rightConcat = false;
     }
 
     PPTokenType type;
     vector<int> data;
     string      utf8str;
     set<Directive*> blackLst;
+    bool leftConcat;
+    bool rightConcat;
 };
 
 
