@@ -130,7 +130,7 @@ class DirectiveHandler {
     PPToken stringize( list<PPToken>& ll )
     {
         vector<int> mergedCodes;
-        list<PPToken> tmp1, tmp2;
+        list<PPToken> tmp1, tmp2, tmp3;
         bool bStripe = true; 
         for ( list<PPToken>::iterator lt = ll.begin(); lt != ll.end() ; ++lt )
         {
@@ -159,12 +159,35 @@ class DirectiveHandler {
             }
         }
 
+        bool prevWhiteSpace = false;
+        for ( list<PPToken>::iterator lt = tmp2.begin(); lt != tmp2.end() ; ++lt )
+        {
+            if (lt->type == PP_WHITESPACE)
+            {
+                if (prevWhiteSpace == true)
+                {
+                    continue;
+                } 
+                else
+                {
+                    tmp3.push_back( *lt );
+                    prevWhiteSpace = true;
+                }
+            }
+            else
+            {
+                tmp3.push_back( *lt );
+                prevWhiteSpace = false;
+            }
+        }
+
+
         //-----
         // merge all tmp2 elements to a signle code list 
         //
         vector<int> tmpCode;
         tmpCode.push_back('"');
-        for (list<PPToken>::iterator lt = tmp2.begin(); lt != tmp2.end() ; ++lt)
+        for (list<PPToken>::iterator lt = tmp3.begin(); lt != tmp3.end() ; ++lt)
         {
 
             if (lt->type == PP_WHITESPACE)
@@ -174,10 +197,16 @@ class DirectiveHandler {
             }
             for (unsigned i=0; i<lt->data.size(); i++)
             {
-                //if (lt->data[i] == '"' || lt->data[i] == '\\')
-                if (lt->data[i] == '"')
+                if (lt->data[i] == '"') 
                 {
                     tmpCode.push_back('\\');
+                }
+                else if ( lt->data[i] == '\\')
+                {
+                    if ( i<lt->data.size()-1 &&  isDigit(lt->data[i+1]) )
+                    {
+                        tmpCode.push_back('\\');
+                    }
                 }
                 tmpCode.push_back( lt->data[i] );
             }
@@ -266,6 +295,35 @@ class DirectiveHandler {
     }
 
 
+    list<PPToken> trimAll( list<PPToken> tokens )
+    {
+        list<PPToken>::iterator it = tokens.begin();
+
+
+        while (it != tokens.end())
+        {
+            if ( it->type == PP_WHITESPACE )
+            {
+                it = tokens.erase(it);
+                continue;
+            }
+            it++;
+        }
+
+        return tokens;
+    }
+
+
+    vector<PPToken> trimAll( vector<PPToken> tokens )
+    { 
+        list<PPToken> tmpl(tokens.begin(), tokens.end()); 
+
+        tmpl = trimAll( tmpl );
+        
+        return vector<PPToken>(tmpl.begin(), tmpl.end());
+    }
+
+
     list<PPToken> trimForConcat ( list<PPToken> tokens )
     {
         // a ## b  ->  a##b
@@ -286,7 +344,7 @@ class DirectiveHandler {
             }
             else 
             {
-                if (it->type == PP_WHITESPACE)
+                if (it->type == PP_WHITESPACE || it->type == PP_NEWLINE)
                 {
                     if (bPrevConcat == true)
                     {
@@ -311,6 +369,17 @@ class DirectiveHandler {
         list<PPToken> tmp2 = trimForConcat( tmp );
         
         return vector<PPToken>(tmp2.begin(), tmp2.end());
+    }
+
+
+    list<PPToken> inheritDirective( list<PPToken> tokens, Directive* dir)
+    {
+        for ( list<PPToken>::iterator it = tokens.begin(); it != tokens.end(); ++it)
+        {
+            it->blackLst.insert( dir );
+        }
+
+        return tokens;
     }
 
 
@@ -496,6 +565,8 @@ class DirectiveHandler {
                                     // recursive replace arguments
                                     list<PPToken> rarg = replaceText( args[idx] );
 
+                                    rarg = inheritDirective( rarg , dir);
+
                                     // put the corresponding argument here
                                     tokens.insert(tokens.begin(), rarg.begin(), rarg.end());
                                 }
@@ -611,6 +682,12 @@ class DirectiveHandler {
                 {
                     dir->replaceLst.push_back( *ppit ); 
                 }
+                else if (state == 3)
+                {
+                    // obj, parse parameter
+                    dir->type = Directive::OBJ;
+                    state = 5;
+                }
             }
             else
             {
@@ -712,13 +789,14 @@ class DirectiveHandler {
 
 
         dir->replaceLst = trimForConcat( dir->replaceLst );
+        dir->replaceLst = trim( dir->replaceLst );
 
         if (checkValidDirective(dir) == false)
         {
             throw DirectiveHandlerException("Bad define syntax");
         }
 
-        markConcat(dir);
+        //markConcat(dir);
 
 
         _directiveLst[ dir->name ] = dir;
@@ -802,6 +880,78 @@ class DirectiveHandler {
         }
 
 
+        // 4. check redefine
+        //  
+        map<string, Directive*>::iterator dit = _directiveLst.find( dir->name ); 
+        if (dit != _directiveLst.end())
+        {
+            Directive* dir0 = dit->second;
+
+            if (dir0->type != dir->type)
+            {
+                return false;
+            }
+
+            if (dir0->paramLst.size() != dir->paramLst.size())
+            {
+                return false;
+            }
+            else
+            {
+                for (unsigned i=0 ; i<dir->paramLst.size(); i++)
+                {
+                    if (dir->paramLst[i] != dir0->paramLst[i]) 
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            
+            list<PPToken> dir0_tokens( dir0->replaceLst.begin(), dir0->replaceLst.end());
+            list<PPToken> dir_tokens( dir->replaceLst.begin(), dir->replaceLst.end() ); 
+
+            dir0_tokens = trim(dir0_tokens);
+            dir_tokens = trim(dir_tokens);
+
+            if (dir0_tokens.front().utf8str == "(")
+            {
+                if (dir0_tokens.back().utf8str == ")")
+                {
+                    dir0_tokens.pop_front();
+                    dir0_tokens.pop_back();
+                    dir0_tokens = trim (dir0_tokens);
+                }
+            }
+
+            if (dir_tokens.front().utf8str == "(")
+            {
+                if (dir_tokens.back().utf8str == ")")
+                {
+                    dir_tokens.pop_front();
+                    dir_tokens.pop_back();
+                    dir_tokens = trim (dir_tokens);
+                }
+            }
+
+            if (dir0_tokens.size() != dir_tokens.size())
+            {
+                return false;
+            }
+            else
+            { 
+                list<PPToken>::iterator it0, it;
+                for (it0=dir0_tokens.begin(), it=dir_tokens.begin() ; it0!=dir0_tokens.end() && it!=dir_tokens.end(); it0++, it++)
+                {
+                    if (it0->type != it->type)
+                        return false;
+
+                    if (it0->utf8str != it->utf8str)
+                        return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -833,7 +983,7 @@ class DirectiveHandler {
 
         for (unsigned i=dir->replaceLst.size(); i>0; i--)
         {
-            if (dir->replaceLst[i].type == PP_WHITESPACE)
+            if (dir->replaceLst[i-1].type == PP_WHITESPACE)
             {
                 continue;
             }
@@ -842,7 +992,7 @@ class DirectiveHandler {
                 prevNonWhite = i; 
             }
 
-            if (dir->replaceLst[i].utf8str == "##")
+            if (dir->replaceLst[i-1].utf8str == "##")
             {
                 dir->replaceLst[prevNonWhite].rightConcat = true;
             }
@@ -995,7 +1145,8 @@ class DirectiveHandler {
                         foundDirective = true;
                     }
 
-                    macro.pplst.push_back( *it );
+                    // macro.pplst.push_back( *it );
+
                     it ++;
                 }
 
