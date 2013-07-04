@@ -501,10 +501,10 @@ class DirectiveHandler {
                             throw DirectiveHandlerException("Unbalanced quotes");
                         }
 
-                        for (unsigned i=0; i<args.size(); ++i)
-                        {
-                            args[i] = trim( args[i] );
-                        }
+                        // for (unsigned i=0; i<args.size(); ++i)
+                        // {
+                        //     args[i] = trim( args[i] );
+                        // }
 
                         //-----
                         // scan through all the replacement list
@@ -520,24 +520,48 @@ class DirectiveHandler {
                             }
 
                             map<string,int>::iterator pmit = dir->paramMap.find( p.utf8str );
-                            if (pmit != dir->paramMap.end())
+                            if (pmit != dir->paramMap.end() || p.utf8str == "__VA_ARGS__")
                             {
-                                int idx = pmit->second; 
+                                list<PPToken> myArg;   // arguments of this parameter
+
+                                if (pmit != dir->paramMap.end())
+                                {
+                                    int idx = pmit->second; 
+                                    myArg = trim ( args[idx] );
+                                }
+                                else   // __VA_ARGS__
+                                {
+                                    // combine the corresponding arguments, includeing commas as the new PPTokens list
+                                    // 1. __VA_ARGS__ should be the last param
+                                    //
+                                    vector<int> v;
+                                    v.push_back(',');
+                                    PPToken comma(PP_OP, v, string(","));
+                                    unsigned idx = dir->paramLst.size() - 1; 
+                                    for (unsigned i = idx; i<args.size() ; i++)
+                                    {
+                                        myArg.insert(myArg.end(), args[i].begin(), args[i].end());
+                                        if ( i != args.size() -1)
+                                        {
+                                            myArg.insert(myArg.end(), comma);
+                                        }
+                                    }
+                                }
                                 
                                 if (i >= 2 && dir->replaceLst[i-2].utf8str== "#" )
                                 {
                                     // no need to replace, and stringize the token
-                                    PPToken ps = stringize( args[idx] );
+                                    PPToken ps = stringize( myArg );
                                     tokens.insert(tokens.begin(), ps);
                                     i--; // skip the "#" token
                                 }
                                 else if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i].utf8str == "##")
                                 {
                                     PPToken pr = *(tokens.begin());
-                                    PPToken pl = (args[idx].size() > 0) ? args[idx].back() : PPToken(PP_PLACEMARKER);
+                                    PPToken pl = (myArg.size() > 0) ? myArg.back() : PPToken(PP_PLACEMARKER);
                                     tokens.pop_front();
 
-                                    list<PPToken> tmp = args[idx];
+                                    list<PPToken> tmp = myArg;
                                     if (tmp.size() > 0)
                                     {
                                         tmp.pop_back();
@@ -550,22 +574,27 @@ class DirectiveHandler {
                                 }
                                 else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
                                 {
-                                    if (args[idx].size() == 0)
+                                    if (myArg.size() == 0)
                                     {
                                         tokens.insert( tokens.begin(), PPToken(PP_PLACEMARKER) );
                                     }
                                     else
                                     {
-                                        tokens.insert(tokens.begin(), args[idx].begin(), args[idx].end());
+                                        tokens.insert(tokens.begin(), myArg.begin(), myArg.end());
                                     }
                                     i--; // skip concat
                                 }
                                 else
                                 {
                                     // recursive replace arguments
-                                    list<PPToken> rarg = replaceText( args[idx] );
+                                    list<PPToken> rarg = replaceText( myArg );
 
                                     rarg = inheritDirective( rarg , dir);
+                                    set<Directive*>::iterator sit;
+                                    for ( sit = curFunc.blackLst.begin(); sit != curFunc.blackLst.end(); sit++)
+                                    {
+                                        rarg = inheritDirective( rarg , *sit );
+                                    }
 
                                     // put the corresponding argument here
                                     tokens.insert(tokens.begin(), rarg.begin(), rarg.end());
@@ -730,7 +759,7 @@ class DirectiveHandler {
                         {
                             if (ppit->type != PP_WHITESPACE)
                             {
-                                if (state4_subState == 0 && ppit->type != PP_IDENTIFIER)
+                                if (state4_subState == 0 && ppit->type != PP_IDENTIFIER && ppit->utf8str != "...")
                                 {
                                     throw DirectiveHandlerException("Bad directive param");
                                 }
@@ -870,7 +899,7 @@ class DirectiveHandler {
                         return false;
                     }
                     map<string,int>::iterator mit = dir->paramMap.find( dir->replaceLst[i+1].utf8str );
-                    if ( mit == dir->paramMap.end() ) 
+                    if ( mit == dir->paramMap.end() && dir->replaceLst[i+1].utf8str != "__VA_ARGS__") 
                     {
                         return false;
                     }

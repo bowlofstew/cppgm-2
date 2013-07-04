@@ -705,7 +705,7 @@ struct PPTokenizer
         }
 
         bool f = true;
-        unsigned int idx = _elst.size()-1;
+        int idx = (int)_elst.size()-1;
         for ( ; idx>=0 ; idx--)
         {
             if (_elst[idx].type == PP_WHITESPACE)
