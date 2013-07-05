@@ -1268,6 +1268,81 @@ struct PostToken
         }
     }
 
+    void emit(ofstream& fout)
+    {
+        int nbytes = bytes();
+
+        if (type == PT_INVALID)
+        {
+		    fout << "invalid " << source << endl;
+        }
+        else if (type == PT_SIMPLE)
+        {
+		    fout << "identifier " << source << endl;
+        }
+        else if (type == PT_LITERAL)
+        {
+            {
+		        fout << "literal " << source << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+            }
+        }
+        else if (type == PT_LITERAL_ARRAY)
+        {
+            if (ltype == FT_UNSIGNED_CHAR)
+                ltype = FT_CHAR;
+
+		    fout << "literal " << source << " array of " << size << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+        } 
+        else if (type == PT_UD_LITERAL)
+        {
+            if (ltype == FT_CHAR || ltype == FT_CHAR16_T || ltype == FT_CHAR32_T || ltype == FT_WCHAR_T)
+            {
+		        fout << "user-defined-literal " << source << " " << udSuffix << " character " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+            }
+            else if (ltype == FT_INT)
+            {
+		        fout << "user-defined-literal " << source << " " << udSuffix << " integer " << udPrefix << endl;
+            }
+            else if (ltype == FT_FLOAT)
+            {
+		        fout << "user-defined-literal " << source << " " << udSuffix << " floating " << udPrefix << endl;
+            }
+        }
+        else if (type == PT_UD_LITERAL_ARRAY)
+        {
+            if (ltype == FT_UNSIGNED_CHAR)
+                ltype = FT_CHAR;
+
+		    fout << "user-defined-literal " << source << " " << udSuffix << " string array of " << size << " " << FundamentalTypeToStringMap.at(ltype) << " " << HexDump(data, nbytes) << endl;
+        }
+        else if (type == PT_EOF)
+        {
+		    fout << "eof" << endl;
+        } 
+        else if (type == PT_NEWLINE)
+        {
+            // do nothing
+        }
+        else if (type == PT_WHITESPACE)
+        {
+            // do nothing
+        }
+        else if (type > PT_INVALID)
+        {
+            if (type == PT_OP_HASH || type == PT_OP_HASHHASH)
+            {
+                fout << "invalid " << source << endl;
+            }
+            else {
+		        fout << "simple " << source << " " << PostTokenTypeToStringMap.at(type) << endl;
+            }
+        }
+        else
+        {
+            fout << "emit error" << endl;
+        }
+    }
+
 };
 
 

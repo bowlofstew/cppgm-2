@@ -2,7 +2,7 @@ all: preproc
 
 # build posttoken application
 preproc: preproc.cpp
-	g++ -g -std=gnu++11 -Wall -o preproc preproc.cpp
+	g++ -g -std=gnu++11 -Wall -DPA5 -o preproc preproc.cpp
 
 # test posttoken application
 test: all
