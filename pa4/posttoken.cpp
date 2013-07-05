@@ -1,6 +1,8 @@
 // (C) 2013 CPPGM Foundation www.cppgm.org.  All rights reserved.
 
+#ifndef PA2
 #pragma once
+#endif
 
 #include <iostream>
 #include <sstream>

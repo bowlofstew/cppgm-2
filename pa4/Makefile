@@ -27,9 +27,13 @@ pa2-test:
 	cd ../pa2; make test
 
 pa3-test:
-	g++ -g -std=gnu++11 -Wall -DPA3 -o ctrlexpr ctrlexpr.cpp
+	g++ -g -O2 -std=gnu++11 -Wall -DPA3 -o ctrlexpr ctrlexpr.cpp
 	cp ctrlexpr ../pa3
 	cd ../pa3; make test
 
+pa4-test:
+	g++ -g -std=gnu++11 -Wall -DPA4 -o macro macro.cpp
+	cp macro ../pa4
+	cd ../pa4; make test
 
- 
+

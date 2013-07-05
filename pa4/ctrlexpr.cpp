@@ -1440,6 +1440,12 @@ class PPCtrlExprEvaluator
     }
 };
 
+template <class T>
+void freeVector( T& t )
+{
+    T tmp;
+    t.swap(tmp);
+}
 
 #ifdef PA3
 int main()
@@ -1467,11 +1473,14 @@ int main()
             uncTokens.push_back('\n');
         }
 
-        PPTokenizer ppTokenizer;
-        ppTokenizer.parse(uncTokens);
+        PPTokenizer *ppTokenizer = new PPTokenizer();;
+        ppTokenizer->parse(uncTokens);
+        freeVector( uncTokens );
 
         // PA2 start
-        PostTokenizer postTokenizer(ppTokenizer._elst);         
+        PostTokenizer postTokenizer(ppTokenizer->_elst);         
+        delete ppTokenizer;  // to save memory
+        
         postTokenizer.parse();
 
         // PA3 start

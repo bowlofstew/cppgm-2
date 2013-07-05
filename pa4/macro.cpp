@@ -825,9 +825,6 @@ class DirectiveHandler {
             throw DirectiveHandlerException("Bad define syntax");
         }
 
-        //markConcat(dir);
-
-
         _directiveLst[ dir->name ] = dir;
         return true;
     }
@@ -983,52 +980,6 @@ class DirectiveHandler {
 
         return true;
     }
-
-
-    void markConcat (Directive* dir)
-    {
-        // 4. mark concat
-        //
-        int prevNonWhite = -1;
-
-        for (unsigned i=0; i<dir->replaceLst.size(); i++)
-        {
-            if (dir->replaceLst[i].type == PP_WHITESPACE)
-            {
-                continue;
-            }
-            else
-            {
-                prevNonWhite = i; 
-            }
-
-            if (dir->replaceLst[i].utf8str == "##")
-            {
-                dir->replaceLst[prevNonWhite].rightConcat = true;
-            }
-        }
-
-        prevNonWhite = dir->replaceLst.size();
-
-        for (unsigned i=dir->replaceLst.size(); i>0; i--)
-        {
-            if (dir->replaceLst[i-1].type == PP_WHITESPACE)
-            {
-                continue;
-            }
-            else
-            {
-                prevNonWhite = i; 
-            }
-
-            if (dir->replaceLst[i-1].utf8str == "##")
-            {
-                dir->replaceLst[prevNonWhite].rightConcat = true;
-            }
-        }
-
-    }
-
 
 
     bool processDirectiveUndefine (MacroPPToken& macro)
