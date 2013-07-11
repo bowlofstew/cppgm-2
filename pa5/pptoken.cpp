@@ -387,8 +387,8 @@ class Directive;
 
 class PPToken {
 public:
-    PPToken(PPTokenType t, vector<int>& d, string s) 
-        : type(t), data(d), utf8str(s) 
+    PPToken(PPTokenType t, vector<int>& d, string s, int lineno=1) 
+        : type(t), data(d), utf8str(s), lineNo(lineno) 
     {
     }
 
@@ -400,6 +400,7 @@ public:
     PPTokenType type;
     vector<int> data;
     string      utf8str;
+    int         lineNo;
 #ifndef PA3
     set<Directive*> blackLst;
 #endif
@@ -440,7 +441,7 @@ struct PPTokenizer
     {}
 #else
     PPTokenizer()
-        : _tstate(0), _chex(0), _vhex(0), _rawStringMode(false)
+        : _tstate(0), _chex(0), _vhex(0), _rawStringMode(false), _lineNo(1)
     {}
 #endif
     vector<PPToken> _elst;
@@ -451,6 +452,12 @@ struct PPTokenizer
     int             _chex;
     int             _vhex;
     unsigned int    _tidx;
+
+    list<int>           _olst;
+    list<int>::iterator _oidx;
+    bool                _rawStringMode;
+
+    int             _lineNo;
 
 
     //---------------------------------
@@ -571,10 +578,6 @@ struct PPTokenizer
     }
 
    
-    list<int>           _olst;
-    list<int>::iterator _oidx;
-    bool                _rawStringMode;
-
 
     //---------------------------------------
     // a double buffer implementation
@@ -747,7 +750,7 @@ struct PPTokenizer
     void createToken(PPTokenType type, vector<int> token)    
     {
         string data = UTF8Encoder::encode(token);
-        _elst.push_back(PPToken(type,token,data));
+        _elst.push_back(PPToken(type,token,data,_lineNo));
 
 #ifdef PA1
         switch (type)
@@ -1056,6 +1059,7 @@ struct PPTokenizer
                 {
                     nextCode();  // skip '\n'
                     createToken(PP_NEWLINE, empty);
+                    _lineNo++;
                     if (peek()=='#')
                     {
                         nextCode(); // skip '#'

@@ -107,7 +107,7 @@ int main(int argc, char** argv)
             PPTokenizer ppTokenizer;
             ppTokenizer.parse(uncTokens);
     
-            DirectiveHandler directiveHandler(ppTokenizer._elst);
+            DirectiveHandler directiveHandler(srcfile, ppTokenizer._elst);
             directiveHandler.process();
                  
     
@@ -291,6 +291,7 @@ int main(int argc, char** argv)
                     strCodes.clear();
                 }
                 pt.emit(out);
+                pt.emit();
             }  // end string concat
 		}
 	}

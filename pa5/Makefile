@@ -1,7 +1,7 @@
 all: preproc
 
 # build posttoken application
-preproc: preproc.cpp
+preproc: preproc.cpp pptoken.cpp posttoken.cpp macro.cpp ctrlexpr.cpp
 	g++ -g -std=gnu++11 -Wall -DPA5 -o preproc preproc.cpp
 
 # test posttoken application

@@ -100,8 +100,8 @@ const map<string, MacroPPTokenType> string2macroPPTokenTypeMap =
 class DirectiveHandler {
 
   public:
-    DirectiveHandler (vector<PPToken>& pps)
-        : _pps(pps)
+    DirectiveHandler (string srcfile, vector<PPToken>& pps)
+        : _srcfile(srcfile), _pps(pps)
     {
     }
 
@@ -695,7 +695,8 @@ class DirectiveHandler {
         //                                       -> (  -> 4 -> paramList -> )  -> 5 -> replacelst
         //
         list<PPToken>::iterator ppit;
-        int state = 0;
+        // int state = 0;
+        int state = 2;
         int argIdx = 0;
         int state4_subState = 0;  // 0, looking for id;  1, looking for comma or ')'
 
@@ -985,7 +986,8 @@ class DirectiveHandler {
     bool processDirectiveUndefine (MacroPPToken& macro)
     {
         list<PPToken>::iterator ppit;
-        int state = 0;
+        // int state = 0;
+        int state = 2;
         while (macro.pplst.size() > 0)
         {
             ppit = macro.pplst.begin();
@@ -1035,7 +1037,211 @@ class DirectiveHandler {
     }
 
 
+    bool evaluate( MacroPPToken& mt)
+    {
+        vector<PPToken> vec(mt.pplst.begin(), mt.pplst.end());
+        PostTokenizer postTokenizer(vec);
+        postTokenizer.parse();
 
+        if (mt.type == IF)
+        {
+            PPCtrlExprEvaluator peval(postTokenizer._tokens.begin(), postTokenizer._tokens.end());
+            PPCtrlExprResult result = peval.evalCtrlExpr();
+            if (result.isErr())
+            {
+                throw DirectiveHandlerException("Bad IF directive ctrl-expr");
+            }
+            else if (result.value() != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (mt.type == IFDEF)
+        {
+            if (postTokenizer._tokens.size() != 1 || postTokenizer._tokens[0].type != PT_SIMPLE)
+            {
+                throw DirectiveHandlerException("Bad IFDEF directive expr");
+            }
+
+            map<string, Directive*>::iterator dit = _directiveLst.find( postTokenizer._tokens[0].source );
+            if (dit == _directiveLst.end())
+            {
+                return false; 
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else if (mt.type == IFNDEF)
+        {
+            if (postTokenizer._tokens.size() != 1 || postTokenizer._tokens[0].type != PT_SIMPLE)
+            {
+                throw DirectiveHandlerException("Bad IFDEF directive expr");
+            }
+
+            map<string, Directive*>::iterator dit = _directiveLst.find( postTokenizer._tokens[0].source );
+            if (dit == _directiveLst.end())
+            {
+                return true; 
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else 
+        {
+            throw DirectiveHandlerException("Expect if-group directives");
+        }
+
+        return true;
+    }
+
+
+    void processDirectiveIF( list<MacroPPToken> &macroTokens, list<MacroPPToken>::iterator& it )
+    {
+        list<MacroPPToken>::iterator oriIt = it;
+        list<MacroPPToken>::iterator sit, eit;
+
+        
+        //----
+        //   0 -> if-group -> 1 -> elif -> 2
+        //                      -> else -> 3
+        //                      -> endif -> 4
+        //
+
+        //----
+        // get all tokens
+        // 
+
+        int state = 0;
+        bool condition = false;
+        bool skip = false;
+
+        while (it->type != ENDIF)
+        {
+            switch (state)
+            {
+                case 0:
+                    if (it->type == IF || it->type == IFDEF || it->type == IFNDEF)
+                    {
+                        condition = evaluate ( *it );
+                    }
+
+                    // it will automaticall move to next token
+                    it = macroTokens.erase( it );
+                    skip = condition ? false : true;
+                    state = 1;
+                    break;
+
+                case 1:
+                    if (it->type == IF || it->type == IFDEF || it->type == IFNDEF)
+                    {
+                        if (skip)
+                        {
+                            int ifdepth = 0; 
+                            while (it != macroTokens.end()) 
+                            {
+
+                                if (it->type == IF || it->type == IFDEF || it->type == IFNDEF)
+                                {
+                                    it = macroTokens.erase( it );
+                                    ifdepth++;
+                                    continue;
+                                }
+                                else if (it->type == ENDIF)
+                                {
+                                    it = macroTokens.erase( it );
+                                    ifdepth--;
+                                    if (ifdepth == 0)
+                                    {
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    it = macroTokens.erase( it );
+                                    continue;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            processDirectiveIF( macroTokens, it ); 
+                        }
+                        state = 1;
+                    }
+                    else if (it->type == ELIF)
+                    {
+                        if (condition == true)
+                        {
+                            skip = true;
+                        }
+                        else if ( (condition = evaluate( *it )) == true )
+                        {
+                            skip = false; 
+                        }
+                        else 
+                        {
+                            skip = true;
+                        }
+                        it = macroTokens.erase( it );
+                        state = 1;
+                    }
+                    else if (it->type == ELSE)
+                    {
+                        if (condition == true)
+                        {
+                            skip = true;
+                        }
+                        else 
+                        {
+                            skip = false;
+                        }
+                        it = macroTokens.erase( it );
+                        state = 1;
+                    }
+                    else if (it->type == ENDIF)
+                    {
+                        it = macroTokens.erase( it );
+                        state = 2;
+                    }
+                    else
+                    {
+                        if (skip)
+                        {
+                            it = macroTokens.erase( it );
+                        }
+                        else
+                        {
+                            it++;
+                        }
+                        state = 1;
+                    }
+                    break;
+                case 2:
+                    break;
+            }
+        }
+
+        if (it->type != ENDIF)
+        {
+            throw DirectiveHandlerException("Expect endif directives");
+        }
+        else
+        {
+            macroTokens.erase(it);
+        }
+
+        it = macroTokens.begin();
+
+        return;
+    }
 
     void process()
     {
@@ -1051,7 +1257,7 @@ class DirectiveHandler {
             {
                 // directive start
                 MacroPPToken macro;
-                macro.pplst.push_back( *it );
+                // macro.pplst.push_back( *it );
                 it++;
                 while (it->type == PP_WHITESPACE)
                 {
@@ -1068,10 +1274,12 @@ class DirectiveHandler {
                     {
                         macro.type = mit->second;
                     }
+                    it++;
                 }
                 else if (it->type == PP_NEWLINE)
                 {
                     // do nothing, empty directive is allowed
+                    macro.pplst.push_back( *it );
                 }
                 else
                 {
@@ -1142,11 +1350,6 @@ class DirectiveHandler {
         }
 
  
-        //----
-        // PA5 goes here 
-        //
-
-
         //----- 
         // loop through all macro lines
         //
@@ -1154,6 +1357,11 @@ class DirectiveHandler {
 
         while (lit != _list.end())
         {
+            if (lit->type == IF || lit->type==IFDEF || lit->type == IFNDEF)
+            {
+                processDirectiveIF( _list, lit ); 
+                continue;
+            }
             if (lit->type == DEFINE)
             {
                 processDirectiveDefine( *lit );
@@ -1172,7 +1380,7 @@ class DirectiveHandler {
 
 
   public:
-    PostTokenizer             _postTokenizer;
+    string                    _srcfile;
     vector<PostToken>         _pts;
     vector<PPToken>           _pps;
     vector<PPToken>           _result;
@@ -1210,7 +1418,7 @@ int main()
         PPTokenizer ppTokenizer;
         ppTokenizer.parse(uncTokens);
 
-        DirectiveHandler directiveHandler(ppTokenizer._elst);
+        DirectiveHandler directiveHandler(string(), ppTokenizer._elst);
         directiveHandler.process();
              
 
