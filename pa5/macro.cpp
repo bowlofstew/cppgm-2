@@ -15,6 +15,46 @@
 using namespace std;
 
 
+// For pragma once implementation:
+// system-wide unique file id type `PA5FileId`
+typedef pair<unsigned long int, unsigned long int> PA5FileId;
+
+// bootstrap system call interface, used by PA5GetFileId
+extern "C" long int syscall(long int n, ...) throw ();
+
+// PA5GetFileId returns true iff file found at path `path`.
+// out parameter `out_fileid` is set to file id
+bool PA5GetFileId(const string& path, PA5FileId& out_fileid)
+{
+	struct
+	{
+			unsigned long int dev;
+			unsigned long int ino;
+			long int unused[16];
+	} data;
+
+	int res = syscall(4, path.c_str(), &data);
+
+	out_fileid = make_pair(data.dev, data.ino);
+
+	return res == 0;
+}
+
+
+// OPTIONAL: Also search `PA5StdIncPaths` on `--stdinc` command-line switch (not by default)
+vector<string> PA5StdIncPaths =
+{
+    "/usr/include/c++/4.7/",
+    "/usr/include/c++/4.7/x86_64-linux-gnu/",
+    "/usr/include/c++/4.7/backward/",
+    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include/",
+    "/usr/local/include/",
+    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/",
+    "/usr/include/x86_64-linux-gnu/",
+    "/usr/include/"
+};
+
+
 class DirectiveHandlerException : public exception
 {
   public:
@@ -51,7 +91,8 @@ enum MacroPPTokenType
     LINE,
     ERROR,
     PRAGMA,
-    TXT
+    TXT,
+    INVALID
 };
 
 
@@ -1039,26 +1080,24 @@ class DirectiveHandler {
 
     bool evaluate( MacroPPToken& mt)
     {
-        vector<PPToken> vec(mt.pplst.begin(), mt.pplst.end());
+        vector<PPToken> vec;
+
+        if (mt.type == IF || mt.type == ELIF)
+        {
+            list<PPToken> newLst = replaceText( mt.pplst );
+            vec.insert(vec.end(), newLst.begin(), newLst.end());
+        }
+        else
+        {
+            vec.insert(vec.end(), mt.pplst.begin(), mt.pplst.end());
+        }
         PostTokenizer postTokenizer(vec);
         postTokenizer.parse();
 
-        if (mt.type == IF)
+        if (mt.type == IF || mt.type == ELIF)
         {
             PPCtrlExprEvaluator peval(postTokenizer._tokens.begin(), postTokenizer._tokens.end());
-            PPCtrlExprResult result = peval.evalCtrlExpr();
-            if (result.isErr())
-            {
-                throw DirectiveHandlerException("Bad IF directive ctrl-expr");
-            }
-            else if (result.value() != 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return peval.startEval();
         }
         else if (mt.type == IFDEF)
         {
@@ -1103,27 +1142,150 @@ class DirectiveHandler {
     }
 
 
-    void processDirectiveIF( list<MacroPPToken> &macroTokens, list<MacroPPToken>::iterator& it )
+    void processDirectiveError( MacroPPToken& mt )
     {
-        list<MacroPPToken>::iterator oriIt = it;
-        list<MacroPPToken>::iterator sit, eit;
+        list<PPToken> tokens;
+        list<PPToken>::iterator ppit;
+        bool prevSpace = false;
 
-        
+        // merge multiple space to 1 space
+        //
+        while (mt.pplst.size() > 0)
+        {
+            ppit = mt.pplst.begin();
+
+            if (ppit->type == PP_WHITESPACE)
+            {
+                if (prevSpace)
+                {
+                    mt.pplst.pop_front();
+                    continue;
+                }
+            }
+            tokens.push_back( *ppit );
+            mt.pplst.pop_front();
+        }
+
+        PPToken pt = stringize( tokens );
+        throw DirectiveHandlerException(pt.utf8str.c_str());
+    }
+
+
+    void processDirectiveInclude( list<MacroPPToken> &macroTokens, list<MacroPPToken>::iterator& it )
+    {
+        //-----
+        // search for the include path
+        //
+        list<PPToken> lst0 = trim( it->pplst );
+        list<PPToken> lst = replaceText( lst0 );
+
+        if (lst.size() != 1)
+        {
+            throw DirectiveHandlerException("Bad include file, extra tokens");
+        }
+
+        //int incType = 0;
+        string incFile = lst.begin()->utf8str;
+        string inc;
+
+        if (incFile[0]=='"' && incFile[incFile.size()-1] == '"')
+        {
+            inc = incFile.substr(1, incFile.size() - 2);
+            //incType = 0;
+        }
+        else if (incFile[0]=='<' && incFile[incFile.size()-1] == '>')
+        {
+            inc = incFile.substr(1, incFile.size() - 2);
+            //incType = 1;
+        }
+        else
+        {
+            throw DirectiveHandlerException("Bad include header name, neither <> nor \"\"");
+        }
+
+        //-----
+        // rebuild the new srcfile name
+        //
+        string nextf;
+        size_t slashPos = _srcfile.rfind("/");
+        if (slashPos == string::npos)
+        {
+            nextf = inc;
+        }
+        else
+        {
+            nextf = _srcfile.substr(0, slashPos+1);
+            nextf += inc;
+        }
+
+        //-----
+        //  check if file exists
+        // 
+        PA5FileId fileid; 
+        bool file_exist = PA5GetFileId(nextf, fileid);
+        if (file_exist == false)
+        {
+            file_exist = PA5GetFileId(inc, fileid);
+            if (file_exist == false)
+            {
+                string msg = "Cannot file include file : ";
+                msg += inc;
+                throw DirectiveHandlerException(msg.c_str());
+            }
+            nextf = inc;
+        }  
+
+        //-----
+        //  parse included file to pptokens 
+        //
+        ifstream in(nextf);
+        ostringstream oss;
+        oss << in.rdbuf();
+        string input = oss.str();
+    
+        vector<int> uncTokens;
+        int code_unit;
+        UTF8Decoder utf8Decoder(&input);
+        while ((code_unit = utf8Decoder.nextCode()) > 0)
+        {
+            uncTokens.push_back(code_unit);
+        }
+        if (uncTokens.size()>0 && uncTokens[uncTokens.size()-1]!='\n')
+        {
+            uncTokens.push_back('\n');
+        }
+        PPTokenizer ppTokenizer;
+        ppTokenizer.parse(uncTokens);
+   
+        //-----
+        // generate MacroPPToken list for the include file
+        //
+        DirectiveHandler dir0(nextf, ppTokenizer._elst);
+        dir0.createMacroTokens();
+
+        dir0._list.back().pplst.pop_back();  // pop eof
+
+        list<MacroPPToken>::iterator insit = it;
+        insit++;
+        macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
+        it = macroTokens.erase( it );
+    }
+
+
+    void processDirectiveIf( list<MacroPPToken> &macroTokens, list<MacroPPToken>::iterator& it )
+    {
         //----
         //   0 -> if-group -> 1 -> elif -> 2
         //                      -> else -> 3
         //                      -> endif -> 4
         //
-
-        //----
-        // get all tokens
         // 
-
         int state = 0;
         bool condition = false;
         bool skip = false;
+        bool elseFound = false;
 
-        while (it->type != ENDIF)
+        while (it != macroTokens.end())
         {
             switch (state)
             {
@@ -1145,6 +1307,7 @@ class DirectiveHandler {
                         if (skip)
                         {
                             int ifdepth = 0; 
+                            int elseFoundi = -1; 
                             while (it != macroTokens.end()) 
                             {
 
@@ -1152,6 +1315,21 @@ class DirectiveHandler {
                                 {
                                     it = macroTokens.erase( it );
                                     ifdepth++;
+                                    continue;
+                                }
+                                else if (it->type == ELIF)
+                                {
+                                    if (elseFoundi == ifdepth)
+                                    {
+                                        throw DirectiveHandlerException("elif out of order");
+                                    }
+                                    it = macroTokens.erase( it );
+                                    continue;
+                                }
+                                else if (it->type == ELSE)
+                                {
+                                    elseFoundi = ifdepth;
+                                    it = macroTokens.erase( it );
                                     continue;
                                 }
                                 else if (it->type == ENDIF)
@@ -1172,7 +1350,7 @@ class DirectiveHandler {
                         }
                         else
                         {
-                            processDirectiveIF( macroTokens, it ); 
+                            processDirectiveIf( macroTokens, it ); 
                         }
                         state = 1;
                     }
@@ -1191,6 +1369,10 @@ class DirectiveHandler {
                             skip = true;
                         }
                         it = macroTokens.erase( it );
+                        if (elseFound == true)
+                        {
+                            throw DirectiveHandlerException("elif out of order");
+                        }
                         state = 1;
                     }
                     else if (it->type == ELSE)
@@ -1204,12 +1386,14 @@ class DirectiveHandler {
                             skip = false;
                         }
                         it = macroTokens.erase( it );
+                        elseFound = true;
                         state = 1;
                     }
                     else if (it->type == ENDIF)
                     {
-                        it = macroTokens.erase( it );
-                        state = 2;
+                        macroTokens.erase( it );
+                        it = macroTokens.begin();
+                        return;
                     }
                     else
                     {
@@ -1243,7 +1427,8 @@ class DirectiveHandler {
         return;
     }
 
-    void process()
+
+    void createMacroTokens()
     {
         //-----
         // group tokens to directive macro token  or text line macro token
@@ -1268,7 +1453,7 @@ class DirectiveHandler {
                     map<string, MacroPPTokenType>::const_iterator mit = string2macroPPTokenTypeMap.find(it->utf8str);
                     if (mit == string2macroPPTokenTypeMap.end())
                     {
-                        throw DirectiveHandlerException("Bad directive type");
+                        macro.type = INVALID;
                     }
                     else
                     {
@@ -1283,7 +1468,8 @@ class DirectiveHandler {
                 }
                 else
                 {
-                    throw DirectiveHandlerException("Bad directive type");
+                    macro.type = INVALID;
+                    // throw DirectiveHandlerException("Bad directive type");
                 }
 
                 while (it->type != PP_NEWLINE)
@@ -1348,8 +1534,13 @@ class DirectiveHandler {
                 continue;
             }
         }
+    }
 
- 
+
+    void process()
+    {
+
+        createMacroTokens();
         //----- 
         // loop through all macro lines
         //
@@ -1359,7 +1550,7 @@ class DirectiveHandler {
         {
             if (lit->type == IF || lit->type==IFDEF || lit->type == IFNDEF)
             {
-                processDirectiveIF( _list, lit ); 
+                processDirectiveIf( _list, lit ); 
                 continue;
             }
             if (lit->type == DEFINE)
@@ -1374,7 +1565,23 @@ class DirectiveHandler {
             {
                 processTextLines( *lit );
             }
-            lit++;
+            else if (lit->type == ERROR)
+            {
+                processDirectiveError( *lit );
+            }
+            else if (lit->type == INCLUDE)
+            {
+                processDirectiveInclude( _list, lit );
+                continue;
+            }
+   
+            else if (lit->type == INVALID)
+            {
+                throw DirectiveHandlerException("Bad directive");
+            }
+
+
+            lit = _list.erase( lit );
         }
     }
 

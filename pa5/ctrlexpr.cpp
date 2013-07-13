@@ -1413,7 +1413,7 @@ class PPCtrlExprEvaluator
         }
     }
 
-    void startEval()
+    void startEval_pa3()
     {
         try 
         {
@@ -1438,6 +1438,34 @@ class PPCtrlExprEvaluator
             cout << e.what() << endl;
         }
     }
+
+    bool startEval()
+    {
+        if (_idx == _end)
+        {
+            // empty line, do nothing
+            throw PPCtrlExprEvalException("Bad ctrli-expr, no tokens");
+        }
+ 
+        PPCtrlExprResult result = evalCtrlExpr();
+        if (_idx != _end)
+        {
+            throw PPCtrlExprEvalException("Bad ctrli-expr, extra tokens");
+        }
+        else if (result.isErr())
+        {
+            throw PPCtrlExprEvalException("Bad ctrli-expr");
+        }
+        else if (result.value() != 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 };
 
 template <class T>
@@ -1493,7 +1521,7 @@ int main()
                 if (it->type == PT_NEWLINE)
                 {
                     PPCtrlExprEvaluator peval(lstart, it);
-                    peval.startEval();
+                    peval.startEval_pa3();
                     it++;
                     lstart = it;
                     continue;

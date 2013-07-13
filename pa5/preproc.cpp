@@ -23,43 +23,43 @@
 
 using namespace std;
 
-// For pragma once implementation:
-// system-wide unique file id type `PA5FileId`
-typedef pair<unsigned long int, unsigned long int> PA5FileId;
-
-// bootstrap system call interface, used by PA5GetFileId
-extern "C" long int syscall(long int n, ...) throw ();
-
-// PA5GetFileId returns true iff file found at path `path`.
-// out parameter `out_fileid` is set to file id
-bool PA5GetFileId(const string& path, PA5FileId& out_fileid)
-{
-	struct
-	{
-			unsigned long int dev;
-			unsigned long int ino;
-			long int unused[16];
-	} data;
-
-	int res = syscall(4, path.c_str(), &data);
-
-	out_fileid = make_pair(data.dev, data.ino);
-
-	return res == 0;
-}
-
-// OPTIONAL: Also search `PA5StdIncPaths` on `--stdinc` command-line switch (not by default)
-vector<string> PA5StdIncPaths =
-{
-    "/usr/include/c++/4.7/",
-    "/usr/include/c++/4.7/x86_64-linux-gnu/",
-    "/usr/include/c++/4.7/backward/",
-    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include/",
-    "/usr/local/include/",
-    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/",
-    "/usr/include/x86_64-linux-gnu/",
-    "/usr/include/"
-};
+// // For pragma once implementation:
+// // system-wide unique file id type `PA5FileId`
+// typedef pair<unsigned long int, unsigned long int> PA5FileId;
+// 
+// // bootstrap system call interface, used by PA5GetFileId
+// extern "C" long int syscall(long int n, ...) throw ();
+// 
+// // PA5GetFileId returns true iff file found at path `path`.
+// // out parameter `out_fileid` is set to file id
+// bool PA5GetFileId(const string& path, PA5FileId& out_fileid)
+// {
+// 	struct
+// 	{
+// 			unsigned long int dev;
+// 			unsigned long int ino;
+// 			long int unused[16];
+// 	} data;
+// 
+// 	int res = syscall(4, path.c_str(), &data);
+// 
+// 	out_fileid = make_pair(data.dev, data.ino);
+// 
+// 	return res == 0;
+// }
+// 
+// // OPTIONAL: Also search `PA5StdIncPaths` on `--stdinc` command-line switch (not by default)
+// vector<string> PA5StdIncPaths =
+// {
+//     "/usr/include/c++/4.7/",
+//     "/usr/include/c++/4.7/x86_64-linux-gnu/",
+//     "/usr/include/c++/4.7/backward/",
+//     "/usr/lib/gcc/x86_64-linux-gnu/4.7/include/",
+//     "/usr/local/include/",
+//     "/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/",
+//     "/usr/include/x86_64-linux-gnu/",
+//     "/usr/include/"
+// };
 
 int main(int argc, char** argv)
 {
@@ -286,9 +286,19 @@ int main(int argc, char** argv)
     
                     concatStr.data = mem;
                     concatStr.size = size;
+                    if (concatStr.type == PT_INVALID)
+                    {
+                        throw DirectiveHandlerException("invalid string");
+                    }
+                    concatStr.emit(out);
                     concatStr.emit();
                     bPrevStr = false;
                     strCodes.clear();
+                }
+
+                if (pt.type == PT_INVALID)
+                {
+                    throw DirectiveHandlerException("invalid PostToken");
                 }
                 pt.emit(out);
                 pt.emit();
