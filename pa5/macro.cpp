@@ -144,10 +144,136 @@ class DirectiveHandler {
     DirectiveHandler (string srcfile, vector<PPToken>& pps)
         : _srcfile(srcfile), _pps(pps)
     {
+        initialize_default_directive();
     }
 
     ~DirectiveHandler () {}
 
+
+    PPToken makePPToken(string s)
+    {
+        int code_unit;
+        vector<int> uncTokens;
+        UTF8Decoder utf8Decoder(&s);
+        while ((code_unit = utf8Decoder.nextCode()) > 0)
+        {
+            uncTokens.push_back(code_unit);
+        }
+
+        PPTokenizer tokenizer;
+        tokenizer.parse( uncTokens );
+        tokenizer._elst.pop_back();  // remove eof
+
+        if (tokenizer._elst.size() != 1)
+        {
+            throw DirectiveHandlerException("Fail making a token out of a string");
+        }
+        return tokenizer._elst[0];  
+    }
+
+    bool isConcatOp( string s )
+    {
+        if (s == "##" || s == "%:%:")
+            return true;
+        else
+            return false;
+    }
+
+    bool isDirectiveStartOp( string s )
+    {
+        if (s == "#" || s == "%:")
+            return true;
+        else
+            return false;
+    }
+
+
+
+//    enum {
+//        OBJ = 1,
+//        FUN
+//    };
+//
+//    string          name;
+//    int             type;     //0: object , 1:func
+//    int             paraNum;
+//
+//    map<string,int> paramMap;
+//    vector<string>  paramLst;
+//    vector<PPToken> replaceLst;
+
+    void initialize_default_directive()
+    {
+        string s;
+        Directive* dir;
+
+        s = "__CPPGM__";
+        dir = new Directive;
+        dir->name = "__CPPGM__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("201303L") );
+        _directiveLst[s] = dir;
+
+        s = "__cplusplus";
+        dir = new Directive;
+        dir->name = "__cplusplus"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("201103L") );
+        _directiveLst[s] = dir;
+
+        s = "__STDC_HOSTED__";
+        dir = new Directive;
+        dir->name = "__STDC_HOSTED__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("1") );
+        _directiveLst[s] = dir;
+
+        s = "__CPPGM_AUTHOR__";
+        dir = new Directive;
+        dir->name = "__CPPGM_AUTHOR__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("\"Rich Huang\"") );
+        _directiveLst[s] = dir;
+
+        s = "__FILE__";
+        dir = new Directive;
+        dir->name = "__FILE__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("__FILE__") );
+        _directiveLst[s] = dir;
+
+        s = "__LINE__";
+        dir = new Directive;
+        dir->name = "__LINE__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("__LINE__") );
+        _directiveLst[s] = dir;
+
+        s = "__DATE__";
+        dir = new Directive;
+        dir->name = "__DATE__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("__DATE__") );
+        _directiveLst[s] = dir;
+
+        s = "__TIME__";
+        dir = new Directive;
+        dir->name = "__TIME__"; 
+        dir->type = Directive::OBJ;
+        dir->paraNum = 0;
+        dir->replaceLst.push_back( makePPToken("__TIME__") );
+        _directiveLst[s] = dir;
+
+
+
+    }
 
     vector<PPToken> mergePPToken ( PPToken& p1, PPToken& p2)
     {
@@ -374,12 +500,12 @@ class DirectiveHandler {
         bool bPrevConcat = false;
         for ( list<PPToken>::iterator it = tokens.begin(); it != tokens.end() ; ++it)
         {
-            if (it->utf8str == "##")
+            if ( isConcatOp (it->utf8str) )
             {
                 result = trimTail(result);
                 bPrevConcat = true;
             }
-            else if (it->utf8str == "#")
+            else if (isDirectiveStartOp(it->utf8str))
             {
                 bPrevConcat = true;
             }
@@ -555,7 +681,7 @@ class DirectiveHandler {
                         {
                             PPToken p = dir->replaceLst[i-1];
 
-                            if (p.utf8str == "##")
+                            if (isConcatOp(p.utf8str))
                             {
                                 continue;
                             }
@@ -589,14 +715,14 @@ class DirectiveHandler {
                                     }
                                 }
                                 
-                                if (i >= 2 && dir->replaceLst[i-2].utf8str== "#" )
+                                if (i >= 2 && isDirectiveStartOp(dir->replaceLst[i-2].utf8str))
                                 {
                                     // no need to replace, and stringize the token
                                     PPToken ps = stringize( myArg );
                                     tokens.insert(tokens.begin(), ps);
                                     i--; // skip the "#" token
                                 }
-                                else if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i].utf8str == "##")
+                                else if ( i<dir->replaceLst.size()-1 && isConcatOp(dir->replaceLst[i].utf8str))
                                 {
                                     PPToken pr = *(tokens.begin());
                                     PPToken pl = (myArg.size() > 0) ? myArg.back() : PPToken(PP_PLACEMARKER);
@@ -613,7 +739,7 @@ class DirectiveHandler {
 
                                     tokens.insert(tokens.begin(), tmp.begin(), tmp.end());
                                 }
-                                else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
+                                else if ( i>= 2 && isConcatOp(dir->replaceLst[i-2].utf8str))
                                 {
                                     if (myArg.size() == 0)
                                     {
@@ -643,7 +769,7 @@ class DirectiveHandler {
                             }
                             else // not parameter
                             {
-                                if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i].utf8str == "##")
+                                if ( i<dir->replaceLst.size()-1 && isConcatOp(dir->replaceLst[i].utf8str))
                                 {
                                     PPToken pr = *(tokens.begin());
                                     PPToken pl = p;
@@ -652,7 +778,7 @@ class DirectiveHandler {
                                     vector<PPToken> tmpv = mergePPToken(pl, pr);
                                     tokens.insert(tokens.begin(), tmpv.begin(), tmpv.end());
                                 }
-                                else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
+                                else if ( i>= 2 && isConcatOp(dir->replaceLst[i-2].utf8str))
                                 {
                                     tokens.insert(tokens.begin(), p);
                                     i--; // skip concat
@@ -674,7 +800,7 @@ class DirectiveHandler {
                         {
                             PPToken p = dir->replaceLst[i-1];
 
-                            if ( i<dir->replaceLst.size()-1 && dir->replaceLst[i].utf8str == "##")
+                            if ( i<dir->replaceLst.size()-1 && isConcatOp(dir->replaceLst[i].utf8str))
                             {
                                 PPToken pr = *(tokens.begin());
                                 PPToken pl = p;
@@ -683,7 +809,7 @@ class DirectiveHandler {
                                 vector<PPToken> tmpv = mergePPToken(pl, pr);
                                 tokens.insert(tokens.begin(), tmpv.begin(), tmpv.end());
                             }
-                            else if ( i>= 2 && dir->replaceLst[i-2].utf8str== "##")
+                            else if ( i>= 2 && isConcatOp(dir->replaceLst[i-2].utf8str))
                             {
                                 tokens.push_front( p );
                                 i--; // skip concat
@@ -698,18 +824,83 @@ class DirectiveHandler {
                         continue;
                     }
                 }
-                else
+                else  // normal identifier
                 {
-                    // normal identifier
                     result.push_back( *ppit );
+
+                    if (ppit->utf8str == "defined")   // special handling for ctrl statement
+                    {
+                        tokens.pop_front();
+
+                        // skip the next ID or next "(" "ID"
+                        //
+                        // 0-> ( -> 1 -> id -> 2
+                        //  -> id -> 2
+                        //  anything else -> 3
+                        //
+                        list<PPToken>::iterator tit;
+                        int state = 0;
+                        while (tokens.size() > 0 && state < 2)
+                        {
+                            tit = tokens.begin();
+                            if (tit->type == PP_WHITESPACE)
+                            {
+                                tokens.pop_front();
+                                continue;
+                            }
+                            else 
+                            {
+                                switch (state)
+                                {
+                                    case 0:
+                                        if (tit->utf8str == "(")
+                                        {
+                                            result.push_back( *tit );
+                                            tokens.pop_front();
+                                            state = 1;
+                                        }
+                                        else if (tit->type == PP_IDENTIFIER)
+                                        {
+                                            result.push_back( *tit );
+                                            tokens.pop_front();
+                                            state = 2;
+                                        }
+                                        else
+                                        {
+                                            state = 3;
+                                        }
+                                        break;
+                                    case 1:
+                                        if (tit->type == PP_IDENTIFIER)
+                                        {
+                                            result.push_back( *tit );
+                                            tokens.pop_front();
+                                            state = 2;
+                                        }
+                                        else
+                                        {
+                                            state = 3;
+                                        }
+                                        break;
+                                    default:
+                                        state = 3;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        tokens.pop_front();
+                    }
+                    continue;
                 }
             }
             else
             {
                 result.push_back( *ppit );
+                tokens.pop_front();
             }
-
-            tokens.pop_front();
         }
         return result;
     }
@@ -765,7 +956,7 @@ class DirectiveHandler {
                 switch (state)
                 {
                     case 0:
-                        if (ppit->utf8str == "#")
+                        if (isDirectiveStartOp(ppit->utf8str))
                         {
                             state = 1;
                         }
@@ -915,11 +1106,11 @@ class DirectiveHandler {
         //
         if ( dir->replaceLst.size() > 0 )
         {
-            if (dir->replaceLst[0].utf8str == "##")
+            if (isConcatOp(dir->replaceLst[0].utf8str))
             {
                 return false;
             }
-            if (dir->replaceLst[dir->replaceLst.size()-1].utf8str == "##")
+            if (isConcatOp(dir->replaceLst[dir->replaceLst.size()-1].utf8str))
             {
                 return false;
             }
@@ -931,7 +1122,7 @@ class DirectiveHandler {
         {
             for (unsigned i=0; i<dir->replaceLst.size(); i++)
             {
-                if (dir->replaceLst[i].utf8str == "#")
+                if (isDirectiveStartOp(dir->replaceLst[i].utf8str))
                 {
                     if (i == dir->replaceLst.size()-1)
                     {
@@ -1042,7 +1233,7 @@ class DirectiveHandler {
                 switch (state)
                 {
                     case 0:
-                        if (ppit->utf8str == "#")
+                        if (isDirectiveStartOp(ppit->utf8str))
                         {
                             state = 1;
                         }
@@ -1097,6 +1288,7 @@ class DirectiveHandler {
         if (mt.type == IF || mt.type == ELIF)
         {
             PPCtrlExprEvaluator peval(postTokenizer._tokens.begin(), postTokenizer._tokens.end());
+            peval._directiveLst = this->_directiveLst;
             return peval.startEval();
         }
         else if (mt.type == IFDEF)
@@ -1438,7 +1630,7 @@ class DirectiveHandler {
         {
             PPTokenType type = it->type;
             string str = it->utf8str; 
-            if (type == PP_OP && str=="#")
+            if (type == PP_OP && isDirectiveStartOp(str))
             {
                 // directive start
                 MacroPPToken macro;
@@ -1514,7 +1706,7 @@ class DirectiveHandler {
                     {
                         it2++;
                     }
-                    if (it2->type == PP_OP && it2->utf8str == "#")
+                    if (it2->type == PP_OP && isDirectiveStartOp(it2->utf8str) )
                     {
                         foundDirective = true;
                     }

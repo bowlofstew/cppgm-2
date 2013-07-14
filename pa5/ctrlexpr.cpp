@@ -755,6 +755,8 @@ ostream& operator<<(ostream &out, PPCtrlExprResult &pp)
 }
 
 
+class Directive;
+
 class PPCtrlExprEvaluator
 {
   public:
@@ -762,6 +764,7 @@ class PPCtrlExprEvaluator
     vector<PostToken>::iterator _start;
     vector<PostToken>::iterator _end;
     vector<PostToken>::iterator _idx;
+    map<string, Directive*>     _directiveLst;
 
     PostToken _result;
 
@@ -774,9 +777,28 @@ class PPCtrlExprEvaluator
     {
     }
 
-    void reset()
+   
+    bool checkDefinedIdentifier (const string identifier)
     {
-    }
+#ifdef PA3
+        if (identifier.empty())
+            return false;
+        else
+            return identifier[0] % 2;
+#else
+        map<string, Directive*>::iterator mit = _directiveLst.find(identifier);
+        if (mit == _directiveLst.end())
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+#endif
+    } 
+
+
 
     PPCtrlExprResult eval_primary ()
     {
@@ -915,7 +937,8 @@ class PPCtrlExprEvaluator
                 if (_idx->type == PT_OP_LPAREN)
                 {
                     _idx++;
-                    if (PA3Mock_IsDefinedIdentifier(_idx->source))
+                    // if (PA3Mock_IsDefinedIdentifier(_idx->source))
+                    if (checkDefinedIdentifier(_idx->source))
                     {
                         term1 = 1;
                     }
@@ -936,7 +959,8 @@ class PPCtrlExprEvaluator
                 }
                 else
                 {
-                    if (PA3Mock_IsDefinedIdentifier(_idx->source))
+                    // if (PA3Mock_IsDefinedIdentifier(_idx->source))
+                    if (checkDefinedIdentifier(_idx->source))
                     {
                         term1 = 1;
                     }

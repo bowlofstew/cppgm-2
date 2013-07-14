@@ -441,7 +441,7 @@ struct PPTokenizer
     {}
 #else
     PPTokenizer()
-        : _tstate(0), _chex(0), _vhex(0), _rawStringMode(false), _lineNo(1)
+        : _tstate(0), _chex(0), _vhex(0), _rawStringMode(false), _lineNo(-1)
     {}
 #endif
     vector<PPToken> _elst;
@@ -1059,7 +1059,6 @@ struct PPTokenizer
                 {
                     nextCode();  // skip '\n'
                     createToken(PP_NEWLINE, empty);
-                    _lineNo++;
                     if (peek()=='#')
                     {
                         nextCode(); // skip '#'
