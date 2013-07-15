@@ -105,6 +105,7 @@ int main(int argc, char** argv)
             }
     
             PPTokenizer ppTokenizer;
+            ppTokenizer._lineNo = 1;
             ppTokenizer.parse(uncTokens);
     
             DirectiveHandler directiveHandler(srcfile, ppTokenizer._elst);

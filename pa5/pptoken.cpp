@@ -459,6 +459,9 @@ struct PPTokenizer
 
     int             _lineNo;
 
+    enum {
+        LINEEND_TAG = 0xFFFFFF
+    };
 
     //---------------------------------
     // trigraph, UCN, line-splicing 
@@ -508,6 +511,7 @@ struct PPTokenizer
                 {
                     _tlst.pop_back();
                     _tlst.pop_back();
+                    _tlst.push_back( LINEEND_TAG );
                     _tstate = 0;
                 }
                 else
@@ -584,13 +588,20 @@ struct PPTokenizer
     //
     int nextCode () 
     {
+        int v = -1;
+
         if (_oidx != _olst.end())
         {
             if (_rawStringMode)
             {
-                int v = *_oidx;
+                while ( *_oidx == LINEEND_TAG )
+                {
+                    _oidx++;  // skip the tag
+                    _lineNo++;
+                }
+                v = *_oidx;
                 ++_oidx;
-                return v; 
+                // return v; 
             }
             else
             {
@@ -618,21 +629,35 @@ struct PPTokenizer
                         else
                             _olst.insert(oripos, *vpos);
                     }
-                    int v = *_oidx;
+
+                    while (*_oidx == LINEEND_TAG)
+                    {
+                        _oidx++;
+                        _lineNo++;
+                    }
+
+                    v = *_oidx;
                     ++_oidx;
-                    return v;
+                    //return v;
                 }
                 else
                 {
                     cout << "TRANSLATE ERROR!" << endl;
-                    return -1;
+                    v = -1;
                 }
             }
         } 
         else
         {
-            return -1;
+            v = -1;
         }
+
+        if (v == '\n')
+        {
+            _lineNo++;
+        }
+
+        return v;
     }
 
     
@@ -641,6 +666,25 @@ struct PPTokenizer
         if (_oidx != _olst.begin())
         {
             --_oidx;
+
+            while (*_oidx == LINEEND_TAG)
+            {
+                if (_oidx != _olst.begin())
+                {
+                    _oidx--;
+                    _lineNo--;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+
+            if (*_oidx == '\n')
+            {
+                _lineNo--;
+            }
+
             return *_oidx;
         }
         else
@@ -652,11 +696,14 @@ struct PPTokenizer
     
     int peek() 
     {
+        list<int>::iterator rit;
+
         if (_oidx != _olst.end())
         {
             if (_rawStringMode)
             {
-                return *_oidx;
+                rit = _oidx;
+                return *rit;
             }
             else
             {
@@ -682,7 +729,14 @@ struct PPTokenizer
                         else
                             _olst.insert(oripos, *vpos);
                     }
-                    int v = *_oidx;
+                    
+                    rit = _oidx;
+                    int v = *rit;;
+                    while (*rit == LINEEND_TAG)
+                    {
+                        ++rit;
+                        v = *rit;
+                    }
                     return v;
                 }
                 else

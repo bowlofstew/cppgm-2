@@ -145,12 +145,13 @@ class DirectiveHandler {
         : _srcfile(srcfile), _pps(pps)
     {
         initialize_default_directive();
+        _pragmaOnce = false;
     }
 
     ~DirectiveHandler () {}
 
 
-    PPToken makePPToken(string s)
+    PPToken makePPToken(string s, int lineNo=-1)
     {
         int code_unit;
         vector<int> uncTokens;
@@ -168,8 +169,17 @@ class DirectiveHandler {
         {
             throw DirectiveHandlerException("Fail making a token out of a string");
         }
+
+        tokenizer._elst[0].lineNo = lineNo;
+
         return tokenizer._elst[0];  
     }
+
+    PPToken makePPToken(int s, int lineNo=-1)
+    {
+        return makePPToken(to_string(s), lineNo);
+    }
+
 
     bool isConcatOp( string s )
     {
@@ -271,9 +281,17 @@ class DirectiveHandler {
         dir->replaceLst.push_back( makePPToken("__TIME__") );
         _directiveLst[s] = dir;
 
-
+        s = "_Pragma";
+        dir = new Directive;
+        dir->name = "_Pragma"; 
+        dir->type = Directive::FUN;
+        dir->paraNum = 1;
+        dir->paramLst.push_back("a");
+        dir->paramMap["a"] = 1;
+        _directiveLst[s] = dir;
 
     }
+
 
     vector<PPToken> mergePPToken ( PPToken& p1, PPToken& p2)
     {
@@ -673,6 +691,12 @@ class DirectiveHandler {
                         //     args[i] = trim( args[i] );
                         // }
 
+                        if (dir->name == "_Pragma" && args.size()==1 && args[0].front().utf8str == "\"once\"")
+                        {
+                            _pragmaOnce = true;
+                            continue;
+                        }
+
                         //-----
                         // scan through all the replacement list
                         // and put each replacement token back to the scan list
@@ -795,12 +819,26 @@ class DirectiveHandler {
                     }
                     else  // Directive::OBJ
                     {
+                        PPToken po = *ppit;
+
                         tokens.pop_front();  // remove the current token, 
                         for (unsigned i=dir->replaceLst.size(); i>0; i--)
                         {
                             PPToken p = dir->replaceLst[i-1];
+                            p.lineNo = po.lineNo;
 
-                            if ( i<dir->replaceLst.size()-1 && isConcatOp(dir->replaceLst[i].utf8str))
+                            if (dir->name == "__LINE__") // should be only one token in replaceLst
+                            {
+                                tokens.insert(tokens.begin(), makePPToken(po.lineNo, po.lineNo));
+                            }
+                            else if (dir->name == "_Pragma")
+                            {
+                                if (p.utf8str == "\"once\"")
+                                {
+                                    _pragmaOnce = true;
+                                }
+                            }
+                            else if ( i<dir->replaceLst.size()-1 && isConcatOp(dir->replaceLst[i].utf8str))
                             {
                                 PPToken pr = *(tokens.begin());
                                 PPToken pl = p;
@@ -1455,12 +1493,32 @@ class DirectiveHandler {
         DirectiveHandler dir0(nextf, ppTokenizer._elst);
         dir0.createMacroTokens();
 
-        dir0._list.back().pplst.pop_back();  // pop eof
+        list<MacroPPToken> mlst = dir0._list;
 
-        list<MacroPPToken>::iterator insit = it;
-        insit++;
-        macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
-        it = macroTokens.erase( it );
+        dir0.processDirectives();
+
+        if (dir0._pragmaOnce==false || _includeSet.find(fileid) == _includeSet.end())
+        {
+            list<MacroPPToken>::iterator insit = it;
+            insit++;
+            // macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
+            mlst.back().pplst.pop_back();   // pop eof
+            macroTokens.insert(insit, mlst.begin(), mlst.end());
+            it = macroTokens.erase( it );
+            
+            _includeSet.insert(fileid);
+        }
+        else
+        {
+            it = macroTokens.erase( it );
+        }
+
+        // dir0._list.back().pplst.pop_back();  // pop eof
+
+        // list<MacroPPToken>::iterator insit = it;
+        // insit++;
+        // macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
+        // it = macroTokens.erase( it );
     }
 
 
@@ -1728,11 +1786,9 @@ class DirectiveHandler {
         }
     }
 
-
-    void process()
+    
+    void processDirectives()
     {
-
-        createMacroTokens();
         //----- 
         // loop through all macro lines
         //
@@ -1775,6 +1831,15 @@ class DirectiveHandler {
 
             lit = _list.erase( lit );
         }
+
+    }
+
+
+    void process()
+    {
+
+        createMacroTokens();
+        processDirectives();
     }
 
 
@@ -1784,8 +1849,10 @@ class DirectiveHandler {
     vector<PPToken>           _pps;
     vector<PPToken>           _result;
     list<MacroPPToken>        _list;
+    set<PA5FileId>            _includeSet;
 
     map<string, Directive*>   _directiveLst;
+    bool                      _pragmaOnce;
 };
 
 #ifdef PA4
