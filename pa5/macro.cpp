@@ -142,10 +142,14 @@ class DirectiveHandler {
 
   public:
     DirectiveHandler (string srcfile, vector<PPToken>& pps)
-        : _srcfile(srcfile), _pps(pps)
     {
         initialize_default_directive();
         _pragmaOnce = false;
+        _baseLineNo = 0;
+        //_srcfile = "\"";
+        _srcfile += srcfile;
+        //_srcfile += "\"";
+        _pps = pps;
     }
 
     ~DirectiveHandler () {}
@@ -457,8 +461,8 @@ class DirectiveHandler {
         {
             if (rit->type == PP_WHITESPACE)
             {
-                rit++;
                 tokens.pop_back();
+                rit = tokens.rbegin();
             }
             else break;
         }
@@ -829,7 +833,16 @@ class DirectiveHandler {
 
                             if (dir->name == "__LINE__") // should be only one token in replaceLst
                             {
-                                tokens.insert(tokens.begin(), makePPToken(po.lineNo, po.lineNo));
+                                tokens.insert(tokens.begin(), makePPToken(po.lineNo+_baseLineNo, po.lineNo+_baseLineNo));
+                            }
+                            else if (dir->name == "__FILE__")
+                            {
+                                // tokens.insert(tokens.begin(), makePPToken(_srcfile));
+                                string s = "\"";
+                                // s += po.srcfile;
+                                s += _fileidMap.find( po.fileid )->second; 
+                                s += "\"";
+                                tokens.insert(tokens.begin(), makePPToken(s));
                             }
                             else if (dir->name == "_Pragma")
                             {
@@ -1208,6 +1221,9 @@ class DirectiveHandler {
             list<PPToken> dir0_tokens( dir0->replaceLst.begin(), dir0->replaceLst.end());
             list<PPToken> dir_tokens( dir->replaceLst.begin(), dir->replaceLst.end() ); 
 
+            debug_pp_list(dir0_tokens);
+            debug_pp_list(dir_tokens);
+
             dir0_tokens = trim(dir0_tokens);
             dir_tokens = trim(dir_tokens);
 
@@ -1231,6 +1247,8 @@ class DirectiveHandler {
                 }
             }
 
+            debug_pp_list( dir_tokens );
+
             if (dir0_tokens.size() != dir_tokens.size())
             {
                 return false;
@@ -1250,6 +1268,18 @@ class DirectiveHandler {
         }
 
         return true;
+    }
+
+
+    void debug_pp_list(list<PPToken>& lst)
+    {
+        list<PPToken>::iterator it = lst.begin();
+        while (it != lst.end())
+        {
+            cerr << it->utf8str << " , ";
+            it ++;
+        }
+        cerr << "." << endl;
     }
 
 
@@ -1401,6 +1431,154 @@ class DirectiveHandler {
     }
 
 
+    string makeQuoteStr(string s)
+    {
+        string r = "\"";
+        r += s;
+        r += "\"";
+        return r;
+    }
+
+
+    void processDirectivePragma( list<MacroPPToken> &tokens, list<MacroPPToken>::iterator &it )
+    {
+        list<PPToken>::iterator ppit;
+        PA5FileId fileid;
+        PPToken ppParm = makePPToken("tmp");
+
+        int state = 0;
+        bool bError = false;
+        while (it->pplst.size() > 0)
+        {
+            ppit = it->pplst.begin();
+            fileid = ppit->fileid;
+            
+            if (ppit->type == PP_WHITESPACE)
+            {
+                // skip whitespace 
+            }
+            else
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (ppit->type == PP_IDENTIFIER)
+                        {
+                            ppParm = *ppit;
+                            state = 1;
+                        }
+                        else
+                        {
+                            state = -1;
+                        }
+                        break;
+                    case 1:
+                        state = -1;
+                        break;
+                    default:
+                        bError = true;
+                        break;
+                }
+            }
+            it->pplst.pop_front();
+        }
+
+        if (bError)
+        {
+            // throw DirectiveHandlerException("Bad pragma directive format");
+        }
+
+        if (ppParm.utf8str == "once")
+        {
+            _pragmaOnce = true;
+            it = tokens.erase(it);
+        }
+        else
+        {
+            it = tokens.erase(it);
+            //  ignore all other pragmas
+        }
+    }
+
+
+    void processDirectiveLine( MacroPPToken &mt)
+    {
+        list<PPToken>::iterator ppit;
+        PPToken ppLineNo = makePPToken(1);
+        PPToken ppFileName = makePPToken( makeQuoteStr(_srcfile) );
+
+        // merge multiple space to 1 space
+        //
+        int currLineNo = 1;
+        int state = 0;
+        bool bError = false;
+        while (mt.pplst.size() > 0)
+        {
+            ppit = mt.pplst.begin();
+            currLineNo = ppit->lineNo;
+            
+            if (ppit->type == PP_WHITESPACE)
+            {
+                // skip whitespace 
+            }
+            else
+            {
+                switch (state)
+                {
+                    case 0:
+                        if (ppit->type == PP_NUMBER)
+                        {
+                            ppLineNo = *ppit;
+                            state = 1;
+                        }
+                        else
+                        {
+                            state = 1;
+                        }
+                        break;
+                    case 1:
+                        if (ppit->type == PP_STRING_LITERAL)
+                        {
+                            ppFileName = *ppit;
+                            state = 2;
+                        }
+                        else
+                        {
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        state = -1;
+                        break;
+                    default:
+                        bError = true;
+                        break;
+                }
+            }
+            mt.pplst.pop_front();
+        }
+
+        if (bError == true)
+        {
+            throw DirectiveHandlerException("Bad line directive format");
+        }
+
+        istringstream( ppLineNo.utf8str ) >> _baseLineNo; 
+        _baseLineNo = _baseLineNo - currLineNo -1;
+        _srcfile = ppFileName.utf8str; 
+        _srcfile = _srcfile.substr(1, _srcfile.size()-2);
+
+        map<PA5FileId,string>::iterator mit = _fileidMap.find(ppFileName.fileid);
+        if (mit != _fileidMap.end())
+        {
+            _fileidMap.erase( mit );
+            _fileidMap.insert( pair<PA5FileId,string>(ppFileName.fileid, _srcfile) );
+        }
+
+        return;
+    }
+
+
     void processDirectiveInclude( list<MacroPPToken> &macroTokens, list<MacroPPToken>::iterator& it )
     {
         //-----
@@ -1416,6 +1594,7 @@ class DirectiveHandler {
 
         //int incType = 0;
         string incFile = lst.begin()->utf8str;
+        string srcfile = lst.begin()->srcfile;
         string inc;
 
         if (incFile[0]=='"' && incFile[incFile.size()-1] == '"')
@@ -1433,18 +1612,19 @@ class DirectiveHandler {
             throw DirectiveHandlerException("Bad include header name, neither <> nor \"\"");
         }
 
+        //string srcfile = _srcfile.substr(1, _srcfile.size()-2);
         //-----
         // rebuild the new srcfile name
         //
         string nextf;
-        size_t slashPos = _srcfile.rfind("/");
+        size_t slashPos = srcfile.rfind("/");
         if (slashPos == string::npos)
         {
             nextf = inc;
         }
         else
         {
-            nextf = _srcfile.substr(0, slashPos+1);
+            nextf = srcfile.substr(0, slashPos+1);
             nextf += inc;
         }
 
@@ -1485,40 +1665,62 @@ class DirectiveHandler {
             uncTokens.push_back('\n');
         }
         PPTokenizer ppTokenizer;
+        ppTokenizer._lineNo = 1;
+        ppTokenizer._srcfile = nextf;
+        ppTokenizer._fileid = fileid; 
         ppTokenizer.parse(uncTokens);
+
+        _fileidMap.insert(pair<PA5FileId,string>(fileid, nextf));
    
         //-----
         // generate MacroPPToken list for the include file
         //
         DirectiveHandler dir0(nextf, ppTokenizer._elst);
+        //dir0._fileidMap.insert( pair<PA5FileId,string>( fileid, nextf ) );
+        dir0._fileidMap = _fileidMap;
+        dir0._includeSet = _includeSet;
+        dir0._directiveLst = _directiveLst;
+
         dir0.createMacroTokens();
+        // list<MacroPPToken> mlst = dir0._list;   // before being processed, keep the macrotokens
+        dir0.processDirectives();         // only after processd, we could know if there's _Pragma(once)
+        dir0.createMacroTokens_post();
 
-        list<MacroPPToken> mlst = dir0._list;
-
-        dir0.processDirectives();
+        _fileidMap = dir0._fileidMap;
+        _includeSet = dir0._includeSet;
+        _directiveLst = dir0._directiveLst;
 
         if (dir0._pragmaOnce==false || _includeSet.find(fileid) == _includeSet.end())
         {
+            // remove pragma since they are done already
+            // 
+            list<MacroPPToken>::iterator tit = dir0._list.begin();
+            while (tit != dir0._list.end())
+            {
+                if (tit->type == PRAGMA)
+                {
+                    tit = dir0._list.erase(tit);
+                    continue;
+                }
+                tit++;
+            }
+            
+            // insert the included file 
+            //
             list<MacroPPToken>::iterator insit = it;
             insit++;
-            // macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
-            mlst.back().pplst.pop_back();   // pop eof
-            macroTokens.insert(insit, mlst.begin(), mlst.end());
+            dir0._list.back().pplst.pop_back();   // pop eof
+            macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
             it = macroTokens.erase( it );
             
             _includeSet.insert(fileid);
         }
         else
         {
+            // ingore the included file
+            //
             it = macroTokens.erase( it );
         }
-
-        // dir0._list.back().pplst.pop_back();  // pop eof
-
-        // list<MacroPPToken>::iterator insit = it;
-        // insit++;
-        // macroTokens.insert(insit, dir0._list.begin(), dir0._list.end());
-        // it = macroTokens.erase( it );
     }
 
 
@@ -1786,6 +1988,122 @@ class DirectiveHandler {
         }
     }
 
+    void createMacroTokens_post()
+    {
+        //-----
+        // group tokens to directive macro token  or text line macro token
+        //
+        _list.resize(0);
+
+        vector<PPToken>::iterator it = _result.begin();        
+        while (it != _result.end())
+        {
+            PPTokenType type = it->type;
+            string str = it->utf8str; 
+            if (type == PP_OP && isDirectiveStartOp(str))
+            {
+                // directive start
+                MacroPPToken macro;
+                // macro.pplst.push_back( *it );
+                it++;
+                while (it->type == PP_WHITESPACE)
+                {
+                    it++;
+                }
+                if (it->type == PP_IDENTIFIER)
+                {
+                    map<string, MacroPPTokenType>::const_iterator mit = string2macroPPTokenTypeMap.find(it->utf8str);
+                    if (mit == string2macroPPTokenTypeMap.end())
+                    {
+                        macro.type = INVALID;
+                    }
+                    else
+                    {
+                        macro.type = mit->second;
+                    }
+                    it++;
+                }
+                else if (it->type == PP_NEWLINE)
+                {
+                    // do nothing, empty directive is allowed
+                    macro.pplst.push_back( *it );
+                }
+                else
+                {
+                    macro.type = INVALID;
+                    // throw DirectiveHandlerException("Bad directive type");
+                }
+
+                while (it->type != PP_NEWLINE)
+                {
+                    macro.pplst.push_back( *it );
+                    it++;
+                }
+                it++; // skip new line
+                _list.push_back( macro );
+                continue;
+            }
+            else if (type == PP_WHITESPACE)
+            {
+                it++;
+                continue;
+            }
+            else if (type == PP_NEWLINE)
+            {
+                it++;
+                continue;
+            }
+            else
+            {
+                bool foundDirective = false;
+                MacroPPToken macro; 
+                macro.type = TXT;
+
+                // text line
+                while (foundDirective == false && it->type != PP_EOF)
+                {
+                    while (it->type != PP_NEWLINE && it->type != PP_EOF)
+                    {
+                        macro.pplst.push_back( *it ); 
+                        it++;
+                    }
+
+                    if (it->type == PP_EOF)
+                    {
+                        break;
+                    }
+
+                    // test if the next line is a directive statement
+                    //
+                    vector<PPToken>::iterator it2 = it;  // it is now newline
+                    it2++;
+                    while ( it2->type == PP_WHITESPACE || it2->type == PP_NEWLINE )
+                    {
+                        it2++;
+                    }
+                    if (it2->type == PP_OP && isDirectiveStartOp(it2->utf8str) )
+                    {
+                        foundDirective = true;
+                    }
+
+                    // macro.pplst.push_back( *it );
+
+                    it ++;
+                }
+
+                if (it->type == PP_EOF)
+                {
+                    macro.pplst.push_back( *it );
+                    it++;
+                }
+
+                _list.push_back( macro );
+                continue;
+            }
+        }
+    }
+
+
     
     void processDirectives()
     {
@@ -1799,7 +2117,7 @@ class DirectiveHandler {
             if (lit->type == IF || lit->type==IFDEF || lit->type == IFNDEF)
             {
                 processDirectiveIf( _list, lit ); 
-                continue;
+                continue;  // lit is moved while processing
             }
             if (lit->type == DEFINE)
             {
@@ -1820,9 +2138,17 @@ class DirectiveHandler {
             else if (lit->type == INCLUDE)
             {
                 processDirectiveInclude( _list, lit );
+                continue;  // lit is moved while processing
+            }
+            else if (lit->type == LINE)
+            {
+                processDirectiveLine( *lit );
+            }
+            else if (lit->type == PRAGMA)
+            {
+                processDirectivePragma( _list, lit );
                 continue;
             }
-   
             else if (lit->type == INVALID)
             {
                 throw DirectiveHandlerException("Bad directive");
@@ -1831,7 +2157,6 @@ class DirectiveHandler {
 
             lit = _list.erase( lit );
         }
-
     }
 
 
@@ -1851,8 +2176,10 @@ class DirectiveHandler {
     list<MacroPPToken>        _list;
     set<PA5FileId>            _includeSet;
 
+    map<PA5FileId, string>    _fileidMap;
     map<string, Directive*>   _directiveLst;
     bool                      _pragmaOnce;
+    int                       _baseLineNo;
 };
 
 #ifdef PA4

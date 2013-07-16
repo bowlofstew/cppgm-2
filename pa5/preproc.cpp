@@ -85,6 +85,9 @@ int main(int argc, char** argv)
 			string srcfile = args[i+2];
 			out << "sof " << srcfile << endl;
 
+            PA5FileId fileid;
+            PA5GetFileId(srcfile, fileid);
+
 			// TODO: implement `preproc` as per PA5 description
 			ifstream in(srcfile);
             ostringstream oss;
@@ -106,9 +109,12 @@ int main(int argc, char** argv)
     
             PPTokenizer ppTokenizer;
             ppTokenizer._lineNo = 1;
+            ppTokenizer._srcfile = srcfile;
+            ppTokenizer._fileid = fileid;
             ppTokenizer.parse(uncTokens);
     
             DirectiveHandler directiveHandler(srcfile, ppTokenizer._elst);
+            directiveHandler._fileidMap.insert( pair<PA5FileId,string>( fileid, srcfile) );
             directiveHandler.process();
                  
     

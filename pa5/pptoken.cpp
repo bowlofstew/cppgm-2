@@ -384,12 +384,18 @@ enum PPTokenType {
 };
 
 class Directive;
+typedef pair<unsigned long int, unsigned long int> PA1FileId;
 
 class PPToken {
 public:
-    PPToken(PPTokenType t, vector<int>& d, string s, int lineno=1) 
-        : type(t), data(d), utf8str(s), lineNo(lineno) 
+    PPToken(PPTokenType t, vector<int>& d, string s, PA1FileId fid=pair<unsigned long, unsigned long>(), string fname="", int lineno=1) 
+        : type(t), data(d), utf8str(s)
     {
+#ifndef PA3
+        fileid = fid;
+        srcfile = fname; 
+        lineNo = lineno;
+#endif
     }
 
     PPToken(PPTokenType t) 
@@ -400,8 +406,10 @@ public:
     PPTokenType type;
     vector<int> data;
     string      utf8str;
-    int         lineNo;
 #ifndef PA3
+    string      srcfile;
+    pair<unsigned long int, unsigned long int> fileid;
+    int         lineNo;
     set<Directive*> blackLst;
 #endif
 };
@@ -458,6 +466,8 @@ struct PPTokenizer
     bool                _rawStringMode;
 
     int             _lineNo;
+    string          _srcfile;
+    pair<unsigned long int, unsigned long int> _fileid;
 
     enum {
         LINEEND_TAG = 0xFFFFFF
@@ -804,7 +814,7 @@ struct PPTokenizer
     void createToken(PPTokenType type, vector<int> token)    
     {
         string data = UTF8Encoder::encode(token);
-        _elst.push_back(PPToken(type,token,data,_lineNo));
+        _elst.push_back(PPToken(type,token,data, _fileid, _srcfile,_lineNo));
 
 #ifdef PA1
         switch (type)
