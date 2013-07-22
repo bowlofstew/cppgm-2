@@ -61,6 +61,7 @@ using namespace std;
 //     "/usr/include/"
 // };
 
+#ifdef PA5
 int main(int argc, char** argv)
 {
 	try
@@ -318,4 +319,4 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 }
-
+#endif

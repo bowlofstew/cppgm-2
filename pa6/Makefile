@@ -34,8 +34,8 @@ pa4-test:
 	cd ../pa4; make test
 
 pa5-test:
-	g++ -g -std=gnu++11 -Wall -DPA5 -o preproc preproc.cpp preproc.cpp pptoken.cpp posttoken.cpp macro.cpp ctrlexpr.cpp
-	cp prerpoc ../pa5
+	g++ -g -std=gnu++11 -Wall -DPA5 -o preproc preproc.cpp
+	cp preproc ../pa5
 	cd ../pa5; make test
 
 
