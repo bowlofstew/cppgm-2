@@ -1,0 +1,9 @@
+------ replace Text--foo--+--2--==--4
+------ replace Text--foo--==--3
+------ replace Text--foo--==--2
+------ replace Text-true1
+------ replace Text-true2
+------ replace Text-
+identifier true1
+identifier true2
+eof

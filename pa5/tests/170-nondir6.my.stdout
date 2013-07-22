@@ -1,0 +1,3 @@
+------ replace Text--1
+------ replace Text--foo--bar--baz
+ERROR: Bad ctrli-expr, extra tokens

@@ -1,0 +1,6 @@
+------ replace Text-line
+------ replace Text-line2-(-line-)-
+------ replace Text-line
+literal 7 int 07000000
+literal 15 int 0F000000
+eof

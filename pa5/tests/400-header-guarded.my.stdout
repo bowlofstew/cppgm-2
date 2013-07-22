@@ -1,0 +1,10 @@
+------ replace Text-"header-guarded.h"
+------ replace Text-header_guarded
+------ replace Text-
+------ replace Text-header_guarded
+------ replace Text-"header-guarded.h"
+------ replace Text-
+------ replace Text
+------ replace Text-
+identifier header_guarded
+eof

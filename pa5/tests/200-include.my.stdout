@@ -1,0 +1,14 @@
+------ replace Text-bar
+------ replace Text-"foo.h"
+------ replace Text-foo-
+------ replace Text-foo
+------ replace Text-baz
+------ replace Text-"tests/foo.h"
+------ replace Text-foo-
+------ replace Text-foo
+------ replace Text-
+identifier bar
+identifier foo
+identifier baz
+identifier foo
+eof

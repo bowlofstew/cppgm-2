@@ -1,0 +1,17 @@
+------ replace Text-"pragma-op.h"
+------ replace Text-foo
+------ replace Text-CATPRAG-(--on-,--ce--)-bar-
+------ replace Text-foo-bar
+------ replace Text-"pragma-op.h"
+------ replace Text-foo
+PRAGMA , ( , a , ## , b , ) , .
+PRAGMA , ( , a , ## , b , ) , .
+PRAGMA , ( , a , ## , b , ) , .
+_Pragma , ( , # , x , ) , .
+_Pragma , ( , # , x , ) , .
+_Pragma , ( , # , x , ) , .
+------ replace Text-CATPRAG-(--on-,--ce--)-bar-
+------ replace Text-
+identifier foo
+identifier bar
+eof

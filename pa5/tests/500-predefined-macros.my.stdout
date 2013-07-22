@@ -1,0 +1,18 @@
+------ replace Text--__CPPGM__--==--201304L
+------ replace Text--__CPPGM__--==--201303L
+------ replace Text-right_course_run
+------ replace Text--__cplusplus--==--201104L
+------ replace Text--__cplusplus--==--201103L
+------ replace Text-right_cplusplus_version
+------ replace Text--__STDC_HOSTED__--==--2
+------ replace Text--__STDC_HOSTED__--==--1
+------ replace Text-right__STDC_HOSTED_value
+------ replace Text--__LINE__--==--26-
+------ replace Text--__LINE__--==--27
+------ replace Text-right__LINE__
+------ replace Text-
+identifier right_course_run
+identifier right_cplusplus_version
+identifier right__STDC_HOSTED_value
+identifier right__LINE__
+eof
