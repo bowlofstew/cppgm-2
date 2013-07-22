@@ -1,0 +1,5 @@
+------ replace Text-debug-(-"Flag"-)-;-debug-(-"X = %d\n"-,--x-)-;-showlist-(-The--first-,--second-,--and--third--items-.-)-;-report-(-x->-y-,--"x is %d but y is %d"-,--x-,--y-)-;-
+------ replace Text-"Flag"
+------ replace Text-"X = %d\n"-,--x
+------ replace Text--"x is %d but y is %d"-,--x-,--y
+------ replace Text-x->-y

@@ -1,0 +1,6 @@
+------ replace Text-foo-(-)
+------ replace Text-foo-(-)-foo-(-qux-)
+------ replace Text-foo-(-baz-,-qux-)
+------ replace Text-baz
+------ replace Text-qux
+------ replace Text-
