@@ -146,9 +146,7 @@ class DirectiveHandler {
         initialize_default_directive();
         _pragmaOnce = false;
         _baseLineNo = 0;
-        //_srcfile = "\"";
         _srcfile += srcfile;
-        //_srcfile += "\"";
         _pps = pps;
     }
 
@@ -202,20 +200,6 @@ class DirectiveHandler {
     }
 
 
-
-//    enum {
-//        OBJ = 1,
-//        FUN
-//    };
-//
-//    string          name;
-//    int             type;     //0: object , 1:func
-//    int             paraNum;
-//
-//    map<string,int> paramMap;
-//    vector<string>  paramLst;
-//    vector<PPToken> replaceLst;
-
     void initialize_default_directive()
     {
         string s;
@@ -258,7 +242,7 @@ class DirectiveHandler {
         dir->name = "__FILE__"; 
         dir->type = Directive::OBJ;
         dir->paraNum = 0;
-        dir->replaceLst.push_back( makePPToken("__FILE__") );
+        dir->replaceLst.push_back( makePPToken("__FILE__") ); // we will have correct value later.
         _directiveLst[s] = dir;
 
         s = "__LINE__";
@@ -290,8 +274,8 @@ class DirectiveHandler {
         dir->name = "_Pragma"; 
         dir->type = Directive::FUN;
         dir->paraNum = 1;
-        dir->paramLst.push_back("a");
-        dir->paramMap["a"] = 1;
+        dir->paramLst.push_back("_Pragma");
+        dir->paramMap["_Pragma"] = 1;
         _directiveLst[s] = dir;
 
     }
@@ -316,40 +300,18 @@ class DirectiveHandler {
         return tokenizer._elst;
     }
 
+
     PPToken stringize( list<PPToken>& ll )
     {
         vector<int> mergedCodes;
         list<PPToken> tmp1, tmp2, tmp3;
-        bool bStripe = true; 
-        for ( list<PPToken>::iterator lt = ll.begin(); lt != ll.end() ; ++lt )
-        {
-            if (lt->type == PP_WHITESPACE && bStripe == true)
-            {
-                continue; 
-            }
-            else
-            {
-                tmp1.push_back( *lt );
-                bStripe = false;
-            }
-        }
 
-        bStripe = true;
-        for ( list<PPToken>::reverse_iterator lt = tmp1.rbegin(); lt != tmp1.rend() ; ++lt )
-        {
-            if (lt->type == PP_WHITESPACE && bStripe == true)
-            {
-                continue; 
-            }
-            else
-            {
-                tmp2.push_front( *lt );
-                bStripe = false;
-            }
-        }
+        // remove begin end white space
+        trim(ll);
 
+        // merge white spaces in the middle of the string
         bool prevWhiteSpace = false;
-        for ( list<PPToken>::iterator lt = tmp2.begin(); lt != tmp2.end() ; ++lt )
+        for ( list<PPToken>::iterator lt = ll.begin(); lt != ll.end() ; ++lt )
         {
             if (lt->type == PP_WHITESPACE)
             {
@@ -369,7 +331,6 @@ class DirectiveHandler {
                 prevWhiteSpace = false;
             }
         }
-
 
         //-----
         // merge all tmp2 elements to a signle code list 
@@ -416,8 +377,8 @@ class DirectiveHandler {
         {
             if (rit->type == PP_WHITESPACE)
             {
-                rit++;
                 tokens.pop_back();
+                rit = tokens.rbegin();
             }
             else break;
         }
@@ -433,8 +394,8 @@ class DirectiveHandler {
         {
             if (it->type == PP_WHITESPACE)
             {
-                it++;
                 tokens.pop_front();
+                it = tokens.begin();
             }
             else break;
         }
@@ -450,8 +411,8 @@ class DirectiveHandler {
         {
             if (it->type == PP_WHITESPACE)
             {
-                it++;
                 tokens.pop_front();
+                it = tokens.begin();
             }
             else break;
         }
@@ -551,6 +512,7 @@ class DirectiveHandler {
 
         return result;
     }
+
 
     vector<PPToken> trimForConcat ( vector<PPToken> tokens )
     {
@@ -957,7 +919,7 @@ class DirectiveHandler {
     }
 
 
-    //
+    //-----
     // consumes all text lines  until the next directive start
     //
     bool processTextLines(MacroPPToken& macro)
@@ -1317,7 +1279,11 @@ class DirectiveHandler {
                         {
                             state = 3;
                             map<string, Directive*>::iterator mit = _directiveLst.find(ppit->utf8str);
-                            _directiveLst.erase( mit );
+                            if (mit != _directiveLst.end())
+                            {
+                                delete mit->second;
+                                _directiveLst.erase( mit );
+                            }
                         }
                         else
                         {
@@ -1592,7 +1558,6 @@ class DirectiveHandler {
             throw DirectiveHandlerException("Bad include file, extra tokens");
         }
 
-        //int incType = 0;
         string incFile = lst.begin()->utf8str;
         string srcfile = lst.begin()->srcfile;
         string inc;
@@ -1600,19 +1565,16 @@ class DirectiveHandler {
         if (incFile[0]=='"' && incFile[incFile.size()-1] == '"')
         {
             inc = incFile.substr(1, incFile.size() - 2);
-            //incType = 0;
         }
         else if (incFile[0]=='<' && incFile[incFile.size()-1] == '>')
         {
             inc = incFile.substr(1, incFile.size() - 2);
-            //incType = 1;
         }
         else
         {
             throw DirectiveHandlerException("Bad include header name, neither <> nor \"\"");
         }
 
-        //string srcfile = _srcfile.substr(1, _srcfile.size()-2);
         //-----
         // rebuild the new srcfile name
         //
@@ -1676,15 +1638,13 @@ class DirectiveHandler {
         // generate MacroPPToken list for the include file
         //
         DirectiveHandler dir0(nextf, ppTokenizer._elst);
-        //dir0._fileidMap.insert( pair<PA5FileId,string>( fileid, nextf ) );
         dir0._fileidMap = _fileidMap;
         dir0._includeSet = _includeSet;
         dir0._directiveLst = _directiveLst;
 
         dir0.createMacroTokens();
-        // list<MacroPPToken> mlst = dir0._list;   // before being processed, keep the macrotokens
-        dir0.processDirectives();         // only after processd, we could know if there's _Pragma(once)
-        dir0.createMacroTokens_post();
+        dir0.processDirectives();        // only after processd, we could know if there's _Pragma(once)
+        dir0.createMacroTokens_post();   // regenerate the macroPPToken list again
 
         _fileidMap = dir0._fileidMap;
         _includeSet = dir0._includeSet;
@@ -2031,7 +1991,6 @@ class DirectiveHandler {
                 else
                 {
                     macro.type = INVALID;
-                    // throw DirectiveHandlerException("Bad directive type");
                 }
 
                 while (it->type != PP_NEWLINE)
@@ -2214,43 +2173,9 @@ int main()
         DirectiveHandler directiveHandler(string(), ppTokenizer._elst);
         directiveHandler.process();
              
-
         // PA2 start
         PostTokenizer postTokenizer(directiveHandler._result);         
         postTokenizer.parse();
-
-        // // PA3 start
-        // vector<PostToken>::iterator it = postTokenizer._tokens.begin(); 
-        // vector<PostToken>::iterator lstart=it, lend; 
-        // while (it != postTokenizer._tokens.end())
-        // {
-        //     if (it != lstart)
-        //     {
-        //         if (it->type == PT_NEWLINE)
-        //         {
-        //             PPCtrlExprEvaluator peval(lstart, it);
-        //             peval.startEval();
-        //             it++;
-        //             lstart = it;
-        //             continue;
-        //         }
-        //     } 
-        //     else
-        //     {
-        //         if (it->type == PT_NEWLINE)
-        //         {
-        //             it++;
-        //             lstart = it;
-        //             continue;
-        //         }
-        //         else if (it->type == PT_EOF)
-        //         {
-        //             cout << "eof" << endl;
-        //             break;
-        //         }
-        //     }
-        //     it++;
-        // }
 
         // PA2 string concat
         PostToken concatStr;
