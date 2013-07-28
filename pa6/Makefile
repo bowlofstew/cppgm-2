@@ -38,4 +38,9 @@ pa5-test:
 	cp preproc ../pa5
 	cd ../pa5; make test
 
+clean:
+	rm -rf a.out recog pptoken posttoken ctrlexpr macro preproc
+
+
+
 
