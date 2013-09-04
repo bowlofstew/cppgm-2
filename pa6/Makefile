@@ -1,8 +1,8 @@
 all: recog
 
 # build posttoken application
-recog: recog.cpp
-	g++ -g -std=gnu++11 -Wall -o recog recog.cpp
+recog: recog.cpp pptoken.cpp posttoken.cpp ctrlexpr.cpp macro.cpp preproc.cpp 
+	g++ -g -std=gnu++11 -DPA6 -Wall -o recog recog.cpp
 
 # test posttoken application
 test: all

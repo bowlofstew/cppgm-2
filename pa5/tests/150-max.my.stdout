@@ -1,9 +1,3 @@
------- replace Text-int--table-[-TABSIZE-]-;
------- replace Text-max-(-2-,-3-)-
------- replace Text-3
------- replace Text-2
------- replace Text-3
------- replace Text-2
 simple int KW_INT
 identifier table
 simple [ OP_LSQUARE

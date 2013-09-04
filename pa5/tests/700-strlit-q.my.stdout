@@ -1,7 +1,3 @@
------- replace Text-debug-(-1-,--2-)-;-fputs-(-str-(-strncmp-(-"abc\0d"-,--"abc"-,--'\4'-)---==--0-)--str-(-:--@-\-n-)-,--s-)-;-include--xstr-(-INCFILE-(-2-)-.-h-)-glue-(-HIGH-,--LOW-)-;-xglue-(-HIGH-,--LOW-)-
------- replace Text-INCFILE-(-2-)-.-h
------- replace Text-LOW
------- replace Text-HIGH
 identifier printf
 simple ( OP_LPAREN
 literal "x" "1" "= %d, x" "2" "= %s" array of 15 char 78313D2025642C2078323D20257300

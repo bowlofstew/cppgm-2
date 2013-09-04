@@ -1,6 +1,3 @@
------- replace Text-__FILE__-__LINE__
------- replace Text-__LINE__
------- replace Text-__FILE__-__LINE__-
 literal "tests/660-line-directive.t" array of 27 char 74657374732F3636302D6C696E652D6469726563746976652E7400
 literal 2 int 02000000
 literal 100 int 64000000

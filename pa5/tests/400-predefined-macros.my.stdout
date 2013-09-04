@@ -1,18 +1,3 @@
------- replace Text-right_foo
------- replace Text-right_bar
------- replace Text--defined--foo
------- replace Text-right_foobar
------- replace Text-right___CPPGM__
------- replace Text-right___CPPGM_AUTHOR___
------- replace Text-right___cpluscplus
------- replace Text-right___STDC_HOSTED__
------- replace Text-right___FILE__
------- replace Text-right___LINE__
------- replace Text-right___DATE__
------- replace Text-right___TIME__
------- replace Text--defined-(-__FILE__-)--&&--defined-(-__DATE__-)--&&--defined-(-__TIME__-)
------- replace Text-YAY
------- replace Text-
 identifier right_foo
 identifier right_bar
 identifier right_foobar

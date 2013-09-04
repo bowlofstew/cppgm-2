@@ -1,2 +1,2 @@
 recog 1
-tests/600-ambig-68.t BAD
+tests/600-ambig-68.t OK

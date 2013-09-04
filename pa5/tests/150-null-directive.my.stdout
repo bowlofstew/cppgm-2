@@ -1,8 +1,3 @@
------- replace Text-1
------- replace Text-2
------- replace Text-3
------- replace Text-4
------- replace Text-5-
 literal 1 int 01000000
 literal 2 int 02000000
 literal 3 int 03000000

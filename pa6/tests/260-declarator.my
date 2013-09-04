@@ -1,2 +1,2 @@
 recog 1
-tests/260-declarator.t BAD
+tests/260-declarator.t OK

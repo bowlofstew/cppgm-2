@@ -539,12 +539,12 @@ class DirectiveHandler {
         //-----
         // debug code
         //
-        cerr << "------ replace Text";
-        for (list<PPToken>::iterator it = tokens.begin(); it!=tokens.end() ; ++it)
-        {
-            cerr << "-" <<  it->utf8str;
-        }
-        cerr << endl;
+        // cerr << "------ replace Text";
+        // for (list<PPToken>::iterator it = tokens.begin(); it!=tokens.end() ; ++it)
+        // {
+        //     cerr << "-" <<  it->utf8str;
+        // }
+        // cerr << endl;
 
 
         list<PPToken> result;
@@ -1183,8 +1183,8 @@ class DirectiveHandler {
             list<PPToken> dir0_tokens( dir0->replaceLst.begin(), dir0->replaceLst.end());
             list<PPToken> dir_tokens( dir->replaceLst.begin(), dir->replaceLst.end() ); 
 
-            debug_pp_list(dir0_tokens);
-            debug_pp_list(dir_tokens);
+            //debug_pp_list(dir0_tokens);
+            //debug_pp_list(dir_tokens);
 
             dir0_tokens = trim(dir0_tokens);
             dir_tokens = trim(dir_tokens);
@@ -1209,7 +1209,7 @@ class DirectiveHandler {
                 }
             }
 
-            debug_pp_list( dir_tokens );
+            //debug_pp_list( dir_tokens );
 
             if (dir0_tokens.size() != dir_tokens.size())
             {

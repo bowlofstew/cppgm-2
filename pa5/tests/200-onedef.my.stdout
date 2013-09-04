@@ -1,6 +1,3 @@
------- replace Text-foo--qux
------- replace Text-foo--qux
------- replace Text-foo--qux-
 identifier bar
 identifier quux
 identifier foo

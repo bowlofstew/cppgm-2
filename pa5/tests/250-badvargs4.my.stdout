@@ -1,2 +1,1 @@
------- replace Text-__VA_ARGS__-
 ERROR: "__VA_ARGS__" is not valid identifier

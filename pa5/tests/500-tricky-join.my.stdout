@@ -1,6 +1,2 @@
------- replace Text-join-(-x-,--y-)-
------- replace Text-y
------- replace Text-x
------- replace Text-x--hash_hash--y
 literal "x ## y" array of 7 char 78202323207900
 eof

@@ -1,2 +1,2 @@
 recog 1
-tests/150-pm-expression.t BAD
+tests/150-pm-expression.t OK

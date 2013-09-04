@@ -1,6 +1,3 @@
------- replace Text-a
------- replace Text-c
------- replace Text-g-
 identifier a
 identifier d
 literal 1 int 01000000

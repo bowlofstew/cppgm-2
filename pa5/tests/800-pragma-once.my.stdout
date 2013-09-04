@@ -1,31 +1,3 @@
------- replace Text-stage1
------- replace Text-"subdir1/subdir11/header.h"
------- replace Text-"../header.h"
------- replace Text-"subdir1"-__FILE__-
------- replace Text-"subdir1"-"tests/subdir1/subdir11/../header.h"
------- replace Text-"subdir1/subdir11/header.h"-__FILE__-
------- replace Text-"subdir1"-"tests/subdir1/subdir11/../header.h"-"subdir1/subdir11/header.h"-"tests/subdir1/subdir11/header.h"
------- replace Text-stage2
------- replace Text-"subdir1/header.h"
------- replace Text-"subdir1"-__FILE__-
------- replace Text-stage3
------- replace Text-"subdir1/subdir11/header.h"
------- replace Text-"../header.h"
------- replace Text-"subdir1"-__FILE__-
------- replace Text-"subdir1/subdir11/header.h"-__FILE__-
------- replace Text-"subdir1/subdir11/header.h"-"tests/subdir1/subdir11/header.h"
------- replace Text-stage4
------- replace Text-"subdir2/header.h"
------- replace Text-"subdir2/header.h"-__FILE__-
------- replace Text-"subdir2/header.h"-"tests/subdir2/header.h"
------- replace Text-stage5
------- replace Text-"tests/subdir1/header.h"
------- replace Text-"subdir1"-__FILE__-
------- replace Text-stage6
------- replace Text-"tests/subdir2/header.h"
------- replace Text-"subdir2/header.h"-__FILE__-
------- replace Text-"subdir2/header.h"-"tests/subdir2/header.h"
------- replace Text-stage7-
 identifier stage1
 literal "subdir1" "tests/subdir1/subdir11/../header.h" "subdir1/subdir11/header.h" "tests/subdir1/subdir11/header.h" array of 98 char 7375626469723174657374732F737562646972312F73756264697231312F2E2E2F6865616465722E68737562646972312F73756264697231312F6865616465722E6874657374732F737562646972312F73756264697231312F6865616465722E6800
 identifier stage2
