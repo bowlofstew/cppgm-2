@@ -51,17 +51,14 @@ unqualified-id:
 
 qualified-id:
 	nested-name-specifier KW_TEMPLATE? unqualified-id
-	OP_COLON2 TT_IDENTIFIER
-	OP_COLON2 operator-function-id
-	OP_COLON2 literal-operator-id
-	OP_COLON2 template-id
 
 nested-name-specifier:
 	nested-name-specifier-root nested-name-specifier-suffix*
 	
 nested-name-specifier-root:
-	OP_COLON2? type-name OP_COLON2
-	OP_COLON2? namespace-name OP_COLON2
+	OP_COLON2	
+	type-name OP_COLON2
+	namespace-name OP_COLON2
 	decltype-specifier OP_COLON2
 
 nested-name-specifier-suffix:

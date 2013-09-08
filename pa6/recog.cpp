@@ -61,6 +61,8 @@ class RecognizerException : public exception {
 
 
 
+
+
 class Recognizer {
   public: 
     typedef vector<PostToken>::iterator PtIt;
@@ -101,11 +103,12 @@ class Recognizer {
             match(PT_OP_LPAREN);
             //parse__expression();
             match(PT_OP_RPAREN);
+            this->parse__primary_expression();
+            match(2, PT_KW_TRUE);
         }
-        else if (_ptIt->type) {
-        }
-        
     }
+
+
 
     void match( int num, EPostTokenType t1, ... ) 
     {
