@@ -859,7 +859,26 @@ enum EPostTokenType
 	PT_OP_ARROW,
 
     PT_OP_HASH,      // #
-    PT_OP_HASHHASH   // ##
+    PT_OP_HASHHASH,   // ##
+
+    PT_ST_RSHIFT_1,   // ##
+    PT_ST_RSHIFT_2,
+
+    // extra token types for pa6-gram
+    //
+    PT_TT_IDENTIFIER,
+    PT_TT_IDENTIFIER_C,
+    PT_TT_IDENTIFIER_E,
+    PT_TT_IDENTIFIER_N,
+    PT_TT_IDENTIFIER_T,
+    PT_TT_IDENTIFIER_Y,
+    PT_TT_LITERAL,
+    PT_ST_EMPTYSTR,
+    PT_ST_EOF,
+    PT_ST_FINAL,
+    PT_ST_NONPAREN,
+    PT_ST_OVERRIDE,
+    PT_ST_ZERO
 };
 
 
@@ -1005,7 +1024,25 @@ const unordered_map<string, EPostTokenType> StringToPostTokenTypeMap =
 	{"--", PT_OP_DEC},
 	{",", PT_OP_COMMA},
 	{"->*", PT_OP_ARROWSTAR},
-	{"->", PT_OP_ARROW}
+	{"->", PT_OP_ARROW},
+
+	{">", PT_ST_RSHIFT_1},
+	{">", PT_ST_RSHIFT_2},
+
+    {"PT_TT_IDENTIFIER", PT_TT_IDENTIFIER},
+    {"PT_TT_IDENTIFIER_C", PT_TT_IDENTIFIER_C},
+    {"PT_TT_IDENTIFIER_E", PT_TT_IDENTIFIER_E},
+    {"PT_TT_IDENTIFIER_N", PT_TT_IDENTIFIER_N},
+    {"PT_TT_IDENTIFIER_T", PT_TT_IDENTIFIER_T},
+    {"PT_TT_IDENTIFIER_Y", PT_TT_IDENTIFIER_Y},
+    {"PT_TT_LITERAL", PT_TT_LITERAL},
+    {"PT_ST_EMPTYSTR", PT_ST_EMPTYSTR},
+    {"PT_ST_EOF", PT_ST_EOF},
+    {"PT_ST_FINAL", PT_ST_FINAL},
+    {"PT_ST_NONPAREN", PT_ST_NONPAREN},
+    {"PT_ST_OVERRIDE", PT_ST_OVERRIDE},
+    {"PT_ST_ZERO", PT_ST_ZERO}
+
 };
 
 
@@ -1149,7 +1186,26 @@ const map<EPostTokenType, string> PostTokenTypeToStringMap =
 	{PT_OP_ARROW, "OP_ARROW"},
 
     {PT_OP_HASH, "OP_HASH"},     // #
-    {PT_OP_HASHHASH, "OP_HASHHAsh"}  // ##
+    {PT_OP_HASHHASH, "OP_HASHHAsh"},  // ##
+
+	{PT_ST_RSHIFT_1, "OP_RSHIFT1"},
+	{PT_ST_RSHIFT_2, "OP_RSHIFT2"},
+
+    {PT_TT_IDENTIFIER, "PT_TT_IDENTIFIER"},
+    {PT_TT_IDENTIFIER_C, "PT_TT_IDENTIFIER_C"},
+    {PT_TT_IDENTIFIER_E, "PT_TT_IDENTIFIER_E"},
+    {PT_TT_IDENTIFIER_N, "PT_TT_IDENTIFIER_N"},
+    {PT_TT_IDENTIFIER_T, "PT_TT_IDENTIFIER_T"},
+    {PT_TT_IDENTIFIER_Y, "PT_TT_IDENTIFIER_Y"},
+
+    {PT_TT_LITERAL, "PT_TT_LITERAL"},
+    {PT_ST_EMPTYSTR, "PT_ST_EMPTYSTR"},
+    {PT_ST_EOF, "PT_ST_EOF"},
+    {PT_ST_FINAL, "PT_ST_FINAL"},
+    {PT_ST_NONPAREN, "PT_ST_NONPAREN"},
+    {PT_ST_OVERRIDE, "PT_ST_OVERRIDE"},
+    {PT_ST_ZERO, "PT_ST_ZERO"}
+
 
 };
 
@@ -1157,6 +1213,25 @@ const map<EPostTokenType, string> PostTokenTypeToStringMap =
 
 struct PostToken
 {
+
+// file name data base
+// 
+static map<string, string*> fdb;
+static string* setFname(const string& fname) 
+{
+    map<string, string*>::iterator mit = fdb.find(fname);
+    if (mit != fdb.end()) {
+        return mit->second;
+    }
+    else {
+        string* ptr = new string(fname); 
+        fdb[fname] = ptr; 
+        return ptr;
+    }
+    return NULL;
+}
+
+
     EPostTokenType type;
     string source;
     string udSuffix;
@@ -1166,6 +1241,10 @@ struct PostToken
     EFundamentalType ltype;
     int   size;
     void* data;
+
+    // for token trace
+    string* fname; 
+    int     fline;
 
     int bytes()
     {
@@ -1342,8 +1421,10 @@ struct PostToken
             fout << "emit error" << endl;
         }
     }
-
 };
+
+
+map<string, string*> PostToken::fdb;
 
 
 class PostTokenizer
@@ -1373,7 +1454,16 @@ class PostTokenizer
 
     vector<PostToken>  _tokens;
 
-    PostToken createToken (EPostTokenType type, string src="", string udSuffix="", string udPrefix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
+
+    PostToken createToken (EPostTokenType type, 
+                           string src="", 
+                           string fname="",
+                           int    lineNo=-1,
+                           string udSuffix="", 
+                           string udPrefix="", 
+                           EFundamentalType ltype=FT_NULLPTR_T, 
+                           int size=0, 
+                           const void* addr=0)
     {
         PostToken pt;
         pt.type = type;
@@ -1382,6 +1472,8 @@ class PostTokenizer
         pt.udPrefix = udPrefix;
         pt.ltype = ltype;
         pt.size = size;
+        pt.setFname(fname);
+        pt.fline = lineNo;
         
         // for different type
         if (size > 0)
@@ -1420,9 +1512,17 @@ class PostTokenizer
     }
 
 
-    void addToken(EPostTokenType type, string src="", string udSuffix="", string udPrefix="", EFundamentalType ltype=FT_NULLPTR_T, int size=0, const void* addr=0)
+    void addToken(EPostTokenType type, 
+                  string src="", 
+                  string fname="",
+                  int    fline=-1,
+                  string udSuffix="", 
+                  string udPrefix="", 
+                  EFundamentalType ltype=FT_NULLPTR_T, 
+                  int size=0, 
+                  const void* addr=0)
     {
-        PostToken pt = createToken(type, src, udSuffix, udPrefix, ltype, size, addr);
+        PostToken pt = createToken(type, src, fname, fline, udSuffix, udPrefix, ltype, size, addr);
         _tokens.push_back(pt);
     }
 
@@ -1432,25 +1532,33 @@ class PostTokenizer
         PPTokenType type = pp.type;
         string str = UTF8Encoder::encode( pp.data );
 
+#ifdef PA3    
+        string pp_srcfile = "";
+        int pp_lineNo = -1;
+#else
+        string pp_srcfile = pp.srcfile; 
+        int pp_lineNo = pp.lineNo;
+#endif
+
         if (type == PP_WHITESPACE)
         {
-            return createToken(PT_WHITESPACE);
+            return createToken(PT_WHITESPACE, "", pp_srcfile, pp_lineNo);
         }
         else if ( type == PP_NEWLINE)
         {
-            return createToken(PT_NEWLINE);
+            return createToken(PT_NEWLINE, "", pp_srcfile, pp_lineNo);
         }
         else if (type == PP_HEADERNAME)
         {
-            return createToken(PT_HEADERNAME, str);
+            return createToken(PT_HEADERNAME, str, pp_srcfile, pp_lineNo);
         }
         else if (type == PP_NONWHITESPACE)
         {
-            return createToken(PT_INVALID, str);
+            return createToken(PT_INVALID, str, pp_srcfile, pp_lineNo);
         }
         else if (type == PP_EOF)
         {
-            return createToken(PT_EOF);
+            return createToken(PT_EOF, "", pp_srcfile, pp_lineNo);
         }
         else if (type == PP_OP || type == PP_IDENTIFIER)
         {
@@ -1459,41 +1567,41 @@ class PostTokenizer
             {
                 if ( str == "#" || str == "%:" )
                 {
-                    return createToken(PT_OP_HASH, str);
+                    return createToken(PT_OP_HASH, str, pp_srcfile, pp_lineNo);
                 }
                 else if (str == "##" || str == "%:%:")
                 {
-                    return createToken(PT_OP_HASHHASH, str);
+                    return createToken(PT_OP_HASHHASH, str, pp_srcfile, pp_lineNo);
                 }
                 else 
                 {
-                    return createToken(PT_SIMPLE, str);
+                    return createToken(PT_SIMPLE, str, pp_srcfile, pp_lineNo);
                 }
             }
             else
             {
                 // op
-                return createToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID + 1), str);
+                return createToken((EPostTokenType) ((int) eit->second + (int)PT_INVALID + 1), str, pp_srcfile, pp_lineNo );
             }
         }
         else if ( type == PP_NUMBER )
         {
-            return parse_one_ppnumber( pp.data );
+            return parse_one_ppnumber( pp );
         }
         else if ( type == PP_CHAR_LITERAL || type == PP_UD_CHAR_LITERAL )
         {
-            return parse_one_ppchar( pp.data );
+            return parse_one_ppchar( pp );
         }
         else if ( type == PP_STRING_LITERAL || type == PP_RAW_STRING_LITERAL || type == PP_UD_STRING_LITERAL || type == PP_UD_RAW_STRING_LITERAL)
         {
-            return parse_one_string( pp.data );
+            return parse_one_string( pp );
         }
         else
         {
             throw PostTokenizerException("Bad Tokens");
         }
 
-        return createToken(PT_INVALID, UTF8Encoder::encode( pp.data ));
+        return createToken(PT_INVALID, UTF8Encoder::encode( pp.data ), pp_srcfile, pp_lineNo );
     }
 
 
@@ -1562,15 +1670,15 @@ class PostTokenizer
             }
             else if ( type == PP_NUMBER )
             {
-                parse_ppnumber( (*it).data );
+                parse_ppnumber( (*it) );
             }
             else if ( type == PP_CHAR_LITERAL || type == PP_UD_CHAR_LITERAL )
             {
-                parse_ppchar( (*it).data );
+                parse_ppchar( (*it) );
             }
             else if ( type == PP_STRING_LITERAL || type == PP_RAW_STRING_LITERAL || type == PP_UD_STRING_LITERAL || type == PP_UD_RAW_STRING_LITERAL)
             {
-                _tokens.push_back( parse_one_string( (*it).data ) ); 
+                _tokens.push_back( parse_one_string( (*it) ) ); 
 
             }
             else
@@ -1582,8 +1690,10 @@ class PostTokenizer
     }
 
 
-    PostToken parse_one_string(vector<int>& codes)
+    //PostToken parse_one_string(vector<int>& codes)
+    PostToken parse_one_string(PPToken& pp)
     {
+        vector<int> codes = pp.data;
         string source;
         vector<int> chars;
         vector<int> udSuffix;
@@ -1844,6 +1954,14 @@ class PostTokenizer
                 char_width = 0;
         }
 
+#ifdef PA3    
+        string pp_srcfile = "";
+        int pp_lineNo = -1;
+#else
+        string pp_srcfile = pp.srcfile; 
+        int pp_lineNo = pp.lineNo;
+#endif
+
 
         string suffix = UTF8Encoder::encode(udSuffix);
         string prefix = UTF8Encoder::encode(chars);
@@ -1853,16 +1971,16 @@ class PostTokenizer
             if (suffix == "")
             {
                 if (char_width == 0)
-                    return createToken(PT_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR, prefix.size(), prefix.c_str());
+                    return createToken(PT_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR, prefix.size(), prefix.c_str());
                 else
-                    return createToken(PT_LITERAL_ARRAY, source, suffix, prefix, FT_UNSIGNED_CHAR, prefix.size(), prefix.c_str());
+                    return createToken(PT_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_UNSIGNED_CHAR, prefix.size(), prefix.c_str());
             }
             else 
             {
                 if (char_width == 0)
-                    return createToken(PT_UD_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR, prefix.size(), prefix.c_str());
+                    return createToken(PT_UD_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR, prefix.size(), prefix.c_str());
                 else
-                    return createToken(PT_UD_LITERAL_ARRAY, source, suffix, prefix, FT_UNSIGNED_CHAR, prefix.size(), prefix.c_str());
+                    return createToken(PT_UD_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_UNSIGNED_CHAR, prefix.size(), prefix.c_str());
             }
         }
         else if (char_width == 2)
@@ -1875,11 +1993,11 @@ class PostTokenizer
             }
             if (suffix == "")
             {
-                return createToken(PT_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR16_T, utf16_codes.size(), data);
+                return createToken(PT_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR16_T, utf16_codes.size(), data);
             }
             else
             {
-                return createToken(PT_UD_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR16_T, utf16_codes.size(), data);
+                return createToken(PT_UD_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR16_T, utf16_codes.size(), data);
             }
         } 
         else if (char_width == 3)
@@ -1891,11 +2009,11 @@ class PostTokenizer
             }
             if (suffix == "")
             {
-                return createToken(PT_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR32_T, chars.size(), data);
+                return createToken(PT_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR32_T, chars.size(), data);
             }
             else
             {
-                return createToken(PT_UD_LITERAL_ARRAY, source, suffix, prefix, FT_CHAR32_T, chars.size(), data);
+                return createToken(PT_UD_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_CHAR32_T, chars.size(), data);
             }
 
         } 
@@ -1908,11 +2026,11 @@ class PostTokenizer
             }
             if (suffix == "")
             {
-                return createToken(PT_LITERAL_ARRAY, source , suffix, prefix, FT_WCHAR_T, chars.size(), data);
+                return createToken(PT_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_WCHAR_T, chars.size(), data);
             }
             else
             {
-                return createToken(PT_UD_LITERAL_ARRAY, source, suffix, prefix, FT_WCHAR_T, chars.size(), data);
+                return createToken(PT_UD_LITERAL_ARRAY, source, pp_srcfile, pp_lineNo, suffix, prefix, FT_WCHAR_T, chars.size(), data);
             }
         }
 
@@ -1921,8 +2039,10 @@ class PostTokenizer
     }
 
 
-    PostToken parse_one_ppchar(vector<int>& codes)
+    //PostToken parse_one_ppchar(vector<int>& codes)
+    PostToken parse_one_ppchar(PPToken& pp)
     {
+        vector<int> codes = pp.data;
         int la = -1;
         int state = 0;
         bool isChar16 = false;
@@ -2061,6 +2181,14 @@ class PostTokenizer
             idx++;
         }
 
+#ifdef PA3    
+        string pp_srcfile = "";
+        int pp_lineNo = -1;
+#else
+        string pp_srcfile = pp.srcfile; 
+        int pp_lineNo = pp.lineNo;
+#endif
+
 
         if (cchars.size() > 1)
         {
@@ -2079,11 +2207,11 @@ class PostTokenizer
             {
                 if (cs == "")
                 {
-                    return createToken(PT_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
+                    return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR32_T, 1, &c);
                 }
                 else 
                 {
-                    return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR32_T, 1, &c);
+                    return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR32_T, 1, &c);
                 }
             }
             else if (isChar16)
@@ -2096,11 +2224,11 @@ class PostTokenizer
                 {
                     if (cs =="")
                     {
-                        return createToken(PT_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR16_T, 1, &c);
                     }
                     else 
                     {
-                        return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR16_T, 1, &c);
+                        return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR16_T, 1, &c);
                     }
                 }
             }
@@ -2108,11 +2236,11 @@ class PostTokenizer
             {
                 if (cs == "")
                 {
-                    return createToken(PT_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
+                    return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_WCHAR_T, 1, &c);
                 }
                 else
                 {
-                    return createToken(PT_UD_LITERAL, source, cs, es, FT_WCHAR_T, 1, &c);
+                    return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_WCHAR_T, 1, &c);
                 }
             }
             else
@@ -2121,22 +2249,22 @@ class PostTokenizer
                 {
                     if (cs == "")
                     {
-                        return createToken(PT_LITERAL, source, cs, es, FT_INT, 1, &c);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_INT, 1, &c);
                     }
                     else 
                     {
-                        return createToken(PT_UD_LITERAL, source, cs, es, FT_INT, 1, &c);
+                        return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_INT, 1, &c);
                     }
                 }
                 else
                 {
                     if (cs == "")
                     {
-                        return createToken(PT_LITERAL, source, cs, es, FT_CHAR, 1, &c);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR, 1, &c);
                     }
                     else
                     {
-                        return createToken(PT_UD_LITERAL, source, cs, es, FT_CHAR, 1, &c);
+                        return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, cs, es, FT_CHAR, 1, &c);
                     }
                 }
             }
@@ -2148,9 +2276,9 @@ class PostTokenizer
 
 
 
-    void parse_ppchar(vector<int>& codes)
+    void parse_ppchar( PPToken& pp)
     {
-        _tokens.push_back(parse_one_ppchar(codes));
+        _tokens.push_back(parse_one_ppchar(pp));
         return;
     }
 
@@ -2173,8 +2301,10 @@ class PostTokenizer
     }
 
 
-    PostToken parse_one_ppnumber(vector<int>& codes)
+    //PostToken parse_one_ppnumber(vector<int>& codes)
+    PostToken parse_one_ppnumber(PPToken& pp)
     {
+        vector<int> codes = pp.data;
         int la = -1;
         int state = 0;  // initial state 
         vector<int>::iterator idx = codes.begin();
@@ -2383,7 +2513,17 @@ class PostTokenizer
         {
             return createToken(PT_INVALID, source);
         }
-        
+       
+#ifdef PA3    
+        string pp_srcfile = "";
+        int pp_lineNo = -1;
+#else
+        string pp_srcfile = pp.srcfile; 
+        int pp_lineNo = pp.lineNo;
+#endif
+
+
+
         if (stop == true)
         {
             // suffix string
@@ -2397,11 +2537,11 @@ class PostTokenizer
                 float f = PA2Decode_float( numS );
                 if (state == 6 || state == 9)
                 {
-                    return createToken(PT_UD_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
+                    return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_FLOAT, 1, &f);
                 }
                 else
                 {
-                    return createToken(PT_UD_LITERAL, source, s, numS, FT_INT, 1, &f);
+                    return createToken(PT_UD_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_INT, 1, &f);
                 }
             }
             else if ( checkNumberLiteralSuffix(s, isUnsigned, isLong, isLonglong, isFloat) )
@@ -2424,7 +2564,7 @@ class PostTokenizer
                 {
                     // float
                     float f = PA2Decode_float( numS );
-                    return createToken(PT_LITERAL, source, s, numS, FT_FLOAT, 1, &f);
+                    return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_FLOAT, 1, &f);
                 }
 
                 if (isDecimalInteger || isHexInteger || isOctalInteger)
@@ -2438,15 +2578,15 @@ class PostTokenizer
                     {
                         if (isUnsigned && isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isLong) // long , long long
                         {
@@ -2456,7 +2596,7 @@ class PostTokenizer
                             }
                             else
                             {
-                                return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                                return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                             }
                         }
                         else // (isLonglong)
@@ -2467,7 +2607,7 @@ class PostTokenizer
                             }
                             else
                             {
-                                return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                                return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                             }
                         }
 
@@ -2477,69 +2617,69 @@ class PostTokenizer
                         // long
                         if (isUnsigned && isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                     else if (bs == 32)
                     {
                         if (isUnsigned && isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_INT, 1, &value);
                         }
                         else if (isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                     else
                     {
                         if (isUnsigned && isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned && isLonglong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_LONG_INT, 1, &value);
                         }
                         else if (isUnsigned)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_INT, 1, &value);
                         }
                         else if (isLong)
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_INT, 1, &value);
                         }
                         else // long long
                         {
-                            return createToken(PT_LITERAL, source, s, numS, FT_LONG_LONG_INT, 1, &value);
+                            return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_LONG_INT, 1, &value);
                         }
                     }
                 }
@@ -2582,35 +2722,35 @@ class PostTokenizer
                     }
                     else
                     {
-                        return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_LONG_INT, 1, &value);
                     }
                 }
                 else if ( bs > 32)
                 {
                     // long
-                    return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                    return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_INT, 1, &value);
                 }
                 else if (bs == 32)
                 {
                     if (isDecimalInteger)
                     {
-                        return createToken(PT_LITERAL, source, s, numS, FT_LONG_INT, 1, &value);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_LONG_INT, 1, &value);
                     }
                     else 
                     {
-                        return createToken(PT_LITERAL, source, s, numS, FT_UNSIGNED_INT, 1, &value);
+                        return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_UNSIGNED_INT, 1, &value);
                     }
                 }
                 else
                 {
                     // int
-                    return createToken(PT_LITERAL, source, s, numS, FT_INT, 1, &value);
+                    return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_INT, 1, &value);
                 }
             }
             else if (isFloatPoint)  // float
             {
                 double value = PA2Decode_double(numS);
-                return createToken(PT_LITERAL, source, s, numS, FT_DOUBLE, 1, &value);
+                return createToken(PT_LITERAL, source, pp_srcfile, pp_lineNo, s, numS, FT_DOUBLE, 1, &value);
             }
             else
             {
@@ -2621,9 +2761,9 @@ class PostTokenizer
 
 
 
-    void parse_ppnumber(vector<int>& codes)
+    void parse_ppnumber(PPToken& pp)
     {
-        _tokens.push_back(parse_one_ppnumber(codes));
+        _tokens.push_back(parse_one_ppnumber(pp));
         return;
     }
 

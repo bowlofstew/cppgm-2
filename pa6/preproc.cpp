@@ -215,7 +215,7 @@ void preproc(const string& srcfile, vector<PostToken>& ptVec)
         }
 
         // after finishing preivously collected concat string token, 
-        // we can not chandle the current token
+        // we can start to handle the current token
         //
         if (pt.type == PT_INVALID)
         {
