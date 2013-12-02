@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <set>
 #include <algorithm>
 
 using namespace std;
@@ -60,6 +61,7 @@ class Rule {
     string                      name; 
     vector< vector<RuleTerm> >  derives;
     int                         canBeEmpty;
+    set<string>                 firstTokens;
 
     Rule () {
         canBeEmpty = -1;
@@ -84,7 +86,7 @@ class Rule {
 
 
 struct deriveSort {
-  bool operator() ( const vector<RuleTerm> v1, const vector<RuleTerm> v2)
+  bool operator() ( const vector<RuleTerm>& v1, const vector<RuleTerm>& v2)
   {
       return (v1.size() >= v2.size());
   }
@@ -144,9 +146,8 @@ class GramGen
             rt.type = RuleTerm::QUES;
             mit++;
         }
-        else {
-            // cout << "bad qualifier : " << *mit << endl;
-            // exit(1);
+        else { 
+            // no qualifier
         }
 
         return rt;
@@ -166,10 +167,10 @@ class GramGen
     }
 
 
-    Rule parseRule() {
-        Rule rule;
+    Rule* parseRule() {
+        Rule *rule = new Rule();
         
-        rule.name = match();
+        rule->name = match();
         match(":");    
         match("\n");
 
@@ -177,7 +178,7 @@ class GramGen
             match("\t");
             vector<RuleTerm> terms = parseRuleTerms();
             match("\n");
-            rule.derives.push_back( terms );
+            rule->derives.push_back( terms );
         }
 
         return rule;
@@ -217,9 +218,9 @@ class GramGen
         {
             for (unsigned i=0; i<rules.size() ; i++) 
             {
-                if (rules[i].name == term.name) 
+                if (rules[i]->name == term.name) 
                 {
-                    return can_be_empty( rules[i] );
+                    return can_be_empty( *rules[i] );
                 }        
             }
             return false;
@@ -228,15 +229,15 @@ class GramGen
         {
             return true;
         }
-        else if (term.type == RuleTerm::PLUS)
+        else // if (term.type == RuleTerm::PLUS)
         {
             if (term.terms.size() == 0) 
             {
                 for (unsigned i=0; i<rules.size() ; i++) 
                 {
-                    if (rules[i].name == term.name) 
+                    if (rules[i]->name == term.name) 
                     {
-                        return can_be_empty( rules[i] );
+                        return can_be_empty( *rules[i] );
                     }        
                 }
                 return false;
@@ -250,23 +251,78 @@ class GramGen
                         return false;
                     } 
                 }
+                return true;
             }
         }
     }
 
+
     void update_empty()
     {
-        bool bEmpty = true;
-
         for (unsigned i=0; i<rules.size(); i++) 
         {
-            bool canBeEmpty = can_be_empty( rules[i] );
-
-            // update the copy in hash
-            map<string, Rule>::iterator mit = this->nonTerminalMap.find( rules[i].name );
-            mit->second.canBeEmpty = canBeEmpty;
+            can_be_empty( *rules[i] );
         }
     }
+
+
+    set<string> find_FIRST(RuleTerm& term) 
+    {
+        if (term.type == RuleTerm::NONE) {
+            if ( isNonTerminal(term.name) ) {
+                map<string, Rule*>::iterator mit = this->nonTerminalMap.find( term.name );
+                return find_FIRST( *(mit->second) );
+            }
+            else {
+                // terminal
+                set<string> s;
+                s.insert( term.name );
+                return s;
+            }
+        }
+        return set<string>();
+    }
+
+
+    set<string> find_FIRST(vector<RuleTerm>& deriveTerms) 
+    {
+        set<string> rslt;
+
+        for (unsigned i=0; i<deriveTerms.size(); i++) {
+            set<string> s = find_FIRST( deriveTerms[i] );
+            rslt.insert(s.begin(), s.end());
+            if ( s.find("$") == s.end() ) {
+                break;
+            }
+        }
+        return rslt;
+    }
+
+
+    set<string> find_FIRST( Rule& rule ) 
+    {
+        if (rule.firstTokens.size() > 0) {
+            return rule.firstTokens;
+        }
+
+        set<string> rslt;
+        for (unsigned j=0; j<rule.derives.size(); j++) {
+            set<string> s = find_FIRST( rule.derives[j] ); 
+            rslt.insert(s.begin(), s.end());
+        }
+        return rslt;
+    }
+
+ 
+    void create_FIRST() 
+    {
+        for (unsigned i=0; i<rules.size(); i++) 
+        {
+            set<string> s = find_FIRST( *rules[i] );        
+            rules[i]->firstTokens = s;
+        }
+    }
+
     
     void parse(vector<string> ts) 
     {
@@ -278,13 +334,14 @@ class GramGen
                 mit++;
                 continue;
             }
-            Rule rule = parseRule();     
-            sort( rule.derives.begin(), rule.derives.end(), derive_sort );
+            Rule *rule = parseRule();     
+            sort( rule->derives.begin(), rule->derives.end(), derive_sort );
             rules.push_back(rule);
-            nonTerminalMap[rule.name] = rule;
+            nonTerminalMap[rule->name] = rule;
         }
 
         update_empty();
+        create_FIRST();  // should be after "update_empty", referring to its result
 
         // start to generate code
         //
@@ -301,6 +358,7 @@ class GramGen
         }
         return s;
     }
+
 
     string generateTokenName( string t )
     {
@@ -326,8 +384,8 @@ class GramGen
             tmpss << "parse__" << replaceStr( token , '-' , '_') << "();"; 
             code << indent << "CppAstPtr " << rID << " = " << tmpss.str() << endl;
 
-            map<string,Rule>::iterator mit = this->nonTerminalMap.find( token );
-            if (mit->second.canBeEmpty == false)    
+            map<string,Rule*>::iterator mit = this->nonTerminalMap.find( token );
+            if (mit->second->canBeEmpty == 0)    
             {
                 code << indent << "if (" << rID << "->size()==0) {" << endl;
                 code << indent << "    break;" << endl;
@@ -374,14 +432,14 @@ class GramGen
         {
             stringstream tmpss;
             string token = ruleTerm.name;
-            bool canBeEmpty = false;
+            int canBeEmpty = 0;
 
             if ( isNonTerminal( token ) ) 
             {
                 tmpss << "parse__" << replaceStr( token , '-' , '_') << "();"; 
 
-                map<string,Rule>::iterator mit = this->nonTerminalMap.find( token );
-                canBeEmpty = mit->second.canBeEmpty;
+                map<string,Rule*>::iterator mit = this->nonTerminalMap.find( token );
+                canBeEmpty = mit->second->canBeEmpty;
             }
             else 
             {
@@ -398,7 +456,7 @@ class GramGen
             code << indent << "CompAst* " << ptrStr << " = new CompAst();" << endl;
             code << indent << "int " << idxStr << " = 0;" << endl;
             code << indent << "CppAstPtr firstPtr = " << tmpss.str() << endl;
-            if (canBeEmpty == false) {
+            if (canBeEmpty == 0) {
                 code << indent << "if (firstPtr->size() == 0) {" << endl;
                 code << indent << "    break;" << endl;
                 code << indent << "}" << endl;
@@ -563,7 +621,7 @@ class GramGen
 
         for (unsigned i=0 ; i<rules.size(); i++) 
         {
-            string nonTerminal = rules[i].name;
+            string nonTerminal = rules[i]->name;
             string indent1 = "    ";
             string indent2 = "        ";
             string indent3 = "            ";
@@ -572,12 +630,12 @@ class GramGen
             code << indent1 << "CppAstPtr parse__" << nonTerminal << " ()" << endl;
             code << indent1 << "{" << endl;
             code << indent1 << "    PtIt bakPos = _ptIt;" << endl;
-            code << indent1 << "    Autocat ac( \"" << rules[i].name << "\" );" << endl;
+            code << indent1 << "    Autocat ac( \"" << rules[i]->name << "\" );" << endl;
 
-            for (unsigned j=0; j<rules[i].derives.size() ; j++)
+            for (unsigned j=0; j<rules[i]->derives.size() ; j++)
             {
                 vector<string> termIds;
-                vector<RuleTerm> derive = rules[i].derives[j]; 
+                vector<RuleTerm> derive = rules[i]->derives[j]; 
 
                 code << indent1 << "    do {" << endl;
                 // code << indent1 << "    for (int rich=0; rich<1; rich++) {" << endl;
@@ -619,7 +677,7 @@ class GramGen
 
     bool isNonTerminal(string s) 
     {
-        map<string, Rule>::iterator mit = nonTerminalMap.find(s);
+        map<string, Rule*>::iterator mit = nonTerminalMap.find(s);
         if (mit == nonTerminalMap.end()) {
             return false;
         }
@@ -630,7 +688,7 @@ class GramGen
 
     void dump() {
         for (unsigned i=0; i<rules.size(); i++) {
-            rules[i].dump();
+            rules[i]->dump();
             cout << endl;
         }
     }
@@ -639,10 +697,10 @@ class GramGen
     
     
 
-    map<string, Rule>         nonTerminalMap;         
+    map<string, Rule*>        nonTerminalMap;         
     vector<string>            tokens;
     vector<string>::iterator  mit;
-    vector<Rule>              rules;
+    vector<Rule*>             rules;
 };
 
 
@@ -650,10 +708,8 @@ class GramGen
 void process(string& gramTxt) {
     vector<string> tokens;
 
-    bool prevChar = true;
-
     string t = "";
-    for (int i=0; i<gramTxt.size(); i++) {
+    for (unsigned i=0; i<gramTxt.size(); i++) {
         if (gramTxt[i] == ' ' ) {
             if (t.size() != 0) {
                 tokens.push_back( t );

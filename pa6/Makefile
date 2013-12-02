@@ -4,6 +4,10 @@ all: recog
 recog: recog.cpp pptoken.cpp posttoken.cpp ctrlexpr.cpp macro.cpp preproc.cpp 
 	g++ -g -std=gnu++11 -DPA6 -Wall -o recog recog.cpp
 
+gram: gram_gen.cpp
+	g++ -g -std=gnu++11 -DPA6 -Wall -o gram_gen gram_gen.cpp
+
+
 # test posttoken application
 test: all
 	scripts/run_all_tests.pl recog my
