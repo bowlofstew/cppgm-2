@@ -268,7 +268,8 @@ class GramGen
 
     set<string> find_FIRST(RuleTerm& term) 
     {
-        if (term.type == RuleTerm::NONE) {
+        if (term.type == RuleTerm::NONE) 
+        {
             if ( isNonTerminal(term.name) ) {
                 map<string, Rule*>::iterator mit = this->nonTerminalMap.find( term.name );
                 return find_FIRST( *(mit->second) );
@@ -280,6 +281,40 @@ class GramGen
                 return s;
             }
         }
+        else if ( term.type == RuleTerm::QUES || term.type == RuleTerm::PLUS || term.type == RuleTerm::STAR) 
+        {
+            set<string> s;
+            if (term.type == RuleTerm::QUES || term.type == RuleTerm::STAR)
+            {
+                s.insert("$");
+            }
+
+            if (term.terms.size() == 0) 
+            {
+                if ( isNonTerminal(term.name) ) {
+                    map<string, Rule*>::iterator mit = this->nonTerminalMap.find( term.name );
+                    set<string> s0 = find_FIRST( *(mit->second) );
+                    s.insert(s0.begin(), s0.end());
+                }
+                else {
+                    // terminal
+                    s.insert( term.name );
+                }
+            } 
+            else 
+            {
+                for (unsigned i=0; i<term.terms.size() ; i++) 
+                {
+                    set<string> s1 = find_FIRST( term.terms[i]);
+                    s.insert(s1.begin(), s1.end());
+                    if (s1.find("$") == s1.end()) {
+                        break; 
+                    }
+                }
+            }
+            return s;
+        }
+
         return set<string>();
     }
 
@@ -320,6 +355,14 @@ class GramGen
         {
             set<string> s = find_FIRST( *rules[i] );        
             rules[i]->firstTokens = s;
+
+            // dump for debug
+            cout <<  rules[i]->name << " TOKENS: " << endl;
+            for (set<string>::iterator sit = s.begin(); sit != s.end(); ++sit)
+            {
+                cout << "  " << *sit;
+            }
+            cout << endl << endl;;
         }
     }
 
