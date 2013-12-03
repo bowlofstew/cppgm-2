@@ -325,8 +325,17 @@ class GramGen
 
         for (unsigned i=0; i<deriveTerms.size(); i++) {
             set<string> s = find_FIRST( deriveTerms[i] );
+            set<string>::iterator emptyIt = s.find("$");
+            bool has_empty = (emptyIt != s.end()) ? true : false;
+            
+            if ( has_empty  && i < deriveTerms.size()-1) {
+                // we can not know whether we could keep "$" in the set or not
+                // until the last term of the derive
+                s.erase( emptyIt ); 
+            }
+
             rslt.insert(s.begin(), s.end());
-            if ( s.find("$") == s.end() ) {
+            if ( has_empty == false ) {  // when this term has no "$"
                 break;
             }
         }
