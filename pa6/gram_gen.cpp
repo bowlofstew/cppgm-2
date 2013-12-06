@@ -62,6 +62,7 @@ class Rule {
     vector< vector<RuleTerm> >  derives;
     int                         canBeEmpty;
     set<string>                 firstTokens;
+    set<string>                 followTokens;
 
     Rule () {
         canBeEmpty = -1;
@@ -375,6 +376,100 @@ class GramGen
         }
     }
 
+
+    set<string> create_FOLLOW( RuleTerm& term, set<string> follow_tokens ) 
+    {
+        if (term.terms.size() > 0) 
+        {
+            // multiple term
+            for (int i=(int)term.terms.size()-1; i>=0 ; --i) 
+            {
+                follow_tokens = create_FOLLOW( term.terms[i], follow_tokens );
+            } 
+            return follow_tokens;
+        }
+        else 
+        {
+            // single term
+            if ( isNonTerminal( term.name ) ) 
+            {
+                Rule* rule = nonTerminalMap.find( term.name )->second;
+                rule->followTokens.insert( follow_tokens.begin(), follow_tokens.end());
+
+                set<string> first = rule->firstTokens;
+                if (first.find("$") != first.end()) 
+                {
+                    first.insert( follow_tokens.begin() , follow_tokens.end() );
+                    first.erase( "$" );
+                }
+                return first;
+            }
+            else 
+            {
+                if (term.type == RuleTerm::QUES || term.type == RuleTerm::STAR) 
+                {
+                    follow_tokens.insert( term.name );
+                }
+                else {
+                    follow_tokens.clear();
+                    follow_tokens.insert(term.name);
+                }
+                return follow_tokens;
+            }
+        }
+    }
+
+
+    void create_FOLLOW() 
+    {
+        // the first rule is the root, "translation-unit"
+
+        for (unsigned i=0; i<rules.size(); i++) 
+        {
+            for (unsigned j=0; j<rules[i]->derives.size() ; j++) 
+            {
+                // for each derive scan token one by one
+                set<string> follow = find_FIRST( rules[i]->derives[j].back() );
+                follow.erase( "$" );
+
+                for (int k=(int)rules[i]->derives[j].size() -2; k>=0; k--) 
+                {
+                    follow = create_FOLLOW( rules[i]->derives[j][k] , follow);
+                }
+            }
+
+        }
+
+        rules[0]->followTokens.insert("$");
+
+        for (unsigned i=0 ; i<rules.size() ; i++) 
+        {
+            for (unsigned j=0; j<rules[i]->derives.size() ; j++) 
+            {
+                set<string> follow = rules[i]->followTokens; 
+                for (int k=(int)rules[i]->derives[j].size()-1; k>=0; k--) 
+                {
+                    follow = create_FOLLOW( rules[i]->derives[j][k] , follow);
+                }
+            } 
+        }
+
+
+        // dump for debug
+        for (unsigned i=0 ; i<rules.size() ; i++) 
+        {
+            set<string> s = rules[i]->followTokens;
+            cout <<  rules[i]->name << " FOLLOW TOKENS: " << endl;
+            for (set<string>::iterator sit = s.begin(); sit != s.end(); ++sit)
+            {
+                cout << "  " << *sit;
+            }
+            cout << endl << endl;;
+        }            
+
+    }
+
+
     
     void parse(vector<string> ts) 
     {
@@ -394,6 +489,7 @@ class GramGen
 
         update_empty();
         create_FIRST();  // should be after "update_empty", referring to its result
+        create_FOLLOW();
 
         // start to generate code
         //
