@@ -420,7 +420,7 @@ class GramGen
     }
 
 
-    void create_FOLLOW() 
+    void create_FOLLOW_iteration() 
     {
         // the first rule is the root, "translation-unit"
 
@@ -455,6 +455,30 @@ class GramGen
         }
 
 
+
+    }
+
+
+    void create_FOLLOW() {
+        int follow_token_count = -1;
+
+        while (1) {
+            create_FOLLOW_iteration();
+            int count = 0;
+            for (unsigned i=0; i<rules.size(); i++) {
+                count += rules[i]->followTokens.size(); 
+            }
+            if (follow_token_count == -1) {
+                follow_token_count = count;
+            }
+            else if (count == follow_token_count) {
+                break;
+            }
+            else {
+                follow_token_count = count;
+            }
+        }
+
         // dump for debug
         for (unsigned i=0 ; i<rules.size() ; i++) 
         {
@@ -467,9 +491,8 @@ class GramGen
             cout << endl << endl;;
         }            
 
+
     }
-
-
     
     void parse(vector<string> ts) 
     {
