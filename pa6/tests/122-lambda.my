@@ -1,2 +1,2 @@
 recog 1
-tests/122-lambda.t OK
+tests/122-lambda.t BAD

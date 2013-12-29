@@ -707,7 +707,7 @@ class GramGen
             string sub_indent = indent;                 
             sub_indent += "    ";
 
-            code << indent << "PtIt " << bakStr << " = _ptIt;" << endl; 
+            // code << indent << "PtIt " << bakStr << " = _ptIt;" << endl; 
             code << indent << "CompAst* " << ptrStr << " = new CompAst();"  << endl; 
             code << indent << "do {" << endl; 
             //code << indent << "for (int rich=0; rich<1 ; rich++) {" << endl; 
@@ -725,16 +725,16 @@ class GramGen
             {
                 code << sub_indent << ptrStr << "->astMap[\"" << subIDs[j] << "\"] = " << subIDs[j] << ";" << endl;
             }
-            code << sub_indent <<  bakStr << " = _ptIt;" << endl;
-            code << sub_indent <<  "cout << \"BACKTO :\" <<  _ptIt->source << endl;" << endl;
+            // code << sub_indent <<  bakStr << " = _ptIt;" << endl;
+            // code << sub_indent <<  "cout << \"BACKTO :\" <<  _ptIt->source << endl;" << endl;
 
             code << indent << "}" << endl; 
             code << indent << "while (false);" << endl; 
-            code << indent << "_ptIt = " << bakStr << ";" << endl;
+            // code << indent << "_ptIt = " << bakStr << ";" << endl;
             code << indent << "CppAstPtr " << rID << "( " << ptrStr << " );" << endl;
 
         }
-        else if (ruleTerm.type == RuleTerm::STAR || ruleTerm.type == RuleTerm::PLUS)
+        else if (ruleTerm.type == RuleTerm::STAR)
         {
             vector<string> subIDs;
 
@@ -750,7 +750,7 @@ class GramGen
             string sub_indent = indent;                 
             sub_indent += "    ";
 
-            code << indent << "PtIt " << bakStr << " = _ptIt;" << endl; 
+            // code << indent << "PtIt " << bakStr << " = _ptIt;" << endl; 
             code << indent << "CompAst* " << ptrStr << " = new CompAst();"  << endl; 
             code << indent << "while (true) {" << endl; 
             for (unsigned i=0; i<ruleTerm.terms.size(); i++) 
@@ -767,10 +767,57 @@ class GramGen
             {
                 code << sub_indent << ptrStr << "->astMap[\"" << subIDs[j] << "\"] = " << subIDs[j] << ";" << endl;
             }
-            code << sub_indent <<  bakStr << " = _ptIt;" << endl; 
+            // code << sub_indent <<  bakStr << " = _ptIt;" << endl; 
 
             code << indent << "}" << endl; 
-            code << indent << "_ptIt = " << bakStr << ";" << endl; 
+            // code << indent << "_ptIt = " << bakStr << ";" << endl; 
+            code << indent <<  "cout << \"BACKTO :\" <<  _ptIt->source << endl;" << endl;
+
+            // if (ruleTerm.type == RuleTerm::PLUS)
+            // {
+            //     code << indent << "if (" << ptrStr << "->size()==0) {"  << endl;
+            //     code << indent << "    break;"  << endl;
+            //     code << indent << "}"  << endl;
+            // }
+            code << indent << "CppAstPtr " << rID << "( " << ptrStr << " );" << endl;
+        }
+        else if (ruleTerm.type == RuleTerm::PLUS)
+        {
+            vector<string> subIDs;
+
+            string ptrStr = rID;
+            ptrStr += "_ptr";
+
+            string idxStr = "idx_";
+            idxStr += rID;
+
+            string bakStr = "bakPos_";
+            bakStr += rID;
+
+            string sub_indent = indent;                 
+            sub_indent += "    ";
+
+            // code << indent << "PtIt " << bakStr << " = _ptIt;" << endl; 
+            code << indent << "CompAst* " << ptrStr << " = new CompAst();"  << endl; 
+            code << indent << "while (true) {" << endl; 
+            for (unsigned i=0; i<ruleTerm.terms.size(); i++) 
+            {
+                string sub_rID = rID;
+                sub_rID += to_string(i);
+                                
+                code << generateCodeTokenTerm(sub_rID, ruleTerm.terms[i], sub_indent);
+
+                subIDs.push_back( sub_rID );
+            }
+
+            for (unsigned j=0; j<subIDs.size(); j++) 
+            {
+                code << sub_indent << ptrStr << "->astMap[\"" << subIDs[j] << "\"] = " << subIDs[j] << ";" << endl;
+            }
+            // code << sub_indent <<  bakStr << " = _ptIt;" << endl; 
+
+            code << indent << "}" << endl; 
+            // code << indent << "_ptIt = " << bakStr << ";" << endl; 
             code << indent <<  "cout << \"BACKTO :\" <<  _ptIt->source << endl;" << endl;
 
             if (ruleTerm.type == RuleTerm::PLUS)
@@ -782,13 +829,92 @@ class GramGen
             code << indent << "CppAstPtr " << rID << "( " << ptrStr << " );" << endl;
         }
 
+
         return code.str();
     }
+
+
+    string generateCode_First()
+    {
+        stringstream ss;
+        string indent = "    ";
+        for (unsigned i=0; i<rules.size(); i++)
+        {
+            string nonTerminal = rules[i]->name;
+            nonTerminal = replaceStr( nonTerminal, '-', '_');
+            ss << indent << "bool is_first_" << nonTerminal << " ( EPostTokenType type )" << endl;
+            ss << indent << "{" << endl;
+            ss << indent << indent << "if ("; 
+            for (set<string>::iterator it=rules[i]->firstTokens.begin() ; it!=rules[i]->firstTokens.end() ; ) 
+            {
+                if ( *it == "$" ) {
+                    ++it;
+                    continue;
+                }
+
+                ss << " matchType( " << generateTokenName( *it ) << ", type )";
+                ++it;
+                if (it != rules[i]->firstTokens.end()) {
+                    ss << " || ";
+                }
+            }
+            ss << ") {" << endl;
+            ss << indent << indent << indent << "return true;"<< endl;
+            ss << indent << indent << "}" << endl;
+            ss << indent << indent << "return false;"<< endl;
+            ss << indent << "}" << endl;
+            ss << endl;
+        }
+
+        return ss.str();
+    }
+
+    string generateCode_FOLLOW()
+    {
+        stringstream ss;
+        string indent = "    ";
+        for (unsigned i=0; i<rules.size(); i++)
+        {
+            string nonTerminal = rules[i]->name;
+            nonTerminal = replaceStr( nonTerminal, '-', '_');
+            if (nonTerminal == "translation_unit") {
+                continue;
+            }
+            ss << indent << "bool is_follow_" << nonTerminal << " ( EPostTokenType type )" << endl;
+            ss << indent << "{" << endl;
+            ss << indent << indent << "if ("; 
+            for (set<string>::iterator it=rules[i]->followTokens.begin() ; it!=rules[i]->followTokens.end() ; ) 
+            {
+                if ( *it == "$" ) {
+                    ++it;
+                    continue;
+                }
+                ss << " matchType( " << generateTokenName( *it ) << ", type )";
+                ++it;
+                if (it != rules[i]->followTokens.end()) {
+                    ss << " || ";
+                }
+            }
+            ss << ") {" << endl;
+            ss << indent << indent << indent << "return true;"<< endl;
+            ss << indent << indent << "}" << endl;
+            ss << indent << indent << "return false;"<< endl;
+            ss << indent << "}" << endl;
+            ss << endl;
+        }
+
+        return ss.str();
+    }
+
+
 
 
     void generateCode() 
     {
         stringstream code; 
+
+        code << generateCode_First();
+        // code << generateCode_FOLLOW();
 
         for (unsigned i=0 ; i<rules.size(); i++) 
         {
@@ -800,6 +926,10 @@ class GramGen
 
             code << indent1 << "CppAstPtr parse__" << nonTerminal << " ()" << endl;
             code << indent1 << "{" << endl;
+            code << indent1 << "    if ( !is_first_" << nonTerminal << "(_ptIt->type) ) {" << endl;
+            code << indent1 << "        return CppAstPtr( new EmptyAst() );" << endl;
+            code << indent1 << "    }" << endl;
+            code << indent1 << endl;
             code << indent1 << "    PtIt bakPos = _ptIt;" << endl;
             code << indent1 << "    Autocat ac( \"" << rules[i]->name << "\" );" << endl;
 

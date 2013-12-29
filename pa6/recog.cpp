@@ -86,6 +86,7 @@ class CppAst {
     virtual AstType type() = 0;  
     virtual void dump() {}
     virtual int size() = 0;
+    virtual bool error() = 0;
 };
 
 typedef shared_ptr<CppAst> CppAstPtr;
@@ -105,6 +106,10 @@ class ErrorAst : public CppAst {
         return -1;
     }
 
+    bool error() {
+        return true;
+    }
+
 };
 
 
@@ -122,6 +127,10 @@ class EmptyAst : public CppAst {
     int size() {
         return 0;
     }
+
+    bool error() {
+        return false;
+    }
 };
 
 
@@ -138,6 +147,10 @@ class TokenAst : public CppAst {
 
     int size() {
         return 1;
+    }
+
+    bool error() {
+        return false;
     }
 
     PostToken pt;
@@ -163,6 +176,16 @@ class CompAst : public CppAst {
             count += mit->second->size(); 
         }
         return count;
+    }
+
+    bool error() {
+        map<string, CppAstPtr>::iterator mit = astMap.begin();
+        bool flag = false;
+        for ( ; mit != astMap.end(); ++mit )
+        {
+            flag |= mit->second->error(); 
+        }
+        return flag;
     }
 
     map<string, CppAstPtr> astMap; 
@@ -237,16 +260,10 @@ class Recognizer {
         }
     }
 
-    
-    shared_ptr<CppAst> match( EPostTokenType tp )
+
+    bool matchType( EPostTokenType tp , EPostTokenType tp2) 
     {
-        if (_ptIt == _ptEnd) {
-            return shared_ptr<CppAst>( new ErrorAst() );
-        }
-
         bool bOK = false ;
-
-        EPostTokenType tp2 = _ptIt->type;
 
         if (tp == tp2) 
         {
@@ -327,6 +344,103 @@ class Recognizer {
         {
             bOK = true;
         }
+
+        return bOK;
+    }
+
+    
+    shared_ptr<CppAst> match( EPostTokenType tp )
+    {
+        if (_ptIt == _ptEnd) {
+            return shared_ptr<CppAst>( new ErrorAst() );
+        }
+
+
+        bool bOK = false ;
+
+        EPostTokenType tp2 = _ptIt->type;
+
+        bOK = matchType( tp , tp2);
+
+        // if (tp == tp2) 
+        // {
+        //     bOK = true;
+        // }
+        // else if (tp == PT_TT_IDENTIFIER && tp2 == PT_SIMPLE ) 
+        // {
+        //     bOK = true;
+        // }
+        // else if (tp == PT_TT_IDENTIFIER_C && tp2 == PT_SIMPLE ) 
+        // {
+        //     if ( PA6_IsClassName( _ptIt->source )) {
+        //         bOK = true;
+        //     } 
+        // }
+        // else if (tp == PT_TT_IDENTIFIER_E && tp2 == PT_SIMPLE ) 
+        // {
+        //     if (PA6_IsTemplateName ( _ptIt->source )) {
+        //         bOK = true;
+        //     }
+        // }
+        // else if (tp == PT_TT_IDENTIFIER_N && tp2 == PT_SIMPLE ) 
+        // {
+        //     if (PA6_IsNamespaceName ( _ptIt->source ) ) {
+        //         bOK = true;
+        //     }
+        // }
+        // else if (tp == PT_TT_IDENTIFIER_T && tp2 == PT_SIMPLE ) 
+        // {
+        //     if (PA6_IsTemplateName (_ptIt->source) ) {
+        //         bOK = true;
+        //     }
+        // }
+        // else if (tp == PT_TT_IDENTIFIER_Y && tp2 == PT_SIMPLE ) 
+        // {
+        //     if (PA6_IsTypedefName( _ptIt->source )) {
+        //         bOK = true;
+        //     }
+        // }
+        // else if ( tp == PT_TT_LITERAL ) 
+        // {
+        //     if (tp2 == PT_LITERAL || tp2 == PT_LITERAL_ARRAY || tp2 == PT_UD_LITERAL || tp2 == PT_UD_LITERAL_ARRAY)
+        //     {
+        //         bOK = true;
+        //     }
+        // }
+        // else if ( tp == PT_ST_EMPTYSTR) 
+        // {
+        //     if (_ptIt->type == PT_LITERAL_ARRAY && _ptIt->ltype == FT_CHAR && _ptIt->size == 1)
+        //     {
+        //         bOK = true;
+        //     }
+        // }
+        // else if ( tp == PT_ST_ZERO ) 
+        // {
+        //     if (_ptIt->type == PT_LITERAL && _ptIt->source == "0") {
+        //         bOK = true; 
+        //     } 
+        // }
+        // else if ( tp == PT_ST_OVERRIDE && _ptIt->type == PT_SIMPLE && _ptIt->source == "override" )
+        // {
+        //     bOK = true;
+        // }
+        // else if ( tp == PT_ST_FINAL && _ptIt->type == PT_SIMPLE && _ptIt->source == "final" )
+        // {
+        //     bOK = true;
+        // }
+        // else if ( tp == PT_ST_NONPAREN) 
+        // {
+        //     if ( tp2 == PT_OP_LPAREN || tp2 == PT_OP_RPAREN || 
+        //          tp2 == PT_OP_LSQUARE || tp2 == PT_OP_RSQUARE || 
+        //          tp2 == PT_OP_LBRACE || tp2 == PT_OP_RBRACE ||
+        //          tp2 == PT_ST_EOF) {
+        //         bOK = true;
+        //     }
+        // }
+        // else if (tp == PT_ST_EOF && tp2 == PT_EOF )
+        // {
+        //     bOK = true;
+        // }
 
         if (bOK)
         {

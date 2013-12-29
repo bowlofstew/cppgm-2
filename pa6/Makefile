@@ -1,7 +1,7 @@
 all: recog
 
 # build posttoken application
-recog: recog.cpp pptoken.cpp posttoken.cpp ctrlexpr.cpp macro.cpp preproc.cpp 
+recog: recog.cpp pptoken.cpp posttoken.cpp ctrlexpr.cpp macro.cpp preproc.cpp code.cpp
 	g++ -g -std=gnu++11 -DPA6 -Wall -o recog recog.cpp
 
 gram: gram_gen.cpp

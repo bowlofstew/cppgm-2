@@ -1,1 +1,251 @@
------- replace Text-template-<-int--n-,--class--C1->-class--C2-{--template-<-int--m-,--class--C3->--void--f-(-C3--c-)--{--return--C2-(-c-)-;--}-}-;-template-<->-class--TC2-<-n-,-C1->-{--typedef--C4--c-;-}-;-template-<-typename--Y->-Y--foo-(-)-{--return--Y-(-)-;-}-
+simple template KW_TEMPLATE
+simple < OP_LT
+simple int KW_INT
+identifier n
+simple , OP_COMMA
+simple class KW_CLASS
+identifier C1
+simple > OP_GT
+simple class KW_CLASS
+identifier C2
+simple { OP_LBRACE
+simple template KW_TEMPLATE
+simple < OP_LT
+simple int KW_INT
+identifier m
+simple , OP_COMMA
+simple class KW_CLASS
+identifier C3
+simple > OP_GT
+simple void KW_VOID
+identifier f
+simple ( OP_LPAREN
+identifier C3
+identifier c
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple return KW_RETURN
+identifier C2
+simple ( OP_LPAREN
+identifier c
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple } OP_RBRACE
+simple ; OP_SEMICOLON
+simple template KW_TEMPLATE
+simple < OP_LT
+simple > OP_GT
+simple class KW_CLASS
+identifier TC2
+simple < OP_LT
+identifier n
+simple , OP_COMMA
+identifier C1
+simple > OP_GT
+simple { OP_LBRACE
+simple typedef KW_TYPEDEF
+identifier C4
+identifier c
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple ; OP_SEMICOLON
+simple template KW_TEMPLATE
+simple < OP_LT
+simple typename KW_TYPENAME
+identifier Y
+simple > OP_GT
+identifier Y
+identifier foo
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple return KW_RETURN
+identifier Y
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+eof
+  entering... translation-unit
+    entering... declaration
+BACKTO :template
+BACKTO :template
+BACKTO :template
+BACKTO :template
+      entering... explicit-specialization
+MATCHED: KW_TEMPLATE to template
+MATCHED: OP_LT to <
+BACKTO :template
+      leaving... explicit-specialization
+BACKTO :template
+      entering... explicit-instantiation
+MATCHED: KW_TEMPLATE to template
+BACKTO :template
+      leaving... explicit-instantiation
+BACKTO :template
+      entering... template-declaration
+MATCHED: KW_TEMPLATE to template
+MATCHED: OP_LT to <
+        entering... template-parameter-list
+          entering... template-parameter
+            entering... parameter-declaration
+              entering... decl-specifier-seq
+                entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                  entering... type-specifier
+BACKTO :int
+BACKTO :int
+                    entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                      entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                      leaving... simple-type-specifier
+                    leaving... trailing-type-specifier
+                  leaving... type-specifier
+                leaving... decl-specifier
+              leaving... decl-specifier-seq
+BACKTO :int
+              entering... decl-specifier-seq
+                entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                  entering... type-specifier
+BACKTO :int
+BACKTO :int
+                    entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                      entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                      leaving... simple-type-specifier
+                    leaving... trailing-type-specifier
+                  leaving... type-specifier
+                leaving... decl-specifier
+              leaving... decl-specifier-seq
+              entering... declarator
+                entering... noptr-declarator
+                  entering... noptr-declarator-root
+BACKTO :n
+                    entering... declarator-id
+                      entering... id-expression
+BACKTO :n
+                        entering... unqualified-id
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+MATCHED: PT_TT_IDENTIFIER to n
+                        leaving... unqualified-id
+                      leaving... id-expression
+                    leaving... declarator-id
+                  leaving... noptr-declarator-root
+BACKTO :,
+                leaving... noptr-declarator
+BACKTO :n
+                entering... ptr-declarator
+                  entering... noptr-declarator
+                    entering... noptr-declarator-root
+BACKTO :n
+                      entering... declarator-id
+                        entering... id-expression
+BACKTO :n
+                          entering... unqualified-id
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+BACKTO :n
+MATCHED: PT_TT_IDENTIFIER to n
+                          leaving... unqualified-id
+                        leaving... id-expression
+                      leaving... declarator-id
+                    leaving... noptr-declarator-root
+BACKTO :,
+                  leaving... noptr-declarator
+                leaving... ptr-declarator
+              leaving... declarator
+BACKTO :int
+              entering... decl-specifier-seq
+                entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                  entering... type-specifier
+BACKTO :int
+BACKTO :int
+                    entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                      entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                      leaving... simple-type-specifier
+                    leaving... trailing-type-specifier
+                  leaving... type-specifier
+                leaving... decl-specifier
+              leaving... decl-specifier-seq
+            leaving... parameter-declaration
+          leaving... template-parameter
+BACKTO :n
+        leaving... template-parameter-list
+BACKTO :template
+      leaving... template-declaration
+BACKTO :template
+BACKTO :template
+BACKTO :template
+    leaving... declaration
+BACKTO :template
+  leaving... translation-unit
+Parsing error!

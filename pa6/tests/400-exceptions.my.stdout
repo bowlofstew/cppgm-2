@@ -1,1 +1,1194 @@
------- replace Text-int--main-(-)-{--try--{--f-(-)-;--throw--exCeption-(-"oh no"-)-;--}--catch--(-exCeption-&--e-)--{--cout--<<--e-.-what-(-)-;--cin-->>--e-.-what-(-)-;--}--catch--(-...-)--{--}-}-void--f-(-)-try-{--throw--C-(-)-;-}-catch--(-const--C-&--c-)-{--throw-;-}-void--g-(-)--throw-(-int-)-;-void--(-*-fp-)-(-)--throw--(-int-)-;-void--h-(-void--pfa-(-)--throw-(-int-)-)-;-void--i-(-)--noexcept-(-2-+-3-)-;-
+simple int KW_INT
+identifier main
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple try KW_TRY
+simple { OP_LBRACE
+identifier f
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple throw KW_THROW
+identifier exCeption
+simple ( OP_LPAREN
+literal "oh no" array of 6 char 6F68206E6F00
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple catch KW_CATCH
+simple ( OP_LPAREN
+identifier exCeption
+simple & OP_AMP
+identifier e
+simple ) OP_RPAREN
+simple { OP_LBRACE
+identifier cout
+simple << OP_LSHIFT
+identifier e
+simple . OP_DOT
+identifier what
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+identifier cin
+simple >> OP_RSHIFT
+identifier e
+simple . OP_DOT
+identifier what
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple catch KW_CATCH
+simple ( OP_LPAREN
+simple ... OP_DOTS
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple } OP_RBRACE
+simple } OP_RBRACE
+simple void KW_VOID
+identifier f
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple try KW_TRY
+simple { OP_LBRACE
+simple throw KW_THROW
+identifier C
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple catch KW_CATCH
+simple ( OP_LPAREN
+simple const KW_CONST
+identifier C
+simple & OP_AMP
+identifier c
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple throw KW_THROW
+simple ; OP_SEMICOLON
+simple } OP_RBRACE
+simple void KW_VOID
+identifier g
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple throw KW_THROW
+simple ( OP_LPAREN
+simple int KW_INT
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple void KW_VOID
+simple ( OP_LPAREN
+simple * OP_STAR
+identifier fp
+simple ) OP_RPAREN
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple throw KW_THROW
+simple ( OP_LPAREN
+simple int KW_INT
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple void KW_VOID
+identifier h
+simple ( OP_LPAREN
+simple void KW_VOID
+identifier pfa
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple throw KW_THROW
+simple ( OP_LPAREN
+simple int KW_INT
+simple ) OP_RPAREN
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple void KW_VOID
+identifier i
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple noexcept KW_NOEXCEPT
+simple ( OP_LPAREN
+literal 2 int 02000000
+simple + OP_PLUS
+literal 3 int 03000000
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+eof
+  entering... translation-unit
+    entering... declaration
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+      entering... function-definition
+        entering... decl-specifier-seq
+          entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+            entering... type-specifier
+BACKTO :int
+BACKTO :int
+              entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                leaving... simple-type-specifier
+              leaving... trailing-type-specifier
+            leaving... type-specifier
+          leaving... decl-specifier
+        leaving... decl-specifier-seq
+        entering... declarator
+          entering... noptr-declarator
+            entering... noptr-declarator-root
+BACKTO :main
+              entering... declarator-id
+                entering... id-expression
+BACKTO :main
+                  entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                  leaving... unqualified-id
+                leaving... id-expression
+              leaving... declarator-id
+            leaving... noptr-declarator-root
+            entering... noptr-declarator-suffix
+BACKTO :(
+              entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+              leaving... parameters-and-qualifiers
+            leaving... noptr-declarator-suffix
+BACKTO :{
+          leaving... noptr-declarator
+BACKTO :main
+          entering... ptr-declarator
+            entering... noptr-declarator
+              entering... noptr-declarator-root
+BACKTO :main
+                entering... declarator-id
+                  entering... id-expression
+BACKTO :main
+                    entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                    leaving... unqualified-id
+                  leaving... id-expression
+                leaving... declarator-id
+              leaving... noptr-declarator-root
+              entering... noptr-declarator-suffix
+BACKTO :(
+                entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                leaving... parameters-and-qualifiers
+              leaving... noptr-declarator-suffix
+BACKTO :{
+            leaving... noptr-declarator
+          leaving... ptr-declarator
+        leaving... declarator
+        entering... function-body
+BACKTO :{
+BACKTO :{
+          entering... compound-statement
+MATCHED: OP_LBRACE to {
+            entering... statement
+              entering... try-block
+MATCHED: KW_TRY to try
+                entering... compound-statement
+MATCHED: OP_LBRACE to {
+                  entering... statement
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+                    entering... expression-statement
+                      entering... expression
+                        entering... assignment-expression
+                          entering... logical-or-expression
+                            entering... logical-and-expression
+                              entering... inclusive-or-expression
+                                entering... exclusive-or-expression
+                                  entering... and-expression
+                                    entering... equality-expression
+                                      entering... relational-expression
+                                        entering... shift-expression
+                                          entering... additive-expression
+                                            entering... multiplicative-expression
+                                              entering... pm-expression
+                                                entering... cast-expression
+BACKTO :f
+                                                  entering... unary-expression
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+                                                    entering... postfix-expression
+                                                      entering... postfix-root
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+                                                        entering... primary-expression
+BACKTO :f
+BACKTO :f
+                                                          entering... id-expression
+BACKTO :f
+                                                            entering... unqualified-id
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+MATCHED: PT_TT_IDENTIFIER to f
+                                                            leaving... unqualified-id
+                                                          leaving... id-expression
+                                                        leaving... primary-expression
+                                                      leaving... postfix-root
+                                                      entering... postfix-suffix
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                                                      leaving... postfix-suffix
+                                                    leaving... postfix-expression
+                                                  leaving... unary-expression
+                                                leaving... cast-expression
+BACKTO :;
+                                              leaving... pm-expression
+BACKTO :;
+                                            leaving... multiplicative-expression
+BACKTO :;
+                                          leaving... additive-expression
+BACKTO :;
+                                        leaving... shift-expression
+BACKTO :;
+                                      leaving... relational-expression
+BACKTO :;
+                                    leaving... equality-expression
+BACKTO :;
+                                  leaving... and-expression
+BACKTO :;
+                                leaving... exclusive-or-expression
+BACKTO :;
+                              leaving... inclusive-or-expression
+BACKTO :;
+                            leaving... logical-and-expression
+BACKTO :;
+                          leaving... logical-or-expression
+BACKTO :f
+BACKTO :f
+                          entering... conditional-expression
+                            entering... logical-or-expression
+                              entering... logical-and-expression
+                                entering... inclusive-or-expression
+                                  entering... exclusive-or-expression
+                                    entering... and-expression
+                                      entering... equality-expression
+                                        entering... relational-expression
+                                          entering... shift-expression
+                                            entering... additive-expression
+                                              entering... multiplicative-expression
+                                                entering... pm-expression
+                                                  entering... cast-expression
+BACKTO :f
+                                                    entering... unary-expression
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+                                                      entering... postfix-expression
+                                                        entering... postfix-root
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+                                                          entering... primary-expression
+BACKTO :f
+BACKTO :f
+                                                            entering... id-expression
+BACKTO :f
+                                                              entering... unqualified-id
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+BACKTO :f
+MATCHED: PT_TT_IDENTIFIER to f
+                                                              leaving... unqualified-id
+                                                            leaving... id-expression
+                                                          leaving... primary-expression
+                                                        leaving... postfix-root
+                                                        entering... postfix-suffix
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                                                        leaving... postfix-suffix
+                                                      leaving... postfix-expression
+                                                    leaving... unary-expression
+                                                  leaving... cast-expression
+BACKTO :;
+                                                leaving... pm-expression
+BACKTO :;
+                                              leaving... multiplicative-expression
+BACKTO :;
+                                            leaving... additive-expression
+BACKTO :;
+                                          leaving... shift-expression
+BACKTO :;
+                                        leaving... relational-expression
+BACKTO :;
+                                      leaving... equality-expression
+BACKTO :;
+                                    leaving... and-expression
+BACKTO :;
+                                  leaving... exclusive-or-expression
+BACKTO :;
+                                leaving... inclusive-or-expression
+BACKTO :;
+                              leaving... logical-and-expression
+BACKTO :;
+                            leaving... logical-or-expression
+                          leaving... conditional-expression
+                        leaving... assignment-expression
+BACKTO :;
+                      leaving... expression
+MATCHED: OP_SEMICOLON to ;
+                    leaving... expression-statement
+                  leaving... statement
+                  entering... statement
+BACKTO :throw
+BACKTO :throw
+BACKTO :throw
+BACKTO :throw
+BACKTO :throw
+                    entering... expression-statement
+                      entering... expression
+                        entering... assignment-expression
+BACKTO :throw
+                          entering... throw-expression
+MATCHED: KW_THROW to throw
+                            entering... assignment-expression
+                              entering... logical-or-expression
+                                entering... logical-and-expression
+                                  entering... inclusive-or-expression
+                                    entering... exclusive-or-expression
+                                      entering... and-expression
+                                        entering... equality-expression
+                                          entering... relational-expression
+                                            entering... shift-expression
+                                              entering... additive-expression
+                                                entering... multiplicative-expression
+                                                  entering... pm-expression
+                                                    entering... cast-expression
+BACKTO :exCeption
+                                                      entering... unary-expression
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                        entering... postfix-expression
+                                                          entering... postfix-root
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                            entering... simple-type-specifier
+                                                              entering... nested-name-specifier
+                                                                entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                  entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                    entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                    leaving... class-name
+                                                                  leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                leaving... nested-name-specifier-root
+BACKTO :exCeption
+                                                              leaving... nested-name-specifier
+BACKTO :exCeption
+                                                              entering... nested-name-specifier
+                                                                entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                  entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                    entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                    leaving... class-name
+                                                                  leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                leaving... nested-name-specifier-root
+BACKTO :exCeption
+                                                              leaving... nested-name-specifier
+                                                              entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                leaving... class-name
+                                                              leaving... type-name
+                                                            leaving... simple-type-specifier
+MATCHED: OP_LPAREN to (
+                                                            entering... expression-list
+                                                              entering... initializer-list
+                                                                entering... initializer-clause-dots
+                                                                  entering... initializer-clause
+BACKTO :"oh no"
+                                                                    entering... assignment-expression
+                                                                      entering... logical-or-expression
+                                                                        entering... logical-and-expression
+                                                                          entering... inclusive-or-expression
+                                                                            entering... exclusive-or-expression
+                                                                              entering... and-expression
+                                                                                entering... equality-expression
+                                                                                  entering... relational-expression
+                                                                                    entering... shift-expression
+                                                                                      entering... additive-expression
+                                                                                        entering... multiplicative-expression
+                                                                                          entering... pm-expression
+                                                                                            entering... cast-expression
+BACKTO :"oh no"
+                                                                                              entering... unary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                entering... postfix-expression
+                                                                                                  entering... postfix-root
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                    entering... primary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+MATCHED: PT_TT_LITERAL to "oh no"
+                                                                                                    leaving... primary-expression
+                                                                                                  leaving... postfix-root
+                                                                                                leaving... postfix-expression
+                                                                                              leaving... unary-expression
+                                                                                            leaving... cast-expression
+BACKTO :)
+                                                                                          leaving... pm-expression
+BACKTO :)
+                                                                                        leaving... multiplicative-expression
+BACKTO :)
+                                                                                      leaving... additive-expression
+BACKTO :)
+                                                                                    leaving... shift-expression
+BACKTO :)
+                                                                                  leaving... relational-expression
+BACKTO :)
+                                                                                leaving... equality-expression
+BACKTO :)
+                                                                              leaving... and-expression
+BACKTO :)
+                                                                            leaving... exclusive-or-expression
+BACKTO :)
+                                                                          leaving... inclusive-or-expression
+BACKTO :)
+                                                                        leaving... logical-and-expression
+BACKTO :)
+                                                                      leaving... logical-or-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                      entering... conditional-expression
+                                                                        entering... logical-or-expression
+                                                                          entering... logical-and-expression
+                                                                            entering... inclusive-or-expression
+                                                                              entering... exclusive-or-expression
+                                                                                entering... and-expression
+                                                                                  entering... equality-expression
+                                                                                    entering... relational-expression
+                                                                                      entering... shift-expression
+                                                                                        entering... additive-expression
+                                                                                          entering... multiplicative-expression
+                                                                                            entering... pm-expression
+                                                                                              entering... cast-expression
+BACKTO :"oh no"
+                                                                                                entering... unary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                  entering... postfix-expression
+                                                                                                    entering... postfix-root
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                      entering... primary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+MATCHED: PT_TT_LITERAL to "oh no"
+                                                                                                      leaving... primary-expression
+                                                                                                    leaving... postfix-root
+                                                                                                  leaving... postfix-expression
+                                                                                                leaving... unary-expression
+                                                                                              leaving... cast-expression
+BACKTO :)
+                                                                                            leaving... pm-expression
+BACKTO :)
+                                                                                          leaving... multiplicative-expression
+BACKTO :)
+                                                                                        leaving... additive-expression
+BACKTO :)
+                                                                                      leaving... shift-expression
+BACKTO :)
+                                                                                    leaving... relational-expression
+BACKTO :)
+                                                                                  leaving... equality-expression
+BACKTO :)
+                                                                                leaving... and-expression
+BACKTO :)
+                                                                              leaving... exclusive-or-expression
+BACKTO :)
+                                                                            leaving... inclusive-or-expression
+BACKTO :)
+                                                                          leaving... logical-and-expression
+BACKTO :)
+                                                                        leaving... logical-or-expression
+                                                                      leaving... conditional-expression
+                                                                    leaving... assignment-expression
+                                                                  leaving... initializer-clause
+                                                                leaving... initializer-clause-dots
+BACKTO :)
+                                                              leaving... initializer-list
+                                                            leaving... expression-list
+MATCHED: OP_RPAREN to )
+                                                          leaving... postfix-root
+                                                        leaving... postfix-expression
+                                                      leaving... unary-expression
+                                                    leaving... cast-expression
+BACKTO :;
+                                                  leaving... pm-expression
+BACKTO :;
+                                                leaving... multiplicative-expression
+BACKTO :;
+                                              leaving... additive-expression
+BACKTO :;
+                                            leaving... shift-expression
+BACKTO :;
+                                          leaving... relational-expression
+BACKTO :;
+                                        leaving... equality-expression
+BACKTO :;
+                                      leaving... and-expression
+BACKTO :;
+                                    leaving... exclusive-or-expression
+BACKTO :;
+                                  leaving... inclusive-or-expression
+BACKTO :;
+                                leaving... logical-and-expression
+BACKTO :;
+                              leaving... logical-or-expression
+BACKTO :exCeption
+BACKTO :exCeption
+                              entering... conditional-expression
+                                entering... logical-or-expression
+                                  entering... logical-and-expression
+                                    entering... inclusive-or-expression
+                                      entering... exclusive-or-expression
+                                        entering... and-expression
+                                          entering... equality-expression
+                                            entering... relational-expression
+                                              entering... shift-expression
+                                                entering... additive-expression
+                                                  entering... multiplicative-expression
+                                                    entering... pm-expression
+                                                      entering... cast-expression
+BACKTO :exCeption
+                                                        entering... unary-expression
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                          entering... postfix-expression
+                                                            entering... postfix-root
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                              entering... simple-type-specifier
+                                                                entering... nested-name-specifier
+                                                                  entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                    entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                      entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                      leaving... class-name
+                                                                    leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                  leaving... nested-name-specifier-root
+BACKTO :exCeption
+                                                                leaving... nested-name-specifier
+BACKTO :exCeption
+                                                                entering... nested-name-specifier
+                                                                  entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                    entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                      entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                      leaving... class-name
+                                                                    leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                  leaving... nested-name-specifier-root
+BACKTO :exCeption
+                                                                leaving... nested-name-specifier
+                                                                entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                                                  entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                                                  leaving... class-name
+                                                                leaving... type-name
+                                                              leaving... simple-type-specifier
+MATCHED: OP_LPAREN to (
+                                                              entering... expression-list
+                                                                entering... initializer-list
+                                                                  entering... initializer-clause-dots
+                                                                    entering... initializer-clause
+BACKTO :"oh no"
+                                                                      entering... assignment-expression
+                                                                        entering... logical-or-expression
+                                                                          entering... logical-and-expression
+                                                                            entering... inclusive-or-expression
+                                                                              entering... exclusive-or-expression
+                                                                                entering... and-expression
+                                                                                  entering... equality-expression
+                                                                                    entering... relational-expression
+                                                                                      entering... shift-expression
+                                                                                        entering... additive-expression
+                                                                                          entering... multiplicative-expression
+                                                                                            entering... pm-expression
+                                                                                              entering... cast-expression
+BACKTO :"oh no"
+                                                                                                entering... unary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                  entering... postfix-expression
+                                                                                                    entering... postfix-root
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                      entering... primary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+MATCHED: PT_TT_LITERAL to "oh no"
+                                                                                                      leaving... primary-expression
+                                                                                                    leaving... postfix-root
+                                                                                                  leaving... postfix-expression
+                                                                                                leaving... unary-expression
+                                                                                              leaving... cast-expression
+BACKTO :)
+                                                                                            leaving... pm-expression
+BACKTO :)
+                                                                                          leaving... multiplicative-expression
+BACKTO :)
+                                                                                        leaving... additive-expression
+BACKTO :)
+                                                                                      leaving... shift-expression
+BACKTO :)
+                                                                                    leaving... relational-expression
+BACKTO :)
+                                                                                  leaving... equality-expression
+BACKTO :)
+                                                                                leaving... and-expression
+BACKTO :)
+                                                                              leaving... exclusive-or-expression
+BACKTO :)
+                                                                            leaving... inclusive-or-expression
+BACKTO :)
+                                                                          leaving... logical-and-expression
+BACKTO :)
+                                                                        leaving... logical-or-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                        entering... conditional-expression
+                                                                          entering... logical-or-expression
+                                                                            entering... logical-and-expression
+                                                                              entering... inclusive-or-expression
+                                                                                entering... exclusive-or-expression
+                                                                                  entering... and-expression
+                                                                                    entering... equality-expression
+                                                                                      entering... relational-expression
+                                                                                        entering... shift-expression
+                                                                                          entering... additive-expression
+                                                                                            entering... multiplicative-expression
+                                                                                              entering... pm-expression
+                                                                                                entering... cast-expression
+BACKTO :"oh no"
+                                                                                                  entering... unary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                    entering... postfix-expression
+                                                                                                      entering... postfix-root
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+                                                                                                        entering... primary-expression
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+BACKTO :"oh no"
+MATCHED: PT_TT_LITERAL to "oh no"
+                                                                                                        leaving... primary-expression
+                                                                                                      leaving... postfix-root
+                                                                                                    leaving... postfix-expression
+                                                                                                  leaving... unary-expression
+                                                                                                leaving... cast-expression
+BACKTO :)
+                                                                                              leaving... pm-expression
+BACKTO :)
+                                                                                            leaving... multiplicative-expression
+BACKTO :)
+                                                                                          leaving... additive-expression
+BACKTO :)
+                                                                                        leaving... shift-expression
+BACKTO :)
+                                                                                      leaving... relational-expression
+BACKTO :)
+                                                                                    leaving... equality-expression
+BACKTO :)
+                                                                                  leaving... and-expression
+BACKTO :)
+                                                                                leaving... exclusive-or-expression
+BACKTO :)
+                                                                              leaving... inclusive-or-expression
+BACKTO :)
+                                                                            leaving... logical-and-expression
+BACKTO :)
+                                                                          leaving... logical-or-expression
+                                                                        leaving... conditional-expression
+                                                                      leaving... assignment-expression
+                                                                    leaving... initializer-clause
+                                                                  leaving... initializer-clause-dots
+BACKTO :)
+                                                                leaving... initializer-list
+                                                              leaving... expression-list
+MATCHED: OP_RPAREN to )
+                                                            leaving... postfix-root
+                                                          leaving... postfix-expression
+                                                        leaving... unary-expression
+                                                      leaving... cast-expression
+BACKTO :;
+                                                    leaving... pm-expression
+BACKTO :;
+                                                  leaving... multiplicative-expression
+BACKTO :;
+                                                leaving... additive-expression
+BACKTO :;
+                                              leaving... shift-expression
+BACKTO :;
+                                            leaving... relational-expression
+BACKTO :;
+                                          leaving... equality-expression
+BACKTO :;
+                                        leaving... and-expression
+BACKTO :;
+                                      leaving... exclusive-or-expression
+BACKTO :;
+                                    leaving... inclusive-or-expression
+BACKTO :;
+                                  leaving... logical-and-expression
+BACKTO :;
+                                leaving... logical-or-expression
+                              leaving... conditional-expression
+                            leaving... assignment-expression
+                          leaving... throw-expression
+                        leaving... assignment-expression
+BACKTO :;
+                      leaving... expression
+MATCHED: OP_SEMICOLON to ;
+                    leaving... expression-statement
+                  leaving... statement
+MATCHED: OP_RBRACE to }
+                leaving... compound-statement
+                entering... handler
+MATCHED: KW_CATCH to catch
+MATCHED: OP_LPAREN to (
+                  entering... exception-declaration
+                    entering... type-specifier
+BACKTO :exCeption
+BACKTO :exCeption
+                      entering... trailing-type-specifier
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                        entering... simple-type-specifier
+                          entering... nested-name-specifier
+                            entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                              entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                leaving... class-name
+                              leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                            leaving... nested-name-specifier-root
+BACKTO :exCeption
+                          leaving... nested-name-specifier
+BACKTO :exCeption
+                          entering... nested-name-specifier
+                            entering... nested-name-specifier-root
+BACKTO :exCeption
+BACKTO :exCeption
+                              entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                                entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                                leaving... class-name
+                              leaving... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+                            leaving... nested-name-specifier-root
+BACKTO :exCeption
+                          leaving... nested-name-specifier
+                          entering... type-name
+BACKTO :exCeption
+BACKTO :exCeption
+BACKTO :exCeption
+                            entering... class-name
+BACKTO :exCeption
+MATCHED: PT_TT_IDENTIFIER_C to exCeption
+                            leaving... class-name
+                          leaving... type-name
+                        leaving... simple-type-specifier
+                      leaving... trailing-type-specifier
+                    leaving... type-specifier
+                    entering... abstract-declarator
+BACKTO :&
+                      entering... abstract-pack-declarator
+                        entering... ptr-operator
+BACKTO :&
+BACKTO :&
+BACKTO :&
+MATCHED: OP_AMP to &
+                        leaving... ptr-operator
+BACKTO :&
+                      leaving... abstract-pack-declarator
+BACKTO :&
+                      entering... ptr-abstract-declarator
+                        entering... ptr-operator
+BACKTO :&
+BACKTO :&
+BACKTO :&
+MATCHED: OP_AMP to &
+                        leaving... ptr-operator
+BACKTO :&
+                        entering... ptr-operator
+BACKTO :&
+BACKTO :&
+BACKTO :&
+MATCHED: OP_AMP to &
+                        leaving... ptr-operator
+                      leaving... ptr-abstract-declarator
+                    leaving... abstract-declarator
+                  leaving... exception-declaration
+BACKTO :catch
+                leaving... handler
+BACKTO :try
+              leaving... try-block
+BACKTO :try
+BACKTO :try
+BACKTO :try
+BACKTO :try
+BACKTO :try
+BACKTO :try
+BACKTO :try
+BACKTO :try
+            leaving... statement
+BACKTO :{
+          leaving... compound-statement
+BACKTO :{
+BACKTO :{
+        leaving... function-body
+BACKTO :int
+      leaving... function-definition
+BACKTO :int
+      entering... block-declaration
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+        entering... simple-declaration
+          entering... decl-specifier-seq
+            entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+              entering... type-specifier
+BACKTO :int
+BACKTO :int
+                entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                  entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                  leaving... simple-type-specifier
+                leaving... trailing-type-specifier
+              leaving... type-specifier
+            leaving... decl-specifier
+          leaving... decl-specifier-seq
+          entering... init-declarator-list
+            entering... init-declarator
+              entering... declarator
+                entering... noptr-declarator
+                  entering... noptr-declarator-root
+BACKTO :main
+                    entering... declarator-id
+                      entering... id-expression
+BACKTO :main
+                        entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                        leaving... unqualified-id
+                      leaving... id-expression
+                    leaving... declarator-id
+                  leaving... noptr-declarator-root
+                  entering... noptr-declarator-suffix
+BACKTO :(
+                    entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                    leaving... parameters-and-qualifiers
+                  leaving... noptr-declarator-suffix
+BACKTO :{
+                leaving... noptr-declarator
+BACKTO :main
+                entering... ptr-declarator
+                  entering... noptr-declarator
+                    entering... noptr-declarator-root
+BACKTO :main
+                      entering... declarator-id
+                        entering... id-expression
+BACKTO :main
+                          entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                          leaving... unqualified-id
+                        leaving... id-expression
+                      leaving... declarator-id
+                    leaving... noptr-declarator-root
+                    entering... noptr-declarator-suffix
+BACKTO :(
+                      entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                      leaving... parameters-and-qualifiers
+                    leaving... noptr-declarator-suffix
+BACKTO :{
+                  leaving... noptr-declarator
+                leaving... ptr-declarator
+              leaving... declarator
+              entering... initializer
+BACKTO :{
+                entering... brace-or-equal-initializer
+BACKTO :{
+                  entering... braced-init-list
+MATCHED: OP_LBRACE to {
+BACKTO :{
+MATCHED: OP_LBRACE to {
+BACKTO :{
+                  leaving... braced-init-list
+BACKTO :{
+                leaving... brace-or-equal-initializer
+BACKTO :{
+              leaving... initializer
+            leaving... init-declarator
+BACKTO :{
+          leaving... init-declarator-list
+BACKTO :int
+        leaving... simple-declaration
+BACKTO :int
+      leaving... block-declaration
+BACKTO :int
+    leaving... declaration
+BACKTO :int
+  leaving... translation-unit
+Parsing error!
