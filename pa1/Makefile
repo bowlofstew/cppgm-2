@@ -2,7 +2,7 @@ all: pptoken
 
 # build pptoken application
 pptoken: pptoken.cpp IPPTokenStream.h DebugPPTokenStream.h utf8.cpp
-	g++ -g -std=gnu++11 -Wall -o pptoken pptoken.cpp
+	g++ -g -std=gnu++0x -Wall -o pptoken pptoken.cpp
 
 # test pptoken application
 test: all

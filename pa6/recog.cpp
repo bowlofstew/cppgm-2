@@ -245,6 +245,10 @@ class Recognizer {
         return false;
     }
 
+    std::string to_string(const unsigned int i)
+    {
+        return std::to_string( (long long unsigned) i);
+    }
 
 #include "code.cpp"
 

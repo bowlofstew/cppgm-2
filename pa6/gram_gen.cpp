@@ -11,6 +11,10 @@
 
 using namespace std;
 
+std::string to_string(const unsigned int i)
+{
+    return std::to_string( (long long unsigned) i);
+}
 
 class RuleTerm {
   public:

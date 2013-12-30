@@ -35,7 +35,7 @@ using namespace std;
 // - comment striping (can be part of whitespace-sequence)
 
 // EndOfFile: synthetic "character" to represent the end of source file
-constexpr int EndOfFile = -1;
+const int EndOfFile = -1;
 
 // given hex digit character c, return its value
 int HexCharToValue(int c)

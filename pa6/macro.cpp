@@ -179,7 +179,7 @@ class DirectiveHandler {
 
     PPToken makePPToken(int s, int lineNo=-1)
     {
-        return makePPToken(to_string(s), lineNo);
+        return makePPToken(to_string((long long unsigned)s), lineNo);
     }
 
 
