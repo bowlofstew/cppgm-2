@@ -344,7 +344,13 @@ MATCHED: PT_TT_IDENTIFIER to foo
                 leaving... attribute-token
                 entering... attribute-argument-clause
 MATCHED: OP_LPAREN to (
-BACKTO :(
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
                 leaving... attribute-argument-clause
               leaving... attribute
 BACKTO :foo
@@ -361,25 +367,26 @@ MATCHED: PT_TT_IDENTIFIER to foo
                 leaving... attribute-token
                 entering... attribute-argument-clause
 MATCHED: OP_LPAREN to (
-BACKTO :(
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
                 leaving... attribute-argument-clause
               leaving... attribute
             leaving... attribute-part
-BACKTO :(
+BACKTO :]
           leaving... attribute-list
-BACKTO :[
-BACKTO :[
+MATCHED: OP_RSQUARE to ]
+MATCHED: OP_RSQUARE to ]
         leaving... attribute-specifier
-BACKTO :[
+MATCHED: OP_SEMICOLON to ;
       leaving... attribute-declaration
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-      entering... function-definition
+    leaving... declaration
+    entering... declaration
+      entering... attribute-declaration
         entering... attribute-specifier
 MATCHED: OP_LSQUARE to [
 MATCHED: OP_LSQUARE to [
@@ -398,7 +405,40 @@ MATCHED: PT_TT_IDENTIFIER to foo
                 leaving... attribute-token
                 entering... attribute-argument-clause
 MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+                  entering... balanced-token
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                  leaving... balanced-token
+                  entering... balanced-token
 BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :[
+MATCHED: OP_LSQUARE to [
+                    entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+                      entering... balanced-token
+BACKTO :foo
+BACKTO :foo
+BACKTO :foo
+MATCHED: PT_ST_NONPAREN to foo
+                      leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                    leaving... balanced-token
+MATCHED: OP_RSQUARE to ]
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
                 leaving... attribute-argument-clause
               leaving... attribute
 BACKTO :foo
@@ -415,124 +455,50 @@ MATCHED: PT_TT_IDENTIFIER to foo
                 leaving... attribute-token
                 entering... attribute-argument-clause
 MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+                  entering... balanced-token
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                  leaving... balanced-token
+                  entering... balanced-token
 BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :[
+MATCHED: OP_LSQUARE to [
+                    entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+                      entering... balanced-token
+BACKTO :foo
+BACKTO :foo
+BACKTO :foo
+MATCHED: PT_ST_NONPAREN to foo
+                      leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                    leaving... balanced-token
+MATCHED: OP_RSQUARE to ]
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
                 leaving... attribute-argument-clause
               leaving... attribute
             leaving... attribute-part
-BACKTO :(
+BACKTO :]
           leaving... attribute-list
-BACKTO :[
-BACKTO :[
+MATCHED: OP_RSQUARE to ]
+MATCHED: OP_RSQUARE to ]
         leaving... attribute-specifier
-BACKTO :[
-      leaving... function-definition
-BACKTO :[
-      entering... block-declaration
-BACKTO :[
-BACKTO :[
-BACKTO :[
-        entering... using-directive
-          entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-MATCHED: OP_LSQUARE to [
-            entering... attribute-list
-              entering... attribute-part
-                entering... attribute
-                  entering... attribute-token
-                    entering... attribute-scoped-token
-                      entering... attribute-namespace
-MATCHED: PT_TT_IDENTIFIER to foo
-                      leaving... attribute-namespace
-BACKTO :foo
-                    leaving... attribute-scoped-token
-BACKTO :foo
-MATCHED: PT_TT_IDENTIFIER to foo
-                  leaving... attribute-token
-                  entering... attribute-argument-clause
-MATCHED: OP_LPAREN to (
-BACKTO :(
-                  leaving... attribute-argument-clause
-                leaving... attribute
-BACKTO :foo
-                entering... attribute
-                  entering... attribute-token
-                    entering... attribute-scoped-token
-                      entering... attribute-namespace
-MATCHED: PT_TT_IDENTIFIER to foo
-                      leaving... attribute-namespace
-BACKTO :foo
-                    leaving... attribute-scoped-token
-BACKTO :foo
-MATCHED: PT_TT_IDENTIFIER to foo
-                  leaving... attribute-token
-                  entering... attribute-argument-clause
-MATCHED: OP_LPAREN to (
-BACKTO :(
-                  leaving... attribute-argument-clause
-                leaving... attribute
-              leaving... attribute-part
-BACKTO :(
-            leaving... attribute-list
-BACKTO :[
-BACKTO :[
-          leaving... attribute-specifier
-BACKTO :[
-        leaving... using-directive
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-        entering... simple-declaration
-          entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-MATCHED: OP_LSQUARE to [
-            entering... attribute-list
-              entering... attribute-part
-                entering... attribute
-                  entering... attribute-token
-                    entering... attribute-scoped-token
-                      entering... attribute-namespace
-MATCHED: PT_TT_IDENTIFIER to foo
-                      leaving... attribute-namespace
-BACKTO :foo
-                    leaving... attribute-scoped-token
-BACKTO :foo
-MATCHED: PT_TT_IDENTIFIER to foo
-                  leaving... attribute-token
-                  entering... attribute-argument-clause
-MATCHED: OP_LPAREN to (
-BACKTO :(
-                  leaving... attribute-argument-clause
-                leaving... attribute
-BACKTO :foo
-                entering... attribute
-                  entering... attribute-token
-                    entering... attribute-scoped-token
-                      entering... attribute-namespace
-MATCHED: PT_TT_IDENTIFIER to foo
-                      leaving... attribute-namespace
-BACKTO :foo
-                    leaving... attribute-scoped-token
-BACKTO :foo
-MATCHED: PT_TT_IDENTIFIER to foo
-                  leaving... attribute-token
-                  entering... attribute-argument-clause
-MATCHED: OP_LPAREN to (
-BACKTO :(
-                  leaving... attribute-argument-clause
-                leaving... attribute
-              leaving... attribute-part
-BACKTO :(
-            leaving... attribute-list
-BACKTO :[
-BACKTO :[
-          leaving... attribute-specifier
-BACKTO :[
-        leaving... simple-declaration
-BACKTO :[
-      leaving... block-declaration
-BACKTO :[
+MATCHED: OP_SEMICOLON to ;
+      leaving... attribute-declaration
     leaving... declaration
-BACKTO :alignas
+MATCHED: PT_ST_EOF to 
   leaving... translation-unit
-Parsing error!

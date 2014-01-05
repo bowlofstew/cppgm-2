@@ -341,6 +341,21 @@ class Recognizer {
                  tp2 == PT_OP_LSQUARE || tp2 == PT_OP_RSQUARE || 
                  tp2 == PT_OP_LBRACE || tp2 == PT_OP_RBRACE ||
                  tp2 == PT_ST_EOF) {
+                bOK = false;
+            }
+            else {
+                bOK = true;
+            }
+        }
+        else if ( tp == PT_ST_LT) 
+        {
+            if (tp2 == PT_OP_LT || tp2 == PT_ST_LT) {
+                bOK = true;
+            }
+        }
+        else if ( tp == PT_ST_GT) 
+        {
+            if (tp2 == PT_OP_GT || tp2 == PT_ST_RSHIFT_1 || tp2 == PT_ST_RSHIFT_2 || tp2 == PT_ST_GT) {
                 bOK = true;
             }
         }
@@ -355,10 +370,22 @@ class Recognizer {
     
     shared_ptr<CppAst> match( EPostTokenType tp )
     {
+
+        while (_bracketStack.size() > 0) {
+            PtIt ptit = _bracketStack.top();
+            unsigned dist = ptit - _ptVec.begin();
+            unsigned dist2 = _ptIt - _ptVec.begin();
+            if (dist > dist2 ) {
+                _bracketStack.pop();
+            }
+            else {
+                break;
+            }
+        }
+
         if (_ptIt == _ptEnd) {
             return shared_ptr<CppAst>( new ErrorAst() );
         }
-
 
         bool bOK = false ;
 
@@ -366,88 +393,38 @@ class Recognizer {
 
         bOK = matchType( tp , tp2);
 
-        // if (tp == tp2) 
-        // {
-        //     bOK = true;
-        // }
-        // else if (tp == PT_TT_IDENTIFIER && tp2 == PT_SIMPLE ) 
-        // {
-        //     bOK = true;
-        // }
-        // else if (tp == PT_TT_IDENTIFIER_C && tp2 == PT_SIMPLE ) 
-        // {
-        //     if ( PA6_IsClassName( _ptIt->source )) {
-        //         bOK = true;
-        //     } 
-        // }
-        // else if (tp == PT_TT_IDENTIFIER_E && tp2 == PT_SIMPLE ) 
-        // {
-        //     if (PA6_IsTemplateName ( _ptIt->source )) {
-        //         bOK = true;
-        //     }
-        // }
-        // else if (tp == PT_TT_IDENTIFIER_N && tp2 == PT_SIMPLE ) 
-        // {
-        //     if (PA6_IsNamespaceName ( _ptIt->source ) ) {
-        //         bOK = true;
-        //     }
-        // }
-        // else if (tp == PT_TT_IDENTIFIER_T && tp2 == PT_SIMPLE ) 
-        // {
-        //     if (PA6_IsTemplateName (_ptIt->source) ) {
-        //         bOK = true;
-        //     }
-        // }
-        // else if (tp == PT_TT_IDENTIFIER_Y && tp2 == PT_SIMPLE ) 
-        // {
-        //     if (PA6_IsTypedefName( _ptIt->source )) {
-        //         bOK = true;
-        //     }
-        // }
-        // else if ( tp == PT_TT_LITERAL ) 
-        // {
-        //     if (tp2 == PT_LITERAL || tp2 == PT_LITERAL_ARRAY || tp2 == PT_UD_LITERAL || tp2 == PT_UD_LITERAL_ARRAY)
-        //     {
-        //         bOK = true;
-        //     }
-        // }
-        // else if ( tp == PT_ST_EMPTYSTR) 
-        // {
-        //     if (_ptIt->type == PT_LITERAL_ARRAY && _ptIt->ltype == FT_CHAR && _ptIt->size == 1)
-        //     {
-        //         bOK = true;
-        //     }
-        // }
-        // else if ( tp == PT_ST_ZERO ) 
-        // {
-        //     if (_ptIt->type == PT_LITERAL && _ptIt->source == "0") {
-        //         bOK = true; 
-        //     } 
-        // }
-        // else if ( tp == PT_ST_OVERRIDE && _ptIt->type == PT_SIMPLE && _ptIt->source == "override" )
-        // {
-        //     bOK = true;
-        // }
-        // else if ( tp == PT_ST_FINAL && _ptIt->type == PT_SIMPLE && _ptIt->source == "final" )
-        // {
-        //     bOK = true;
-        // }
-        // else if ( tp == PT_ST_NONPAREN) 
-        // {
-        //     if ( tp2 == PT_OP_LPAREN || tp2 == PT_OP_RPAREN || 
-        //          tp2 == PT_OP_LSQUARE || tp2 == PT_OP_RSQUARE || 
-        //          tp2 == PT_OP_LBRACE || tp2 == PT_OP_RBRACE ||
-        //          tp2 == PT_ST_EOF) {
-        //         bOK = true;
-        //     }
-        // }
-        // else if (tp == PT_ST_EOF && tp2 == PT_EOF )
-        // {
-        //     bOK = true;
-        // }
-
         if (bOK)
         {
+            // special handling for closing-angle-bracket 
+            if (tp == PT_OP_LPAREN || tp == PT_OP_LSQUARE || tp == PT_OP_LBRACE || tp == PT_ST_LT) {
+                _bracketStack.push( _ptIt );
+            }
+            else if ( tp == PT_OP_RPAREN ) {
+                if (_bracketStack.top()->type == PT_OP_LPAREN) {
+                    _bracketStack.pop();
+                }
+            }
+            else if ( tp == PT_OP_RSQUARE ) {
+                if (_bracketStack.top()->type == PT_OP_LSQUARE) {
+                    _bracketStack.pop();
+                }
+            }
+            else if ( tp == PT_OP_RBRACE ) {
+                if (_bracketStack.top()->type == PT_OP_LBRACE) {
+                    _bracketStack.pop();
+                }
+            }
+            else if ( tp == PT_ST_GT ) {
+                if (_bracketStack.top()->type == PT_ST_LT) {
+                    _bracketStack.pop();
+                }
+            }
+            else if ( tp == PT_OP_GT || tp == PT_ST_RSHIFT_1 || tp == PT_ST_RSHIFT_2 ) {
+                if ( _bracketStack.top()->type == PT_OP_LT) {
+                    return shared_ptr<CppAst>( new EmptyAst );
+                }
+            }
+
             cout << "MATCHED: " << PostTokenTypeToStringMap.at( tp ) << " to " <<  _ptIt->source << endl;
             TokenAst* ast = new TokenAst();
             ast->pt = *_ptIt;
@@ -459,46 +436,6 @@ class Recognizer {
         }
 
     }
-
-    // bool match( int num, EPostTokenType t1, ... ) 
-    // {
-    //     EPostTokenType t = _ptIt->type; 
-    //     va_list args;
-    //     va_start (args, t1);
-    //     for (int i=0; i<num; i++) {
-    //         EPostTokenType tt = va_arg(args, EPostTokenType);
-    //         if (tt==t) {
-    //             va_end(args);
-    //             _ptIt++;
-    //             return true;
-    //         }
-    //     }
-    //     va_end(args);
-    //     return false;
-    // }
-
-    // bool match( EPostTokenType tp )
-    // {
-    //     if (_ptIt == _ptEnd) {
-    //         return false;
-    //     }
-    //     else if (_ptIt->type == tp) {
-    //         _ptIt++;
-    //         return true;
-    //     }
-    //     else {
-    //         return false;
-    //     }
-    // }
-
-    // bool matchAny() 
-    // {
-    //     if (_ptIt == _ptEnd) {
-    //         return false;
-    //     }
-    //     _ptIt++;
-    //     return true;
-    // }
 
     // to keep the current position for backtracking
     //
@@ -527,6 +464,8 @@ class Recognizer {
     PtIt              _ptIt;
     PtIt              _ptEnd;
     stack<PtIt>       _bakIts;
+
+    stack<PtIt>       _bracketStack;
 
     vector<string>    _errFile;
     vector<int>       _errLine;

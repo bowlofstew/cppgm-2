@@ -1870,40 +1870,6 @@ MATCHED: KW_INT to int
                                                                   leaving... type-specifier
                                                                 leaving... decl-specifier
                                                               leaving... decl-specifier-seq
-BACKTO :int
-                                                              entering... decl-specifier-seq
-                                                                entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                  entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                    entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                      entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                      leaving... simple-type-specifier
-                                                                    leaving... trailing-type-specifier
-                                                                  leaving... type-specifier
-                                                                leaving... decl-specifier
-                                                              leaving... decl-specifier-seq
                                                               entering... declarator
                                                                 entering... noptr-declarator
                                                                   entering... noptr-declarator-root
@@ -1949,42 +1915,8 @@ BACKTO :)
                                                                   leaving... noptr-declarator
                                                                 leaving... ptr-declarator
                                                               leaving... declarator
-BACKTO :int
-                                                              entering... decl-specifier-seq
-                                                                entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                  entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                    entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                      entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                      leaving... simple-type-specifier
-                                                                    leaving... trailing-type-specifier
-                                                                  leaving... type-specifier
-                                                                leaving... decl-specifier
-                                                              leaving... decl-specifier-seq
                                                             leaving... parameter-declaration
-BACKTO :x
+BACKTO :)
                                                           leaving... parameter-declaration-list
 BACKTO :int
                                                           entering... parameter-declaration-list
@@ -2022,40 +1954,6 @@ MATCHED: KW_INT to int
                                                                   leaving... type-specifier
                                                                 leaving... decl-specifier
                                                               leaving... decl-specifier-seq
-BACKTO :int
-                                                              entering... decl-specifier-seq
-                                                                entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                  entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                    entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                      entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                      leaving... simple-type-specifier
-                                                                    leaving... trailing-type-specifier
-                                                                  leaving... type-specifier
-                                                                leaving... decl-specifier
-                                                              leaving... decl-specifier-seq
                                                               entering... declarator
                                                                 entering... noptr-declarator
                                                                   entering... noptr-declarator-root
@@ -2101,85 +1999,43 @@ BACKTO :)
                                                                   leaving... noptr-declarator
                                                                 leaving... ptr-declarator
                                                               leaving... declarator
-BACKTO :int
-                                                              entering... decl-specifier-seq
-                                                                entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                  entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                    entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                      entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                      leaving... simple-type-specifier
-                                                                    leaving... trailing-type-specifier
-                                                                  leaving... type-specifier
-                                                                leaving... decl-specifier
-                                                              leaving... decl-specifier-seq
                                                             leaving... parameter-declaration
-BACKTO :x
+BACKTO :)
                                                           leaving... parameter-declaration-list
                                                         leaving... parameter-declaration-clause
-BACKTO :(
+MATCHED: OP_RPAREN to )
                                                       leaving... lambda-declarator
-BACKTO :[
+                                                      entering... compound-statement
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                                                      leaving... compound-statement
                                                     leaving... lambda-expression
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
                                                   leaving... primary-expression
-BACKTO :[
                                                 leaving... postfix-root
-BACKTO :[
                                               leaving... postfix-expression
-BACKTO :[
                                             leaving... unary-expression
-BACKTO :[
                                           leaving... cast-expression
-BACKTO :[
+BACKTO :;
                                         leaving... pm-expression
-BACKTO :[
+BACKTO :;
                                       leaving... multiplicative-expression
-BACKTO :[
+BACKTO :;
                                     leaving... additive-expression
-BACKTO :[
+BACKTO :;
                                   leaving... shift-expression
-BACKTO :[
+BACKTO :;
                                 leaving... relational-expression
-BACKTO :[
+BACKTO :;
                               leaving... equality-expression
-BACKTO :[
+BACKTO :;
                             leaving... and-expression
-BACKTO :[
+BACKTO :;
                           leaving... exclusive-or-expression
-BACKTO :[
+BACKTO :;
                         leaving... inclusive-or-expression
-BACKTO :[
+BACKTO :;
                       leaving... logical-and-expression
-BACKTO :[
+BACKTO :;
                     leaving... logical-or-expression
 BACKTO :[
 BACKTO :[
@@ -2263,40 +2119,6 @@ MATCHED: KW_INT to int
                                                                     leaving... type-specifier
                                                                   leaving... decl-specifier
                                                                 leaving... decl-specifier-seq
-BACKTO :int
-                                                                entering... decl-specifier-seq
-                                                                  entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                    entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                      entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                        entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                        leaving... simple-type-specifier
-                                                                      leaving... trailing-type-specifier
-                                                                    leaving... type-specifier
-                                                                  leaving... decl-specifier
-                                                                leaving... decl-specifier-seq
                                                                 entering... declarator
                                                                   entering... noptr-declarator
                                                                     entering... noptr-declarator-root
@@ -2342,42 +2164,8 @@ BACKTO :)
                                                                     leaving... noptr-declarator
                                                                   leaving... ptr-declarator
                                                                 leaving... declarator
-BACKTO :int
-                                                                entering... decl-specifier-seq
-                                                                  entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                    entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                      entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                        entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                        leaving... simple-type-specifier
-                                                                      leaving... trailing-type-specifier
-                                                                    leaving... type-specifier
-                                                                  leaving... decl-specifier
-                                                                leaving... decl-specifier-seq
                                                               leaving... parameter-declaration
-BACKTO :x
+BACKTO :)
                                                             leaving... parameter-declaration-list
 BACKTO :int
                                                             entering... parameter-declaration-list
@@ -2415,40 +2203,6 @@ MATCHED: KW_INT to int
                                                                     leaving... type-specifier
                                                                   leaving... decl-specifier
                                                                 leaving... decl-specifier-seq
-BACKTO :int
-                                                                entering... decl-specifier-seq
-                                                                  entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                    entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                                                      entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                                        entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                                        leaving... simple-type-specifier
-                                                                      leaving... trailing-type-specifier
-                                                                    leaving... type-specifier
-                                                                  leaving... decl-specifier
-                                                                leaving... decl-specifier-seq
                                                                 entering... declarator
                                                                   entering... noptr-declarator
                                                                     entering... noptr-declarator-root
@@ -2494,441 +2248,730 @@ BACKTO :)
                                                                     leaving... noptr-declarator
                                                                   leaving... ptr-declarator
                                                                 leaving... declarator
-BACKTO :int
+                                                              leaving... parameter-declaration
+BACKTO :)
+                                                            leaving... parameter-declaration-list
+                                                          leaving... parameter-declaration-clause
+MATCHED: OP_RPAREN to )
+                                                        leaving... lambda-declarator
+                                                        entering... compound-statement
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                                                        leaving... compound-statement
+                                                      leaving... lambda-expression
+                                                    leaving... primary-expression
+                                                  leaving... postfix-root
+                                                leaving... postfix-expression
+                                              leaving... unary-expression
+                                            leaving... cast-expression
+BACKTO :;
+                                          leaving... pm-expression
+BACKTO :;
+                                        leaving... multiplicative-expression
+BACKTO :;
+                                      leaving... additive-expression
+BACKTO :;
+                                    leaving... shift-expression
+BACKTO :;
+                                  leaving... relational-expression
+BACKTO :;
+                                leaving... equality-expression
+BACKTO :;
+                              leaving... and-expression
+BACKTO :;
+                            leaving... exclusive-or-expression
+BACKTO :;
+                          leaving... inclusive-or-expression
+BACKTO :;
+                        leaving... logical-and-expression
+BACKTO :;
+                      leaving... logical-or-expression
+                    leaving... conditional-expression
+                  leaving... assignment-expression
+BACKTO :;
+                leaving... expression
+MATCHED: OP_SEMICOLON to ;
+              leaving... expression-statement
+            leaving... statement
+            entering... statement
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+BACKTO :[
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+BACKTO :[
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+BACKTO :[
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+BACKTO :[
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+BACKTO :[
+              entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+BACKTO :[
+BACKTO :[
+              leaving... attribute-specifier
+              entering... expression-statement
+                entering... expression
+                  entering... assignment-expression
+                    entering... logical-or-expression
+                      entering... logical-and-expression
+                        entering... inclusive-or-expression
+                          entering... exclusive-or-expression
+                            entering... and-expression
+                              entering... equality-expression
+                                entering... relational-expression
+                                  entering... shift-expression
+                                    entering... additive-expression
+                                      entering... multiplicative-expression
+                                        entering... pm-expression
+                                          entering... cast-expression
+BACKTO :[
+                                            entering... unary-expression
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+                                              entering... postfix-expression
+                                                entering... postfix-root
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+                                                  entering... primary-expression
+BACKTO :[
+                                                    entering... lambda-expression
+                                                      entering... lambda-introducer
+MATCHED: OP_LSQUARE to [
+MATCHED: OP_RSQUARE to ]
+                                                      leaving... lambda-introducer
+                                                      entering... lambda-declarator
+MATCHED: OP_LPAREN to (
+                                                        entering... parameter-declaration-clause
+                                                          entering... parameter-declaration-list
+                                                            entering... parameter-declaration
+                                                              entering... decl-specifier-seq
+                                                                entering... decl-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                  entering... type-specifier
+BACKTO :C
+BACKTO :C
+                                                                    entering... trailing-type-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                      entering... simple-type-specifier
+                                                                        entering... nested-name-specifier
+                                                                          entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                            entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                              entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                              leaving... class-name
+                                                                            leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                          leaving... nested-name-specifier-root
+BACKTO :C
+                                                                        leaving... nested-name-specifier
+BACKTO :C
+                                                                        entering... nested-name-specifier
+                                                                          entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                            entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                              entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                              leaving... class-name
+                                                                            leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                          leaving... nested-name-specifier-root
+BACKTO :C
+                                                                        leaving... nested-name-specifier
+                                                                        entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                          entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                          leaving... class-name
+                                                                        leaving... type-name
+                                                                      leaving... simple-type-specifier
+                                                                    leaving... trailing-type-specifier
+                                                                  leaving... type-specifier
+                                                                leaving... decl-specifier
+                                                              leaving... decl-specifier-seq
+                                                              entering... declarator
+                                                                entering... noptr-declarator
+                                                                  entering... noptr-declarator-root
+BACKTO :y
+                                                                    entering... declarator-id
+                                                                      entering... id-expression
+BACKTO :y
+                                                                        entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                        leaving... unqualified-id
+                                                                      leaving... id-expression
+                                                                    leaving... declarator-id
+                                                                  leaving... noptr-declarator-root
+BACKTO :,
+                                                                leaving... noptr-declarator
+BACKTO :y
+                                                                entering... ptr-declarator
+                                                                  entering... noptr-declarator
+                                                                    entering... noptr-declarator-root
+BACKTO :y
+                                                                      entering... declarator-id
+                                                                        entering... id-expression
+BACKTO :y
+                                                                          entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                          leaving... unqualified-id
+                                                                        leaving... id-expression
+                                                                      leaving... declarator-id
+                                                                    leaving... noptr-declarator-root
+BACKTO :,
+                                                                  leaving... noptr-declarator
+                                                                leaving... ptr-declarator
+                                                              leaving... declarator
+                                                            leaving... parameter-declaration
+MATCHED: OP_COMMA to ,
+BACKTO :...
+                                                          leaving... parameter-declaration-list
+BACKTO :C
+                                                          entering... parameter-declaration-list
+                                                            entering... parameter-declaration
+                                                              entering... decl-specifier-seq
+                                                                entering... decl-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                  entering... type-specifier
+BACKTO :C
+BACKTO :C
+                                                                    entering... trailing-type-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                      entering... simple-type-specifier
+                                                                        entering... nested-name-specifier
+                                                                          entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                            entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                              entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                              leaving... class-name
+                                                                            leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                          leaving... nested-name-specifier-root
+BACKTO :C
+                                                                        leaving... nested-name-specifier
+BACKTO :C
+                                                                        entering... nested-name-specifier
+                                                                          entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                            entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                              entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                              leaving... class-name
+                                                                            leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                          leaving... nested-name-specifier-root
+BACKTO :C
+                                                                        leaving... nested-name-specifier
+                                                                        entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                          entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                          leaving... class-name
+                                                                        leaving... type-name
+                                                                      leaving... simple-type-specifier
+                                                                    leaving... trailing-type-specifier
+                                                                  leaving... type-specifier
+                                                                leaving... decl-specifier
+                                                              leaving... decl-specifier-seq
+                                                              entering... declarator
+                                                                entering... noptr-declarator
+                                                                  entering... noptr-declarator-root
+BACKTO :y
+                                                                    entering... declarator-id
+                                                                      entering... id-expression
+BACKTO :y
+                                                                        entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                        leaving... unqualified-id
+                                                                      leaving... id-expression
+                                                                    leaving... declarator-id
+                                                                  leaving... noptr-declarator-root
+BACKTO :,
+                                                                leaving... noptr-declarator
+BACKTO :y
+                                                                entering... ptr-declarator
+                                                                  entering... noptr-declarator
+                                                                    entering... noptr-declarator-root
+BACKTO :y
+                                                                      entering... declarator-id
+                                                                        entering... id-expression
+BACKTO :y
+                                                                          entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                          leaving... unqualified-id
+                                                                        leaving... id-expression
+                                                                      leaving... declarator-id
+                                                                    leaving... noptr-declarator-root
+BACKTO :,
+                                                                  leaving... noptr-declarator
+                                                                leaving... ptr-declarator
+                                                              leaving... declarator
+                                                            leaving... parameter-declaration
+MATCHED: OP_COMMA to ,
+BACKTO :...
+                                                          leaving... parameter-declaration-list
+MATCHED: OP_DOTS to ...
+                                                        leaving... parameter-declaration-clause
+MATCHED: OP_RPAREN to )
+                                                      leaving... lambda-declarator
+                                                      entering... compound-statement
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                                                      leaving... compound-statement
+                                                    leaving... lambda-expression
+                                                  leaving... primary-expression
+                                                leaving... postfix-root
+                                              leaving... postfix-expression
+                                            leaving... unary-expression
+                                          leaving... cast-expression
+BACKTO :;
+                                        leaving... pm-expression
+BACKTO :;
+                                      leaving... multiplicative-expression
+BACKTO :;
+                                    leaving... additive-expression
+BACKTO :;
+                                  leaving... shift-expression
+BACKTO :;
+                                leaving... relational-expression
+BACKTO :;
+                              leaving... equality-expression
+BACKTO :;
+                            leaving... and-expression
+BACKTO :;
+                          leaving... exclusive-or-expression
+BACKTO :;
+                        leaving... inclusive-or-expression
+BACKTO :;
+                      leaving... logical-and-expression
+BACKTO :;
+                    leaving... logical-or-expression
+BACKTO :[
+BACKTO :[
+                    entering... conditional-expression
+                      entering... logical-or-expression
+                        entering... logical-and-expression
+                          entering... inclusive-or-expression
+                            entering... exclusive-or-expression
+                              entering... and-expression
+                                entering... equality-expression
+                                  entering... relational-expression
+                                    entering... shift-expression
+                                      entering... additive-expression
+                                        entering... multiplicative-expression
+                                          entering... pm-expression
+                                            entering... cast-expression
+BACKTO :[
+                                              entering... unary-expression
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+                                                entering... postfix-expression
+                                                  entering... postfix-root
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+BACKTO :[
+                                                    entering... primary-expression
+BACKTO :[
+                                                      entering... lambda-expression
+                                                        entering... lambda-introducer
+MATCHED: OP_LSQUARE to [
+MATCHED: OP_RSQUARE to ]
+                                                        leaving... lambda-introducer
+                                                        entering... lambda-declarator
+MATCHED: OP_LPAREN to (
+                                                          entering... parameter-declaration-clause
+                                                            entering... parameter-declaration-list
+                                                              entering... parameter-declaration
                                                                 entering... decl-specifier-seq
                                                                   entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
+BACKTO :C
+BACKTO :C
+BACKTO :C
+BACKTO :C
                                                                     entering... type-specifier
-BACKTO :int
-BACKTO :int
+BACKTO :C
+BACKTO :C
                                                                       entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
+BACKTO :C
+BACKTO :C
+BACKTO :C
                                                                         entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
+                                                                          entering... nested-name-specifier
+                                                                            entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                              entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                                entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                                leaving... class-name
+                                                                              leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                            leaving... nested-name-specifier-root
+BACKTO :C
+                                                                          leaving... nested-name-specifier
+BACKTO :C
+                                                                          entering... nested-name-specifier
+                                                                            entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                              entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                                entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                                leaving... class-name
+                                                                              leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                            leaving... nested-name-specifier-root
+BACKTO :C
+                                                                          leaving... nested-name-specifier
+                                                                          entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                            entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                            leaving... class-name
+                                                                          leaving... type-name
                                                                         leaving... simple-type-specifier
                                                                       leaving... trailing-type-specifier
                                                                     leaving... type-specifier
                                                                   leaving... decl-specifier
                                                                 leaving... decl-specifier-seq
+                                                                entering... declarator
+                                                                  entering... noptr-declarator
+                                                                    entering... noptr-declarator-root
+BACKTO :y
+                                                                      entering... declarator-id
+                                                                        entering... id-expression
+BACKTO :y
+                                                                          entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                          leaving... unqualified-id
+                                                                        leaving... id-expression
+                                                                      leaving... declarator-id
+                                                                    leaving... noptr-declarator-root
+BACKTO :,
+                                                                  leaving... noptr-declarator
+BACKTO :y
+                                                                  entering... ptr-declarator
+                                                                    entering... noptr-declarator
+                                                                      entering... noptr-declarator-root
+BACKTO :y
+                                                                        entering... declarator-id
+                                                                          entering... id-expression
+BACKTO :y
+                                                                            entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                            leaving... unqualified-id
+                                                                          leaving... id-expression
+                                                                        leaving... declarator-id
+                                                                      leaving... noptr-declarator-root
+BACKTO :,
+                                                                    leaving... noptr-declarator
+                                                                  leaving... ptr-declarator
+                                                                leaving... declarator
                                                               leaving... parameter-declaration
-BACKTO :x
+MATCHED: OP_COMMA to ,
+BACKTO :...
                                                             leaving... parameter-declaration-list
+BACKTO :C
+                                                            entering... parameter-declaration-list
+                                                              entering... parameter-declaration
+                                                                entering... decl-specifier-seq
+                                                                  entering... decl-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                    entering... type-specifier
+BACKTO :C
+BACKTO :C
+                                                                      entering... trailing-type-specifier
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                        entering... simple-type-specifier
+                                                                          entering... nested-name-specifier
+                                                                            entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                              entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                                entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                                leaving... class-name
+                                                                              leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                            leaving... nested-name-specifier-root
+BACKTO :C
+                                                                          leaving... nested-name-specifier
+BACKTO :C
+                                                                          entering... nested-name-specifier
+                                                                            entering... nested-name-specifier-root
+BACKTO :C
+BACKTO :C
+                                                                              entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                                entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                                leaving... class-name
+                                                                              leaving... type-name
+BACKTO :C
+BACKTO :C
+                                                                            leaving... nested-name-specifier-root
+BACKTO :C
+                                                                          leaving... nested-name-specifier
+                                                                          entering... type-name
+BACKTO :C
+BACKTO :C
+BACKTO :C
+                                                                            entering... class-name
+BACKTO :C
+MATCHED: PT_TT_IDENTIFIER_C to C
+                                                                            leaving... class-name
+                                                                          leaving... type-name
+                                                                        leaving... simple-type-specifier
+                                                                      leaving... trailing-type-specifier
+                                                                    leaving... type-specifier
+                                                                  leaving... decl-specifier
+                                                                leaving... decl-specifier-seq
+                                                                entering... declarator
+                                                                  entering... noptr-declarator
+                                                                    entering... noptr-declarator-root
+BACKTO :y
+                                                                      entering... declarator-id
+                                                                        entering... id-expression
+BACKTO :y
+                                                                          entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                          leaving... unqualified-id
+                                                                        leaving... id-expression
+                                                                      leaving... declarator-id
+                                                                    leaving... noptr-declarator-root
+BACKTO :,
+                                                                  leaving... noptr-declarator
+BACKTO :y
+                                                                  entering... ptr-declarator
+                                                                    entering... noptr-declarator
+                                                                      entering... noptr-declarator-root
+BACKTO :y
+                                                                        entering... declarator-id
+                                                                          entering... id-expression
+BACKTO :y
+                                                                            entering... unqualified-id
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+BACKTO :y
+MATCHED: PT_TT_IDENTIFIER to y
+                                                                            leaving... unqualified-id
+                                                                          leaving... id-expression
+                                                                        leaving... declarator-id
+                                                                      leaving... noptr-declarator-root
+BACKTO :,
+                                                                    leaving... noptr-declarator
+                                                                  leaving... ptr-declarator
+                                                                leaving... declarator
+                                                              leaving... parameter-declaration
+MATCHED: OP_COMMA to ,
+BACKTO :...
+                                                            leaving... parameter-declaration-list
+MATCHED: OP_DOTS to ...
                                                           leaving... parameter-declaration-clause
-BACKTO :(
+MATCHED: OP_RPAREN to )
                                                         leaving... lambda-declarator
-BACKTO :[
+                                                        entering... compound-statement
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                                                        leaving... compound-statement
                                                       leaving... lambda-expression
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
                                                     leaving... primary-expression
-BACKTO :[
                                                   leaving... postfix-root
-BACKTO :[
                                                 leaving... postfix-expression
-BACKTO :[
                                               leaving... unary-expression
-BACKTO :[
                                             leaving... cast-expression
-BACKTO :[
+BACKTO :;
                                           leaving... pm-expression
-BACKTO :[
+BACKTO :;
                                         leaving... multiplicative-expression
-BACKTO :[
+BACKTO :;
                                       leaving... additive-expression
-BACKTO :[
+BACKTO :;
                                     leaving... shift-expression
-BACKTO :[
+BACKTO :;
                                   leaving... relational-expression
-BACKTO :[
+BACKTO :;
                                 leaving... equality-expression
-BACKTO :[
+BACKTO :;
                               leaving... and-expression
-BACKTO :[
+BACKTO :;
                             leaving... exclusive-or-expression
-BACKTO :[
+BACKTO :;
                           leaving... inclusive-or-expression
-BACKTO :[
+BACKTO :;
                         leaving... logical-and-expression
-BACKTO :[
+BACKTO :;
                       leaving... logical-or-expression
-BACKTO :[
                     leaving... conditional-expression
-BACKTO :[
                   leaving... assignment-expression
-BACKTO :[
+BACKTO :;
                 leaving... expression
-BACKTO :[
+MATCHED: OP_SEMICOLON to ;
               leaving... expression-statement
-BACKTO :[
-              entering... declaration-statement
-                entering... block-declaration
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                  entering... using-directive
-                    entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-BACKTO :[
-BACKTO :[
-                    leaving... attribute-specifier
-BACKTO :[
-                  leaving... using-directive
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                  entering... simple-declaration
-                    entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-BACKTO :[
-BACKTO :[
-                    leaving... attribute-specifier
-BACKTO :[
-                  leaving... simple-declaration
-BACKTO :[
-                leaving... block-declaration
-BACKTO :[
-              leaving... declaration-statement
-BACKTO :[
-              entering... labeled-statement
-                entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-BACKTO :[
-BACKTO :[
-                leaving... attribute-specifier
-BACKTO :[
-                entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-BACKTO :[
-BACKTO :[
-                leaving... attribute-specifier
-BACKTO :[
-                entering... attribute-specifier
-MATCHED: OP_LSQUARE to [
-BACKTO :[
-BACKTO :[
-                leaving... attribute-specifier
-BACKTO :[
-              leaving... labeled-statement
-BACKTO :[
             leaving... statement
-BACKTO :{
+MATCHED: OP_RBRACE to }
           leaving... compound-statement
-BACKTO :{
-BACKTO :{
         leaving... function-body
-BACKTO :int
       leaving... function-definition
-BACKTO :int
-      entering... block-declaration
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-        entering... simple-declaration
-          entering... decl-specifier-seq
-            entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-              entering... type-specifier
-BACKTO :int
-BACKTO :int
-                entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                  entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                  leaving... simple-type-specifier
-                leaving... trailing-type-specifier
-              leaving... type-specifier
-            leaving... decl-specifier
-          leaving... decl-specifier-seq
-          entering... init-declarator-list
-            entering... init-declarator
-              entering... declarator
-                entering... noptr-declarator
-                  entering... noptr-declarator-root
-BACKTO :main
-                    entering... declarator-id
-                      entering... id-expression
-BACKTO :main
-                        entering... unqualified-id
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-MATCHED: PT_TT_IDENTIFIER to main
-                        leaving... unqualified-id
-                      leaving... id-expression
-                    leaving... declarator-id
-                  leaving... noptr-declarator-root
-                  entering... noptr-declarator-suffix
-BACKTO :(
-                    entering... parameters-and-qualifiers
-MATCHED: OP_LPAREN to (
-MATCHED: OP_RPAREN to )
-                    leaving... parameters-and-qualifiers
-                  leaving... noptr-declarator-suffix
-BACKTO :{
-                leaving... noptr-declarator
-BACKTO :main
-                entering... ptr-declarator
-                  entering... noptr-declarator
-                    entering... noptr-declarator-root
-BACKTO :main
-                      entering... declarator-id
-                        entering... id-expression
-BACKTO :main
-                          entering... unqualified-id
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-BACKTO :main
-MATCHED: PT_TT_IDENTIFIER to main
-                          leaving... unqualified-id
-                        leaving... id-expression
-                      leaving... declarator-id
-                    leaving... noptr-declarator-root
-                    entering... noptr-declarator-suffix
-BACKTO :(
-                      entering... parameters-and-qualifiers
-MATCHED: OP_LPAREN to (
-MATCHED: OP_RPAREN to )
-                      leaving... parameters-and-qualifiers
-                    leaving... noptr-declarator-suffix
-BACKTO :{
-                  leaving... noptr-declarator
-                leaving... ptr-declarator
-              leaving... declarator
-              entering... initializer
-BACKTO :{
-                entering... brace-or-equal-initializer
-BACKTO :{
-                  entering... braced-init-list
-MATCHED: OP_LBRACE to {
-                    entering... initializer-list
-                      entering... initializer-clause-dots
-                        entering... initializer-clause
-BACKTO :[
-                          entering... assignment-expression
-                            entering... logical-or-expression
-                              entering... logical-and-expression
-                                entering... inclusive-or-expression
-                                  entering... exclusive-or-expression
-                                    entering... and-expression
-                                      entering... equality-expression
-                                        entering... relational-expression
-                                          entering... shift-expression
-                                            entering... additive-expression
-                                              entering... multiplicative-expression
-                                                entering... pm-expression
-                                                  entering... cast-expression
-BACKTO :[
-                                                    entering... unary-expression
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                                                      entering... postfix-expression
-                                                        entering... postfix-root
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                                                          entering... primary-expression
-BACKTO :[
-                                                            entering... lambda-expression
-                                                              entering... lambda-introducer
-MATCHED: OP_LSQUARE to [
-MATCHED: OP_RSQUARE to ]
-                                                              leaving... lambda-introducer
-                                                              entering... compound-statement
-MATCHED: OP_LBRACE to {
-MATCHED: OP_RBRACE to }
-                                                              leaving... compound-statement
-                                                            leaving... lambda-expression
-                                                          leaving... primary-expression
-                                                        leaving... postfix-root
-                                                      leaving... postfix-expression
-                                                    leaving... unary-expression
-                                                  leaving... cast-expression
-BACKTO :;
-                                                leaving... pm-expression
-BACKTO :;
-                                              leaving... multiplicative-expression
-BACKTO :;
-                                            leaving... additive-expression
-BACKTO :;
-                                          leaving... shift-expression
-BACKTO :;
-                                        leaving... relational-expression
-BACKTO :;
-                                      leaving... equality-expression
-BACKTO :;
-                                    leaving... and-expression
-BACKTO :;
-                                  leaving... exclusive-or-expression
-BACKTO :;
-                                leaving... inclusive-or-expression
-BACKTO :;
-                              leaving... logical-and-expression
-BACKTO :;
-                            leaving... logical-or-expression
-BACKTO :[
-BACKTO :[
-                            entering... conditional-expression
-                              entering... logical-or-expression
-                                entering... logical-and-expression
-                                  entering... inclusive-or-expression
-                                    entering... exclusive-or-expression
-                                      entering... and-expression
-                                        entering... equality-expression
-                                          entering... relational-expression
-                                            entering... shift-expression
-                                              entering... additive-expression
-                                                entering... multiplicative-expression
-                                                  entering... pm-expression
-                                                    entering... cast-expression
-BACKTO :[
-                                                      entering... unary-expression
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                                                        entering... postfix-expression
-                                                          entering... postfix-root
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-BACKTO :[
-                                                            entering... primary-expression
-BACKTO :[
-                                                              entering... lambda-expression
-                                                                entering... lambda-introducer
-MATCHED: OP_LSQUARE to [
-MATCHED: OP_RSQUARE to ]
-                                                                leaving... lambda-introducer
-                                                                entering... compound-statement
-MATCHED: OP_LBRACE to {
-MATCHED: OP_RBRACE to }
-                                                                leaving... compound-statement
-                                                              leaving... lambda-expression
-                                                            leaving... primary-expression
-                                                          leaving... postfix-root
-                                                        leaving... postfix-expression
-                                                      leaving... unary-expression
-                                                    leaving... cast-expression
-BACKTO :;
-                                                  leaving... pm-expression
-BACKTO :;
-                                                leaving... multiplicative-expression
-BACKTO :;
-                                              leaving... additive-expression
-BACKTO :;
-                                            leaving... shift-expression
-BACKTO :;
-                                          leaving... relational-expression
-BACKTO :;
-                                        leaving... equality-expression
-BACKTO :;
-                                      leaving... and-expression
-BACKTO :;
-                                    leaving... exclusive-or-expression
-BACKTO :;
-                                  leaving... inclusive-or-expression
-BACKTO :;
-                                leaving... logical-and-expression
-BACKTO :;
-                              leaving... logical-or-expression
-                            leaving... conditional-expression
-                          leaving... assignment-expression
-                        leaving... initializer-clause
-                      leaving... initializer-clause-dots
-BACKTO :;
-                    leaving... initializer-list
-BACKTO :{
-MATCHED: OP_LBRACE to {
-BACKTO :{
-                  leaving... braced-init-list
-BACKTO :{
-                leaving... brace-or-equal-initializer
-BACKTO :{
-              leaving... initializer
-            leaving... init-declarator
-BACKTO :{
-          leaving... init-declarator-list
-BACKTO :int
-        leaving... simple-declaration
-BACKTO :int
-      leaving... block-declaration
-BACKTO :int
     leaving... declaration
-BACKTO :int
+MATCHED: PT_ST_EOF to 
   leaving... translation-unit
-Parsing error!

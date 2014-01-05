@@ -34,7 +34,7 @@ typedef-name:
 	TT_IDENTIFIER_Y
 
 simple-template-id:
-	template-name OP_LT template-argument-list? close-angle-bracket
+	template-name ST_LT template-argument-list? ST_GT
 
 id-expression:
 	unqualified-id
@@ -100,10 +100,10 @@ postfix-root:
 	typename-specifier OP_LPAREN expression-list? OP_RPAREN
 	simple-type-specifier braced-init-list
 	typename-specifier braced-init-list
-	KW_DYNAMIC_CAST OP_LT type-id close-angle-bracket OP_LPAREN expression OP_RPAREN
-	KW_STATIC_CAST OP_LT type-id close-angle-bracket OP_LPAREN expression OP_RPAREN
-	KW_REINTERPET_CAST OP_LT type-id close-angle-bracket OP_LPAREN expression OP_RPAREN
-	KW_CONST_CAST OP_LT type-id close-angle-bracket OP_LPAREN expression OP_RPAREN
+	KW_DYNAMIC_CAST ST_LT type-id ST_GT OP_LPAREN expression OP_RPAREN
+	KW_STATIC_CAST ST_LT type-id ST_GT OP_LPAREN expression OP_RPAREN
+	KW_REINTERPET_CAST ST_LT type-id ST_GT OP_LPAREN expression OP_RPAREN
+	KW_CONST_CAST ST_LT type-id ST_GT OP_LPAREN expression OP_RPAREN
 	KW_TYPEID OP_LPAREN expression OP_RPAREN
 	KW_TYPEID OP_LPAREN type-id OP_RPAREN
 
@@ -605,10 +605,8 @@ parameter-declaration-list:
 	parameter-declaration (OP_COMMA parameter-declaration)*
 
 parameter-declaration:
-	attribute-specifier* decl-specifier-seq declarator
-	attribute-specifier* decl-specifier-seq declarator OP_ASS initializer-clause
-	attribute-specifier* decl-specifier-seq abstract-declarator?
-	attribute-specifier* decl-specifier-seq abstract-declarator? OP_ASS initializer-clause
+	attribute-specifier* decl-specifier-seq declarator (OP_ASS initializer-clause)?
+	attribute-specifier* decl-specifier-seq abstract-declarator? (OP_ASS initializer-clause)?
 
 function-definition:
 	attribute-specifier* decl-specifier-seq declarator virt-specifier* function-body
@@ -675,9 +673,9 @@ member-declarator-list:
 	member-declarator (OP_COMMA member-declarator)*
 
 member-declarator:
-	declarator virt-specifier* pure-specifier?
-	declarator brace-or-equal-initializer?
 	TT_IDENTIFIER? attribute-specifier* OP_COLON constant-expression
+	declarator brace-or-equal-initializer?
+	declarator virt-specifier* pure-specifier?
 
 virt-specifier:
 	ST_OVERRIDE
@@ -783,7 +781,7 @@ literal-operator-id:
 	KW_OPERATOR ST_EMPTYSTR TT_IDENTIFIER
 
 template-declaration:
-	KW_TEMPLATE OP_LT template-parameter-list close-angle-bracket declaration
+	KW_TEMPLATE ST_LT template-parameter-list ST_GT declaration
 
 template-parameter-list:
 	template-parameter (OP_COMMA template-parameter)*
@@ -797,18 +795,13 @@ type-parameter:
 	KW_CLASS TT_IDENTIFIER? OP_ASS type-id
 	KW_TYPENAME OP_DOTS? TT_IDENTIFIER?
 	KW_TYPENAME TT_IDENTIFIER? OP_ASS type-id
-	KW_TEMPLATE OP_LT template-parameter-list close-angle-bracket KW_CLASS OP_DOTS? TT_IDENTIFIER?
-	KW_TEMPLATE OP_LT template-parameter-list close-angle-bracket KW_CLASS TT_IDENTIFIER? OP_ASS id-expression
-
-close-angle-bracket:
-	OP_GT
-	ST_RSHIFT_1
-	ST_RSHIFT_2
+	KW_TEMPLATE ST_LT template-parameter-list ST_GT KW_CLASS OP_DOTS? TT_IDENTIFIER?
+	KW_TEMPLATE ST_LT template-parameter-list ST_GT KW_CLASS TT_IDENTIFIER? OP_ASS id-expression
 
 template-id:
 	simple-template-id
-	operator-function-id OP_LT template-argument-list? close-angle-bracket
-	literal-operator-id OP_LT template-argument-list? close-angle-bracket
+	operator-function-id ST_LT template-argument-list? ST_GT 
+	literal-operator-id ST_LT template-argument-list? ST_GT 
 
 template-argument-list:
 	template-argument-dots (OP_COMMA template-argument-dots)*
@@ -829,7 +822,7 @@ explicit-instantiation:
 	KW_EXTERN? KW_TEMPLATE declaration
 
 explicit-specialization:
-	KW_TEMPLATE OP_LT close-angle-bracket declaration
+	KW_TEMPLATE ST_LT ST_GT declaration
 
 try-block:
 	KW_TRY compound-statement handler+

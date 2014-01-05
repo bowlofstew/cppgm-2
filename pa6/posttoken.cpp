@@ -840,6 +840,9 @@ enum EPostTokenType
     PT_ST_RSHIFT_1,   // ##
     PT_ST_RSHIFT_2,
 
+    PT_ST_LT,  // to match close-angle-bracket
+    PT_ST_GT,  // to match close-angle-bracket
+
     // extra token types for pa6-gram
     //
     PT_TT_IDENTIFIER,
@@ -1166,6 +1169,8 @@ const map<EPostTokenType, string> PostTokenTypeToStringMap =
 
 	{PT_ST_RSHIFT_1, "OP_RSHIFT1"},
 	{PT_ST_RSHIFT_2, "OP_RSHIFT2"},
+	{PT_ST_LT, "OP_ST_LT"},
+	{PT_ST_GT, "OP_ST_GT"},
 
     {PT_TT_IDENTIFIER, "PT_TT_IDENTIFIER"},
     {PT_TT_IDENTIFIER_C, "PT_TT_IDENTIFIER_C"},

@@ -3080,7 +3080,7 @@ BACKTO :T
                                                               entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                               leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                               entering... template-argument-list
                                                                 entering... template-argument-dots
                                                                   entering... template-argument
@@ -3144,35 +3144,31 @@ BACKTO :>
                                                                                       entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                       leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                     leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                   leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... logical-or-expression
                                                                       leaving... conditional-expression
                                                                     leaving... constant-expression
                                                                   leaving... template-argument
                                                                 leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                               leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                             leaving... simple-template-id
-BACKTO :T
-BACKTO :T
-                                                            entering... enum-name
-MATCHED: PT_TT_IDENTIFIER_E to T
-                                                            leaving... enum-name
                                                           leaving... type-name
 BACKTO :T
 BACKTO :T
@@ -3192,7 +3188,7 @@ BACKTO :T
                                                           entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                           leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                           entering... template-argument-list
                                                             entering... template-argument-dots
                                                               entering... template-argument
@@ -3256,108 +3252,46 @@ BACKTO :>
                                                                                   entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                   leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                 leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                       leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                     leaving... logical-or-expression
                                                                   leaving... conditional-expression
                                                                 leaving... constant-expression
                                                               leaving... template-argument
                                                             leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                           leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                         leaving... simple-template-id
-BACKTO :T
                                                       leaving... template-id
-BACKTO :T
-BACKTO :T
-BACKTO :T
-BACKTO :T
-MATCHED: PT_TT_IDENTIFIER to T
                                                     leaving... unqualified-id
                                                   leaving... id-expression
                                                 leaving... postfix-suffix
                                               leaving... postfix-expression
                                             leaving... unary-expression
                                           leaving... cast-expression
-BACKTO :<
+BACKTO :;
                                         leaving... pm-expression
-BACKTO :<
+BACKTO :;
                                       leaving... multiplicative-expression
-BACKTO :<
+BACKTO :;
                                     leaving... additive-expression
-BACKTO :<
+BACKTO :;
                                   leaving... shift-expression
-                                  entering... relational-operator
-BACKTO :<
-BACKTO :<
-BACKTO :<
-MATCHED: OP_LT to <
-                                  leaving... relational-operator
-                                  entering... shift-expression
-                                    entering... additive-expression
-                                      entering... multiplicative-expression
-                                        entering... pm-expression
-                                          entering... cast-expression
-BACKTO :3
-                                            entering... unary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                              entering... postfix-expression
-                                                entering... postfix-root
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                  entering... primary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-MATCHED: PT_TT_LITERAL to 3
-                                                  leaving... primary-expression
-                                                leaving... postfix-root
-                                              leaving... postfix-expression
-                                            leaving... unary-expression
-                                          leaving... cast-expression
-BACKTO :>
-                                        leaving... pm-expression
-BACKTO :>
-                                      leaving... multiplicative-expression
-BACKTO :>
-                                    leaving... additive-expression
-BACKTO :>
-                                  leaving... shift-expression
-                                  entering... relational-operator
-BACKTO :>
-BACKTO :>
-MATCHED: OP_GT to >
-                                  leaving... relational-operator
 BACKTO :;
                                 leaving... relational-expression
 BACKTO :;
@@ -3440,7 +3374,7 @@ BACKTO :T
                                                                 entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                                 leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                                 entering... template-argument-list
                                                                   entering... template-argument-dots
                                                                     entering... template-argument
@@ -3504,35 +3438,31 @@ BACKTO :>
                                                                                         entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                         leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                       leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                     leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                                   leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... logical-or-expression
                                                                         leaving... conditional-expression
                                                                       leaving... constant-expression
                                                                     leaving... template-argument
                                                                   leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                                 leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                               leaving... simple-template-id
-BACKTO :T
-BACKTO :T
-                                                              entering... enum-name
-MATCHED: PT_TT_IDENTIFIER_E to T
-                                                              leaving... enum-name
                                                             leaving... type-name
 BACKTO :T
 BACKTO :T
@@ -3552,7 +3482,7 @@ BACKTO :T
                                                             entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                             leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                             entering... template-argument-list
                                                               entering... template-argument-dots
                                                                 entering... template-argument
@@ -3616,108 +3546,46 @@ BACKTO :>
                                                                                     entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                     leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                   leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                       leaving... logical-or-expression
                                                                     leaving... conditional-expression
                                                                   leaving... constant-expression
                                                                 leaving... template-argument
                                                               leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                             leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                           leaving... simple-template-id
-BACKTO :T
                                                         leaving... template-id
-BACKTO :T
-BACKTO :T
-BACKTO :T
-BACKTO :T
-MATCHED: PT_TT_IDENTIFIER to T
                                                       leaving... unqualified-id
                                                     leaving... id-expression
                                                   leaving... postfix-suffix
                                                 leaving... postfix-expression
                                               leaving... unary-expression
                                             leaving... cast-expression
-BACKTO :<
+BACKTO :;
                                           leaving... pm-expression
-BACKTO :<
+BACKTO :;
                                         leaving... multiplicative-expression
-BACKTO :<
+BACKTO :;
                                       leaving... additive-expression
-BACKTO :<
+BACKTO :;
                                     leaving... shift-expression
-                                    entering... relational-operator
-BACKTO :<
-BACKTO :<
-BACKTO :<
-MATCHED: OP_LT to <
-                                    leaving... relational-operator
-                                    entering... shift-expression
-                                      entering... additive-expression
-                                        entering... multiplicative-expression
-                                          entering... pm-expression
-                                            entering... cast-expression
-BACKTO :3
-                                              entering... unary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                entering... postfix-expression
-                                                  entering... postfix-root
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                    entering... primary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-MATCHED: PT_TT_LITERAL to 3
-                                                    leaving... primary-expression
-                                                  leaving... postfix-root
-                                                leaving... postfix-expression
-                                              leaving... unary-expression
-                                            leaving... cast-expression
-BACKTO :>
-                                          leaving... pm-expression
-BACKTO :>
-                                        leaving... multiplicative-expression
-BACKTO :>
-                                      leaving... additive-expression
-BACKTO :>
-                                    leaving... shift-expression
-                                    entering... relational-operator
-BACKTO :>
-BACKTO :>
-MATCHED: OP_GT to >
-                                    leaving... relational-operator
 BACKTO :;
                                   leaving... relational-expression
 BACKTO :;
@@ -3814,7 +3682,7 @@ BACKTO :T
                                                               entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                               leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                               entering... template-argument-list
                                                                 entering... template-argument-dots
                                                                   entering... template-argument
@@ -3878,35 +3746,31 @@ BACKTO :>
                                                                                       entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                       leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                     leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                   leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... logical-or-expression
                                                                       leaving... conditional-expression
                                                                     leaving... constant-expression
                                                                   leaving... template-argument
                                                                 leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                               leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                             leaving... simple-template-id
-BACKTO :T
-BACKTO :T
-                                                            entering... enum-name
-MATCHED: PT_TT_IDENTIFIER_E to T
-                                                            leaving... enum-name
                                                           leaving... type-name
 BACKTO :T
 BACKTO :T
@@ -3926,7 +3790,7 @@ BACKTO :T
                                                           entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                           leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                           entering... template-argument-list
                                                             entering... template-argument-dots
                                                               entering... template-argument
@@ -3990,108 +3854,46 @@ BACKTO :>
                                                                                   entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                   leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                 leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                       leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                     leaving... logical-or-expression
                                                                   leaving... conditional-expression
                                                                 leaving... constant-expression
                                                               leaving... template-argument
                                                             leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                           leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                         leaving... simple-template-id
-BACKTO :T
                                                       leaving... template-id
-BACKTO :T
-BACKTO :T
-BACKTO :T
-BACKTO :T
-MATCHED: PT_TT_IDENTIFIER to T
                                                     leaving... unqualified-id
                                                   leaving... id-expression
                                                 leaving... postfix-suffix
                                               leaving... postfix-expression
                                             leaving... unary-expression
                                           leaving... cast-expression
-BACKTO :<
+BACKTO :;
                                         leaving... pm-expression
-BACKTO :<
+BACKTO :;
                                       leaving... multiplicative-expression
-BACKTO :<
+BACKTO :;
                                     leaving... additive-expression
-BACKTO :<
+BACKTO :;
                                   leaving... shift-expression
-                                  entering... relational-operator
-BACKTO :<
-BACKTO :<
-BACKTO :<
-MATCHED: OP_LT to <
-                                  leaving... relational-operator
-                                  entering... shift-expression
-                                    entering... additive-expression
-                                      entering... multiplicative-expression
-                                        entering... pm-expression
-                                          entering... cast-expression
-BACKTO :3
-                                            entering... unary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                              entering... postfix-expression
-                                                entering... postfix-root
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                  entering... primary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-MATCHED: PT_TT_LITERAL to 3
-                                                  leaving... primary-expression
-                                                leaving... postfix-root
-                                              leaving... postfix-expression
-                                            leaving... unary-expression
-                                          leaving... cast-expression
-BACKTO :>
-                                        leaving... pm-expression
-BACKTO :>
-                                      leaving... multiplicative-expression
-BACKTO :>
-                                    leaving... additive-expression
-BACKTO :>
-                                  leaving... shift-expression
-                                  entering... relational-operator
-BACKTO :>
-BACKTO :>
-MATCHED: OP_GT to >
-                                  leaving... relational-operator
 BACKTO :;
                                 leaving... relational-expression
 BACKTO :;
@@ -4175,7 +3977,7 @@ BACKTO :T
                                                                 entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                                 leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                                 entering... template-argument-list
                                                                   entering... template-argument-dots
                                                                     entering... template-argument
@@ -4239,35 +4041,31 @@ BACKTO :>
                                                                                         entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                         leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                       leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                     leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                                   leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... logical-or-expression
                                                                         leaving... conditional-expression
                                                                       leaving... constant-expression
                                                                     leaving... template-argument
                                                                   leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                                 leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                               leaving... simple-template-id
-BACKTO :T
-BACKTO :T
-                                                              entering... enum-name
-MATCHED: PT_TT_IDENTIFIER_E to T
-                                                              leaving... enum-name
                                                             leaving... type-name
 BACKTO :T
 BACKTO :T
@@ -4287,7 +4085,7 @@ BACKTO :T
                                                             entering... template-name
 MATCHED: PT_TT_IDENTIFIER_T to T
                                                             leaving... template-name
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
                                                             entering... template-argument-list
                                                               entering... template-argument-dots
                                                                 entering... template-argument
@@ -4351,108 +4149,46 @@ BACKTO :>
                                                                                     entering... relational-operator
 BACKTO :>
 BACKTO :>
-MATCHED: OP_GT to >
+BACKTO :>
+BACKTO :>
                                                                                     leaving... relational-operator
-BACKTO :;
+BACKTO :>
                                                                                   leaving... relational-expression
-BACKTO :;
+BACKTO :>
                                                                                 leaving... equality-expression
-BACKTO :;
+BACKTO :>
                                                                               leaving... and-expression
-BACKTO :;
+BACKTO :>
                                                                             leaving... exclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                           leaving... inclusive-or-expression
-BACKTO :;
+BACKTO :>
                                                                         leaving... logical-and-expression
-BACKTO :;
+BACKTO :>
                                                                       leaving... logical-or-expression
                                                                     leaving... conditional-expression
                                                                   leaving... constant-expression
                                                                 leaving... template-argument
                                                               leaving... template-argument-dots
-BACKTO :;
+BACKTO :>
                                                             leaving... template-argument-list
-BACKTO :T
+MATCHED: OP_ST_GT to >
                                                           leaving... simple-template-id
-BACKTO :T
                                                         leaving... template-id
-BACKTO :T
-BACKTO :T
-BACKTO :T
-BACKTO :T
-MATCHED: PT_TT_IDENTIFIER to T
                                                       leaving... unqualified-id
                                                     leaving... id-expression
                                                   leaving... postfix-suffix
                                                 leaving... postfix-expression
                                               leaving... unary-expression
                                             leaving... cast-expression
-BACKTO :<
+BACKTO :;
                                           leaving... pm-expression
-BACKTO :<
+BACKTO :;
                                         leaving... multiplicative-expression
-BACKTO :<
+BACKTO :;
                                       leaving... additive-expression
-BACKTO :<
+BACKTO :;
                                     leaving... shift-expression
-                                    entering... relational-operator
-BACKTO :<
-BACKTO :<
-BACKTO :<
-MATCHED: OP_LT to <
-                                    leaving... relational-operator
-                                    entering... shift-expression
-                                      entering... additive-expression
-                                        entering... multiplicative-expression
-                                          entering... pm-expression
-                                            entering... cast-expression
-BACKTO :3
-                                              entering... unary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                entering... postfix-expression
-                                                  entering... postfix-root
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-                                                    entering... primary-expression
-BACKTO :3
-BACKTO :3
-BACKTO :3
-BACKTO :3
-MATCHED: PT_TT_LITERAL to 3
-                                                    leaving... primary-expression
-                                                  leaving... postfix-root
-                                                leaving... postfix-expression
-                                              leaving... unary-expression
-                                            leaving... cast-expression
-BACKTO :>
-                                          leaving... pm-expression
-BACKTO :>
-                                        leaving... multiplicative-expression
-BACKTO :>
-                                      leaving... additive-expression
-BACKTO :>
-                                    leaving... shift-expression
-                                    entering... relational-operator
-BACKTO :>
-BACKTO :>
-MATCHED: OP_GT to >
-                                    leaving... relational-operator
 BACKTO :;
                                   leaving... relational-expression
 BACKTO :;

@@ -684,7 +684,7 @@ BACKTO :template
 BACKTO :template
       entering... explicit-specialization
 MATCHED: KW_TEMPLATE to template
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
 BACKTO :template
       leaving... explicit-specialization
 BACKTO :template
@@ -695,140 +695,10 @@ BACKTO :template
 BACKTO :template
       entering... template-declaration
 MATCHED: KW_TEMPLATE to template
-MATCHED: OP_LT to <
+MATCHED: OP_ST_LT to <
         entering... template-parameter-list
           entering... template-parameter
             entering... parameter-declaration
-              entering... decl-specifier-seq
-                entering... decl-specifier
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-                  entering... type-specifier
-BACKTO :typename
-BACKTO :typename
-                    entering... trailing-type-specifier
-BACKTO :typename
-                      entering... typename-specifier
-MATCHED: KW_TYPENAME to typename
-                        entering... nested-name-specifier
-                          entering... nested-name-specifier-root
-BACKTO :C
-BACKTO :C
-                            entering... type-name
-BACKTO :C
-BACKTO :C
-BACKTO :C
-                              entering... class-name
-BACKTO :C
-MATCHED: PT_TT_IDENTIFIER_C to C
-                              leaving... class-name
-                            leaving... type-name
-BACKTO :C
-BACKTO :C
-                          leaving... nested-name-specifier-root
-BACKTO :C
-                        leaving... nested-name-specifier
-BACKTO :typename
-MATCHED: KW_TYPENAME to typename
-                        entering... nested-name-specifier
-                          entering... nested-name-specifier-root
-BACKTO :C
-BACKTO :C
-                            entering... type-name
-BACKTO :C
-BACKTO :C
-BACKTO :C
-                              entering... class-name
-BACKTO :C
-MATCHED: PT_TT_IDENTIFIER_C to C
-                              leaving... class-name
-                            leaving... type-name
-BACKTO :C
-BACKTO :C
-                          leaving... nested-name-specifier-root
-BACKTO :C
-                        leaving... nested-name-specifier
-BACKTO :typename
-                      leaving... typename-specifier
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-                    leaving... trailing-type-specifier
-BACKTO :typename
-                  leaving... type-specifier
-BACKTO :typename
-BACKTO :typename
-                leaving... decl-specifier
-BACKTO :typename
-              leaving... decl-specifier-seq
-BACKTO :typename
-              entering... decl-specifier-seq
-                entering... decl-specifier
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-                  entering... type-specifier
-BACKTO :typename
-BACKTO :typename
-                    entering... trailing-type-specifier
-BACKTO :typename
-                      entering... typename-specifier
-MATCHED: KW_TYPENAME to typename
-                        entering... nested-name-specifier
-                          entering... nested-name-specifier-root
-BACKTO :C
-BACKTO :C
-                            entering... type-name
-BACKTO :C
-BACKTO :C
-BACKTO :C
-                              entering... class-name
-BACKTO :C
-MATCHED: PT_TT_IDENTIFIER_C to C
-                              leaving... class-name
-                            leaving... type-name
-BACKTO :C
-BACKTO :C
-                          leaving... nested-name-specifier-root
-BACKTO :C
-                        leaving... nested-name-specifier
-BACKTO :typename
-MATCHED: KW_TYPENAME to typename
-                        entering... nested-name-specifier
-                          entering... nested-name-specifier-root
-BACKTO :C
-BACKTO :C
-                            entering... type-name
-BACKTO :C
-BACKTO :C
-BACKTO :C
-                              entering... class-name
-BACKTO :C
-MATCHED: PT_TT_IDENTIFIER_C to C
-                              leaving... class-name
-                            leaving... type-name
-BACKTO :C
-BACKTO :C
-                          leaving... nested-name-specifier-root
-BACKTO :C
-                        leaving... nested-name-specifier
-BACKTO :typename
-                      leaving... typename-specifier
-BACKTO :typename
-BACKTO :typename
-BACKTO :typename
-                    leaving... trailing-type-specifier
-BACKTO :typename
-                  leaving... type-specifier
-BACKTO :typename
-BACKTO :typename
-                leaving... decl-specifier
-BACKTO :typename
-              leaving... decl-specifier-seq
-BACKTO :typename
               entering... decl-specifier-seq
                 entering... decl-specifier
 BACKTO :typename
@@ -974,11 +844,7 @@ MATCHED: PT_TT_IDENTIFIER to C
           leaving... template-parameter
 BACKTO :>
         leaving... template-parameter-list
-        entering... close-angle-bracket
-BACKTO :>
-BACKTO :>
-MATCHED: OP_GT to >
-        leaving... close-angle-bracket
+MATCHED: OP_ST_GT to >
         entering... declaration
 BACKTO :class
 BACKTO :class

@@ -11,10 +11,11 @@
 
 using namespace std;
 
-std::string to_string(const unsigned int i)
-{
-    return std::to_string( (long long unsigned) i);
-}
+// const std::string to_string(const unsigned int i)
+// {
+//     return std::to_string( (long long unsigned) i);
+// }
+
 
 class RuleTerm {
   public:
@@ -267,6 +268,9 @@ class GramGen
         for (unsigned i=0; i<rules.size(); i++) 
         {
             can_be_empty( *rules[i] );
+            if (rules[i]->canBeEmpty != 0) {
+                cout << "// can be emppty " << rules[i]->name  << endl;;
+            }
         }
     }
 
@@ -509,7 +513,16 @@ class GramGen
                 continue;
             }
             Rule *rule = parseRule();     
-            sort( rule->derives.begin(), rule->derives.end(), derive_sort );
+
+            // special handling:
+            if (rule->name == "parameter-declaration" || 
+                rule->name == "member-declarator" || 
+                rule->name == "exception-declaration") {
+                ; // use the order in grammar file
+            }
+            else {
+                sort( rule->derives.begin(), rule->derives.end(), derive_sort );
+            }
             rules.push_back(rule);
             nonTerminalMap[rule->name] = rule;
         }
@@ -933,9 +946,9 @@ class GramGen
             code << indent1 << "    if ( !is_first_" << nonTerminal << "(_ptIt->type) ) {" << endl;
             code << indent1 << "        return CppAstPtr( new EmptyAst() );" << endl;
             code << indent1 << "    }" << endl;
+            code << indent1 << "    Autocat ac( \"" << rules[i]->name << "\" );" << endl;
             code << indent1 << endl;
             code << indent1 << "    PtIt bakPos = _ptIt;" << endl;
-            code << indent1 << "    Autocat ac( \"" << rules[i]->name << "\" );" << endl;
 
             for (unsigned j=0; j<rules[i]->derives.size() ; j++)
             {

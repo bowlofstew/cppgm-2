@@ -3512,80 +3512,12 @@ MATCHED: KW_INT to int
                                           leaving... type-specifier
                                         leaving... decl-specifier
                                       leaving... decl-specifier-seq
-BACKTO :int
-                                      entering... decl-specifier-seq
-                                        entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                          entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                            entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                              entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                              leaving... simple-type-specifier
-                                            leaving... trailing-type-specifier
-                                          leaving... type-specifier
-                                        leaving... decl-specifier
-                                      leaving... decl-specifier-seq
                                     leaving... parameter-declaration
 BACKTO :)
                                   leaving... parameter-declaration-list
 BACKTO :int
                                   entering... parameter-declaration-list
                                     entering... parameter-declaration
-                                      entering... decl-specifier-seq
-                                        entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                          entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                            entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                              entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                              leaving... simple-type-specifier
-                                            leaving... trailing-type-specifier
-                                          leaving... type-specifier
-                                        leaving... decl-specifier
-                                      leaving... decl-specifier-seq
-BACKTO :int
                                       entering... decl-specifier-seq
                                         entering... decl-specifier
 BACKTO :int
@@ -3769,80 +3701,12 @@ MATCHED: KW_INT to int
                                             leaving... type-specifier
                                           leaving... decl-specifier
                                         leaving... decl-specifier-seq
-BACKTO :int
-                                        entering... decl-specifier-seq
-                                          entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                            entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                              entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                leaving... simple-type-specifier
-                                              leaving... trailing-type-specifier
-                                            leaving... type-specifier
-                                          leaving... decl-specifier
-                                        leaving... decl-specifier-seq
                                       leaving... parameter-declaration
 BACKTO :)
                                     leaving... parameter-declaration-list
 BACKTO :int
                                     entering... parameter-declaration-list
                                       entering... parameter-declaration
-                                        entering... decl-specifier-seq
-                                          entering... decl-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                            entering... type-specifier
-BACKTO :int
-BACKTO :int
-                                              entering... trailing-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-                                                entering... simple-type-specifier
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-BACKTO :int
-MATCHED: KW_INT to int
-                                                leaving... simple-type-specifier
-                                              leaving... trailing-type-specifier
-                                            leaving... type-specifier
-                                          leaving... decl-specifier
-                                        leaving... decl-specifier-seq
-BACKTO :int
                                         entering... decl-specifier-seq
                                           entering... decl-specifier
 BACKTO :int
