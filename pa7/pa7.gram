@@ -9,7 +9,7 @@ namespace-name:
 
 typedef-name:
 	TT_IDENTIFIER
-		
+
 id-expression:
 	unqualified-id
 	qualified-id
@@ -22,7 +22,7 @@ qualified-id:
 
 nested-name-specifier:
 	nested-name-specifier-root nested-name-specifier-suffix*
-	
+
 nested-name-specifier-root:
 	OP_COLON2
 	namespace-name OP_COLON2
@@ -44,10 +44,10 @@ declaration:
 
 alias-declaration:
 	KW_USING TT_IDENTIFIER OP_ASS type-id OP_SEMICOLON
-	
+
 simple-declaration:
 	decl-specifier-seq declarator-list OP_SEMICOLON
-	
+
 empty-declaration:
 	OP_SEMICOLON
 
@@ -133,7 +133,7 @@ ptr-operator:
 cv-qualifier:
 	KW_CONST
 	KW_VOLATILE
-	
+
 type-id:
 	type-specifier-seq abstract-declarator?
 
@@ -143,7 +143,7 @@ abstract-declarator:
 ptr-abstract-declarator:
 	ptr-operator* noptr-abstract-declarator
 	ptr-operator+
-	
+
 noptr-abstract-declarator:
 	noptr-abstract-declarator-root noptr-declarator-suffix*
 	noptr-declarator-suffix+
@@ -151,7 +151,7 @@ noptr-abstract-declarator:
 noptr-abstract-declarator-root:
 	noptr-declarator-suffix
 	OP_LPAREN ptr-abstract-declarator OP_RPAREN
-	
+
 parameter-declaration-clause:
 	parameter-declaration-list? OP_DOTS?
 	parameter-declaration-list OP_COMMA OP_DOTS
@@ -162,3 +162,5 @@ parameter-declaration-list:
 parameter-declaration:
 	decl-specifier-seq declarator
 	decl-specifier-seq abstract-declarator?
+
+
