@@ -1222,8 +1222,6 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 MATCHED: KW_NEW to new
                                                           leaving... operator-function-id
 BACKTO :operator
@@ -1245,8 +1243,6 @@ MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 MATCHED: KW_NEW to new
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
@@ -1350,8 +1346,6 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 MATCHED: KW_NEW to new
                                                             leaving... operator-function-id
 BACKTO :operator
@@ -1373,8 +1367,6 @@ MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 MATCHED: KW_NEW to new
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
@@ -1484,10 +1476,6 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 MATCHED: OP_LSQUARE to [
 MATCHED: OP_RSQUARE to ]
                                                           leaving... operator-function-id
@@ -1506,10 +1494,6 @@ BACKTO :operator
                                                         leaving... conversion-function-id
 BACKTO :operator
                                                         entering... operator-function-id
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
@@ -1604,10 +1588,6 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
 MATCHED: OP_LSQUARE to [
 MATCHED: OP_RSQUARE to ]
                                                             leaving... operator-function-id
@@ -1626,10 +1606,6 @@ BACKTO :operator
                                                           leaving... conversion-function-id
 BACKTO :operator
                                                           entering... operator-function-id
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
-MATCHED: KW_OPERATOR to operator
-BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
@@ -1737,6 +1713,8 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
+BACKTO :operator
+MATCHED: KW_OPERATOR to operator
 MATCHED: OP_LPAREN to (
 MATCHED: OP_RPAREN to )
                                                           leaving... operator-function-id
@@ -1755,6 +1733,8 @@ BACKTO :operator
                                                         leaving... conversion-function-id
 BACKTO :operator
                                                         entering... operator-function-id
+MATCHED: KW_OPERATOR to operator
+BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
@@ -1849,6 +1829,8 @@ BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
+BACKTO :operator
+MATCHED: KW_OPERATOR to operator
 MATCHED: OP_LPAREN to (
 MATCHED: OP_RPAREN to )
                                                             leaving... operator-function-id
@@ -1867,6 +1849,8 @@ BACKTO :operator
                                                           leaving... conversion-function-id
 BACKTO :operator
                                                           entering... operator-function-id
+MATCHED: KW_OPERATOR to operator
+BACKTO :operator
 MATCHED: KW_OPERATOR to operator
 BACKTO :operator
 MATCHED: KW_OPERATOR to operator
