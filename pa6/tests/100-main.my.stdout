@@ -1,0 +1,121 @@
+simple int KW_INT
+identifier main
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple { OP_LBRACE
+simple } OP_RBRACE
+eof
+  entering... translation-unit
+    entering... declaration
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+      entering... function-definition
+        entering... decl-specifier-seq
+          entering... decl-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+            entering... type-specifier
+BACKTO :int
+BACKTO :int
+              entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                leaving... simple-type-specifier
+              leaving... trailing-type-specifier
+            leaving... type-specifier
+          leaving... decl-specifier
+        leaving... decl-specifier-seq
+        entering... declarator
+          entering... noptr-declarator
+            entering... noptr-declarator-root
+BACKTO :main
+              entering... declarator-id
+                entering... id-expression
+BACKTO :main
+                  entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                  leaving... unqualified-id
+                leaving... id-expression
+              leaving... declarator-id
+            leaving... noptr-declarator-root
+            entering... noptr-declarator-suffix
+BACKTO :(
+              entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+              leaving... parameters-and-qualifiers
+            leaving... noptr-declarator-suffix
+BACKTO :{
+          leaving... noptr-declarator
+BACKTO :main
+          entering... ptr-declarator
+            entering... noptr-declarator
+              entering... noptr-declarator-root
+BACKTO :main
+                entering... declarator-id
+                  entering... id-expression
+BACKTO :main
+                    entering... unqualified-id
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+BACKTO :main
+MATCHED: PT_TT_IDENTIFIER to main
+                    leaving... unqualified-id
+                  leaving... id-expression
+                leaving... declarator-id
+              leaving... noptr-declarator-root
+              entering... noptr-declarator-suffix
+BACKTO :(
+                entering... parameters-and-qualifiers
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                leaving... parameters-and-qualifiers
+              leaving... noptr-declarator-suffix
+BACKTO :{
+            leaving... noptr-declarator
+          leaving... ptr-declarator
+        leaving... declarator
+        entering... function-body
+BACKTO :{
+BACKTO :{
+          entering... compound-statement
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+          leaving... compound-statement
+        leaving... function-body
+      leaving... function-definition
+    leaving... declaration
+MATCHED: PT_ST_EOF to 
+  leaving... translation-unit

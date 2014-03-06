@@ -1,0 +1,504 @@
+simple alignas KW_ALIGNAS
+simple ( OP_LPAREN
+simple int KW_INT
+simple ) OP_RPAREN
+simple ; OP_SEMICOLON
+simple [ OP_LSQUARE
+simple [ OP_LSQUARE
+identifier foo
+simple ] OP_RSQUARE
+simple ] OP_RSQUARE
+simple ; OP_SEMICOLON
+simple [ OP_LSQUARE
+simple [ OP_LSQUARE
+identifier foo
+simple ( OP_LPAREN
+identifier bar
+simple ) OP_RPAREN
+simple ] OP_RSQUARE
+simple ] OP_RSQUARE
+simple ; OP_SEMICOLON
+simple [ OP_LSQUARE
+simple [ OP_LSQUARE
+identifier foo
+simple ( OP_LPAREN
+identifier bar
+simple { OP_LBRACE
+simple } OP_RBRACE
+simple ( OP_LPAREN
+simple ) OP_RPAREN
+simple [ OP_LSQUARE
+simple ( OP_LPAREN
+identifier foo
+simple ) OP_RPAREN
+simple ] OP_RSQUARE
+simple ) OP_RPAREN
+simple ] OP_RSQUARE
+simple ] OP_RSQUARE
+simple ; OP_SEMICOLON
+eof
+  entering... translation-unit
+    entering... declaration
+      entering... attribute-declaration
+        entering... attribute-specifier
+BACKTO :alignas
+          entering... alignment-specifier
+MATCHED: KW_ALIGNAS to alignas
+MATCHED: OP_LPAREN to (
+            entering... assignment-expression
+              entering... logical-or-expression
+                entering... logical-and-expression
+                  entering... inclusive-or-expression
+                    entering... exclusive-or-expression
+                      entering... and-expression
+                        entering... equality-expression
+                          entering... relational-expression
+                            entering... shift-expression
+                              entering... additive-expression
+                                entering... multiplicative-expression
+                                  entering... pm-expression
+                                    entering... cast-expression
+BACKTO :int
+                                      entering... unary-expression
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                                        entering... postfix-expression
+                                          entering... postfix-root
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                                            entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                                            leaving... simple-type-specifier
+BACKTO :int
+BACKTO :int
+                                            entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                                            leaving... simple-type-specifier
+BACKTO :int
+BACKTO :int
+                                          leaving... postfix-root
+BACKTO :int
+                                        leaving... postfix-expression
+BACKTO :int
+                                      leaving... unary-expression
+BACKTO :int
+                                    leaving... cast-expression
+BACKTO :int
+                                  leaving... pm-expression
+BACKTO :int
+                                leaving... multiplicative-expression
+BACKTO :int
+                              leaving... additive-expression
+BACKTO :int
+                            leaving... shift-expression
+BACKTO :int
+                          leaving... relational-expression
+BACKTO :int
+                        leaving... equality-expression
+BACKTO :int
+                      leaving... and-expression
+BACKTO :int
+                    leaving... exclusive-or-expression
+BACKTO :int
+                  leaving... inclusive-or-expression
+BACKTO :int
+                leaving... logical-and-expression
+BACKTO :int
+              leaving... logical-or-expression
+BACKTO :int
+BACKTO :int
+              entering... conditional-expression
+                entering... logical-or-expression
+                  entering... logical-and-expression
+                    entering... inclusive-or-expression
+                      entering... exclusive-or-expression
+                        entering... and-expression
+                          entering... equality-expression
+                            entering... relational-expression
+                              entering... shift-expression
+                                entering... additive-expression
+                                  entering... multiplicative-expression
+                                    entering... pm-expression
+                                      entering... cast-expression
+BACKTO :int
+                                        entering... unary-expression
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                                          entering... postfix-expression
+                                            entering... postfix-root
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                                              entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                                              leaving... simple-type-specifier
+BACKTO :int
+BACKTO :int
+                                              entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                                              leaving... simple-type-specifier
+BACKTO :int
+BACKTO :int
+                                            leaving... postfix-root
+BACKTO :int
+                                          leaving... postfix-expression
+BACKTO :int
+                                        leaving... unary-expression
+BACKTO :int
+                                      leaving... cast-expression
+BACKTO :int
+                                    leaving... pm-expression
+BACKTO :int
+                                  leaving... multiplicative-expression
+BACKTO :int
+                                leaving... additive-expression
+BACKTO :int
+                              leaving... shift-expression
+BACKTO :int
+                            leaving... relational-expression
+BACKTO :int
+                          leaving... equality-expression
+BACKTO :int
+                        leaving... and-expression
+BACKTO :int
+                      leaving... exclusive-or-expression
+BACKTO :int
+                    leaving... inclusive-or-expression
+BACKTO :int
+                  leaving... logical-and-expression
+BACKTO :int
+                leaving... logical-or-expression
+BACKTO :int
+              leaving... conditional-expression
+BACKTO :int
+            leaving... assignment-expression
+BACKTO :alignas
+MATCHED: KW_ALIGNAS to alignas
+MATCHED: OP_LPAREN to (
+            entering... type-id
+              entering... type-specifier-seq
+                entering... type-specifier
+BACKTO :int
+BACKTO :int
+                  entering... trailing-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+                    entering... simple-type-specifier
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+BACKTO :int
+MATCHED: KW_INT to int
+                    leaving... simple-type-specifier
+                  leaving... trailing-type-specifier
+                leaving... type-specifier
+              leaving... type-specifier-seq
+            leaving... type-id
+MATCHED: OP_RPAREN to )
+          leaving... alignment-specifier
+        leaving... attribute-specifier
+MATCHED: OP_SEMICOLON to ;
+      leaving... attribute-declaration
+    leaving... declaration
+    entering... declaration
+      entering... attribute-declaration
+        entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+MATCHED: OP_LSQUARE to [
+          entering... attribute-list
+            entering... attribute-part
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+              leaving... attribute
+BACKTO :foo
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+              leaving... attribute
+            leaving... attribute-part
+BACKTO :]
+          leaving... attribute-list
+MATCHED: OP_RSQUARE to ]
+MATCHED: OP_RSQUARE to ]
+        leaving... attribute-specifier
+MATCHED: OP_SEMICOLON to ;
+      leaving... attribute-declaration
+    leaving... declaration
+    entering... declaration
+      entering... attribute-declaration
+        entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+MATCHED: OP_LSQUARE to [
+          entering... attribute-list
+            entering... attribute-part
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+                entering... attribute-argument-clause
+MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                leaving... attribute-argument-clause
+              leaving... attribute
+BACKTO :foo
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+                entering... attribute-argument-clause
+MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                leaving... attribute-argument-clause
+              leaving... attribute
+            leaving... attribute-part
+BACKTO :]
+          leaving... attribute-list
+MATCHED: OP_RSQUARE to ]
+MATCHED: OP_RSQUARE to ]
+        leaving... attribute-specifier
+MATCHED: OP_SEMICOLON to ;
+      leaving... attribute-declaration
+    leaving... declaration
+    entering... declaration
+      entering... attribute-declaration
+        entering... attribute-specifier
+MATCHED: OP_LSQUARE to [
+MATCHED: OP_LSQUARE to [
+          entering... attribute-list
+            entering... attribute-part
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+                entering... attribute-argument-clause
+MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+                  entering... balanced-token
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :[
+MATCHED: OP_LSQUARE to [
+                    entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+                      entering... balanced-token
+BACKTO :foo
+BACKTO :foo
+BACKTO :foo
+MATCHED: PT_ST_NONPAREN to foo
+                      leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                    leaving... balanced-token
+MATCHED: OP_RSQUARE to ]
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                leaving... attribute-argument-clause
+              leaving... attribute
+BACKTO :foo
+              entering... attribute
+                entering... attribute-token
+                  entering... attribute-scoped-token
+                    entering... attribute-namespace
+MATCHED: PT_TT_IDENTIFIER to foo
+                    leaving... attribute-namespace
+BACKTO :foo
+                  leaving... attribute-scoped-token
+BACKTO :foo
+MATCHED: PT_TT_IDENTIFIER to foo
+                leaving... attribute-token
+                entering... attribute-argument-clause
+MATCHED: OP_LPAREN to (
+                  entering... balanced-token
+BACKTO :bar
+BACKTO :bar
+BACKTO :bar
+MATCHED: PT_ST_NONPAREN to bar
+                  leaving... balanced-token
+                  entering... balanced-token
+MATCHED: OP_LBRACE to {
+MATCHED: OP_RBRACE to }
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+MATCHED: OP_RPAREN to )
+                  leaving... balanced-token
+                  entering... balanced-token
+BACKTO :[
+MATCHED: OP_LSQUARE to [
+                    entering... balanced-token
+BACKTO :(
+BACKTO :(
+MATCHED: OP_LPAREN to (
+                      entering... balanced-token
+BACKTO :foo
+BACKTO :foo
+BACKTO :foo
+MATCHED: PT_ST_NONPAREN to foo
+                      leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                    leaving... balanced-token
+MATCHED: OP_RSQUARE to ]
+                  leaving... balanced-token
+MATCHED: OP_RPAREN to )
+                leaving... attribute-argument-clause
+              leaving... attribute
+            leaving... attribute-part
+BACKTO :]
+          leaving... attribute-list
+MATCHED: OP_RSQUARE to ]
+MATCHED: OP_RSQUARE to ]
+        leaving... attribute-specifier
+MATCHED: OP_SEMICOLON to ;
+      leaving... attribute-declaration
+    leaving... declaration
+MATCHED: PT_ST_EOF to 
+  leaving... translation-unit

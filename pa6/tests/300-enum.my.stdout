@@ -1,0 +1,282 @@
+simple enum KW_ENUM
+identifier E
+simple { OP_LBRACE
+identifier e1
+simple , OP_COMMA
+identifier e2
+simple , OP_COMMA
+identifier e3
+simple } OP_RBRACE
+simple ; OP_SEMICOLON
+eof
+  entering... translation-unit
+    entering... declaration
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+      entering... function-definition
+        entering... decl-specifier-seq
+          entering... decl-specifier
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+            entering... type-specifier
+              entering... enum-specifier
+                entering... enum-head
+                  entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                  leaving... enum-key
+BACKTO :enum
+                  entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                  leaving... enum-key
+MATCHED: PT_TT_IDENTIFIER to E
+                leaving... enum-head
+MATCHED: OP_LBRACE to {
+                entering... enumerator-list
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                    leaving... enumerator
+BACKTO :e1
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                    leaving... enumerator
+                  leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                    leaving... enumerator
+BACKTO :e2
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                    leaving... enumerator
+                  leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                    leaving... enumerator
+BACKTO :e3
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                    leaving... enumerator
+                  leaving... enumerator-definition
+BACKTO :}
+                leaving... enumerator-list
+BACKTO :enum
+                entering... enum-head
+                  entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                  leaving... enum-key
+BACKTO :enum
+                  entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                  leaving... enum-key
+MATCHED: PT_TT_IDENTIFIER to E
+                leaving... enum-head
+MATCHED: OP_LBRACE to {
+                entering... enumerator-list
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                    leaving... enumerator
+BACKTO :e1
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                    leaving... enumerator
+                  leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                    leaving... enumerator
+BACKTO :e2
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                    leaving... enumerator
+                  leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                  entering... enumerator-definition
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                    leaving... enumerator
+BACKTO :e3
+                    entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                    leaving... enumerator
+                  leaving... enumerator-definition
+BACKTO :}
+                leaving... enumerator-list
+MATCHED: OP_RBRACE to }
+              leaving... enum-specifier
+            leaving... type-specifier
+          leaving... decl-specifier
+        leaving... decl-specifier-seq
+BACKTO :enum
+      leaving... function-definition
+BACKTO :enum
+      entering... block-declaration
+        entering... opaque-enum-declaration
+          entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+          leaving... enum-key
+MATCHED: PT_TT_IDENTIFIER to E
+BACKTO :enum
+        leaving... opaque-enum-declaration
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+        entering... simple-declaration
+          entering... decl-specifier-seq
+            entering... decl-specifier
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+BACKTO :enum
+              entering... type-specifier
+                entering... enum-specifier
+                  entering... enum-head
+                    entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                    leaving... enum-key
+BACKTO :enum
+                    entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                    leaving... enum-key
+MATCHED: PT_TT_IDENTIFIER to E
+                  leaving... enum-head
+MATCHED: OP_LBRACE to {
+                  entering... enumerator-list
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                      leaving... enumerator
+BACKTO :e1
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                      leaving... enumerator
+                    leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                      leaving... enumerator
+BACKTO :e2
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                      leaving... enumerator
+                    leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                      leaving... enumerator
+BACKTO :e3
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                      leaving... enumerator
+                    leaving... enumerator-definition
+BACKTO :}
+                  leaving... enumerator-list
+BACKTO :enum
+                  entering... enum-head
+                    entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                    leaving... enum-key
+BACKTO :enum
+                    entering... enum-key
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+BACKTO :enum
+MATCHED: KW_ENUM to enum
+                    leaving... enum-key
+MATCHED: PT_TT_IDENTIFIER to E
+                  leaving... enum-head
+MATCHED: OP_LBRACE to {
+                  entering... enumerator-list
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                      leaving... enumerator
+BACKTO :e1
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e1
+                      leaving... enumerator
+                    leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                      leaving... enumerator
+BACKTO :e2
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e2
+                      leaving... enumerator
+                    leaving... enumerator-definition
+MATCHED: OP_COMMA to ,
+                    entering... enumerator-definition
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                      leaving... enumerator
+BACKTO :e3
+                      entering... enumerator
+MATCHED: PT_TT_IDENTIFIER to e3
+                      leaving... enumerator
+                    leaving... enumerator-definition
+BACKTO :}
+                  leaving... enumerator-list
+MATCHED: OP_RBRACE to }
+                leaving... enum-specifier
+              leaving... type-specifier
+            leaving... decl-specifier
+          leaving... decl-specifier-seq
+MATCHED: OP_SEMICOLON to ;
+        leaving... simple-declaration
+      leaving... block-declaration
+    leaving... declaration
+MATCHED: PT_ST_EOF to 
+  leaving... translation-unit
