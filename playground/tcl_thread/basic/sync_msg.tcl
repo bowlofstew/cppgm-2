@@ -27,6 +27,12 @@ set program {
 thread::send $tid $program
 
 
+#==
+#
+set msg "puts C"
+set msg "$msg;puts D"
+thread::send $tid $msg
+
 
 #=== child thread exception would propogate to main thread 
 #
