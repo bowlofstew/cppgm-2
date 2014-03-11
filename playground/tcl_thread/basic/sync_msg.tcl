@@ -15,6 +15,19 @@ thread::send $tid [ list set cList $mList ] ; # <- this is reall cool
 thread::send $tid { puts "Got list: $cList" }
 
 
+#==
+#
+set program {
+    proc show {} {
+        puts A
+        puts B
+    }
+    show
+}
+thread::send $tid $program
+
+
+
 #=== child thread exception would propogate to main thread 
 #
 catch {thread::send $tid { expr 2/0 }} retMsg
