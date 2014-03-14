@@ -1,4 +1,5 @@
 
+package require Thread
 
 set tList [list]
 for {set i 0} {$i < 4} {incr i} {
