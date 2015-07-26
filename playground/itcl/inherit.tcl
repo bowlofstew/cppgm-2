@@ -44,8 +44,7 @@ class PayRoll {
 }
 
 
-set payRoll [PayRoll #auto [DBFactoryImp2 #auto]]
-
+set payRoll [PayRoll #auto [DBFactoryImp1 #auto]]
 $payRoll make_emp_record "rich"
 
 
