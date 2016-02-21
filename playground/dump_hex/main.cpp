@@ -188,6 +188,10 @@ class Hex2binary {
             myCharIdx++;
             return ' ';
         }
+        else if (_input[myCharIdx] == '\r' && _input[myCharIdx+1] == '\n') {
+            myCharIdx+=2;
+            return ' ';
+        }
         else {
             stringstream ss;
             ss << "ERROR, exepct to match line end char at line " << myLineIdx ;
